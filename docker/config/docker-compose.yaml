@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  web:
+    build: 
+      context: .
+      dockerfile: docker/config/Dockerfile
+      args:
+        - GITLAB_TOKEN=${GITLAB_TOKEN}
+        - GITLAB_REPO_URL=${GITLAB_REPO_URL}
+    ports:
+      - "${PORT}:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - DATABASE_URL=${DATABASE_URL}
+      - API_KEY=${API_KEY}
+      # Add any other environment variables your app needs
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - .env:/app/.env
