@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "docker:build": "docker build -t estivales-brou -f docker/config/Dockerfile .",
+    "docker:run": "docker run -p 3000:3000 --env-file .env estivales-brou",
+    "docker:compose": "docker-compose -f docker/config/docker-compose.yml up -d",
+    "docker:compose:build": "docker-compose -f docker/config/docker-compose.yml up -d --build",
+    "docker:deploy": "./docker/scripts/deploy.sh",
+    "docker:update": "./docker/scripts/update.sh"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.0",

@@ -14,13 +14,17 @@ const MobileNavbar = dynamic(
   }
 );
 
+const Footer = dynamic(() => import("../../components/common/Footer"), {
+  loading: () => null,
+});
+
 interface ClientLayoutProps {
   children: React.ReactNode;
 }
 
 const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <div className="hidden lg:block">
         <Navbar />
       </div>
@@ -28,6 +32,7 @@ const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
         <MobileNavbar />
       </div>
       <main className="flex-grow lg:mt-20">{children}</main>
+      <Footer />
     </div>
   );
 };
