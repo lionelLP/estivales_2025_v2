@@ -76,3 +76,17 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .prose {
+    @apply max-w-none;
+  }
+
+  .prose p {
+    @apply text-gray-600 dark:text-gray-300 text-justify;
+  }
+
+  .shadow-xl {
+    @apply shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)];
+  }
+}
