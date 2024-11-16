@@ -55,3 +55,28 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
+
+export async function GET() {
+  try {
+    const connection = await pool.getConnection();
+
+    try {
+      const [rows] = await connection.execute(
+        "SELECT * FROM Event ORDER BY event_date DESC"
+      );
+
+      return NextResponse.json(rows);
+    } catch (error) {
+      console.error("Erreur SQL:", error);
+      return NextResponse.json(
+        { error: "Erreur lors de la récupération des événements" },
+        { status: 500 }
+      );
+    } finally {
+      connection.release();
+    }
+  } catch (error) {
+    console.error("Erreur:", error);
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+  }
+}
