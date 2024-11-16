@@ -38,12 +38,14 @@ export async function POST(request: Request) {
         message: "Événement créé avec succès",
         result,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Erreur SQL:", error);
       return NextResponse.json(
         {
           error:
-            error.sqlMessage || "Erreur lors de la création de l'événement",
+            error instanceof Error && "sqlMessage" in error
+              ? error.sqlMessage
+              : "Erreur lors de la création de l'événement",
         },
         { status: 500 }
       );

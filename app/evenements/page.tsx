@@ -1,6 +1,7 @@
 "use client";
 
 import { Event } from "@/lib/types/event";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Evenements() {
@@ -19,6 +20,7 @@ export default function Evenements() {
           setError("Erreur lors de la récupération des événements");
         }
       } catch (error) {
+        console.error("Erreur lors de la récupération des événements:", error);
         setError("Erreur lors de la récupération des événements");
       } finally {
         setIsLoading(false);
@@ -48,12 +50,12 @@ export default function Evenements() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Liste des événements</h1>
-        <a
+        <Link
           href="/evenements/creer"
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
         >
           Créer un événement
-        </a>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -93,6 +95,14 @@ export default function Evenements() {
               >
                 {event.is_public ? "Public" : "Privé"}
               </span>
+            </div>
+            <div className="flex justify-end mt-4">
+              <Link
+                href={`/evenements/${event.id}/edit`}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+              >
+                Modifier
+              </Link>
             </div>
           </div>
         ))}
