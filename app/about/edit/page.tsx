@@ -73,7 +73,7 @@ export default function EditAbout() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Éditer la page À propos</h1>
+      <h1 className="text-3xl font-bold text-center mb-12 mt-12">Éditer la page À propos</h1>
       <div className="mb-6">
         <ReactQuill
           theme="snow"
