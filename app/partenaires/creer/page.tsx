@@ -3,6 +3,7 @@
 import { FileUpload } from "@/components/common/file-upload";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { CircularImageCropper } from "@/components/common/circular-image-cropper";
 
 export default function CreatePartner() {
   const router = useRouter();
@@ -15,6 +16,8 @@ export default function CreatePartner() {
   const [banner, setBanner] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [showCropper, setShowCropper] = useState(false);
+  const [logoToProcess, setLogoToProcess] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,11 +65,27 @@ export default function CreatePartner() {
     }));
   };
 
+  const handleLogoSelect = (files: File[]) => {
+    if (files.length > 0) {
+      setLogoToProcess(files[0]);
+      setShowCropper(true);
+    }
+  };
+
+  const handleCroppedLogo = (croppedBlob: Blob) => {
+    const croppedFile = new File([croppedBlob], logoToProcess?.name || 'logo.png', {
+      type: 'image/png'
+    });
+    setLogo([croppedFile]);
+    setShowCropper(false);
+    setLogoToProcess(null);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 mt-20">
       <h1 className="text-3xl font-bold text-center mb-12">Ajouter un partenaire</h1>
 
-      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-8">
         {error && (
           <div className="bg-red-50 text-red-500 p-4 rounded-lg">
             {error}
@@ -121,15 +140,25 @@ export default function CreatePartner() {
         </div>
 
         {/* Logo Upload */}
-        <div className="space-y-2">
+        <div className="space-y-4">
           <label className="block text-sm font-medium">Logo</label>
           <FileUpload
-            onChange={(files) => setLogo(files)}
+            onChange={handleLogoSelect}
             maxFiles={1}
             accept="image/*"
             multiple={false}
           />
           <p className="text-sm text-gray-500">Format recommandé : PNG ou JPG, taille maximale : 2MB</p>
+          {showCropper && logoToProcess && (
+            <CircularImageCropper
+              imageFile={logoToProcess}
+              onCropComplete={handleCroppedLogo}
+              onCancel={() => {
+                setShowCropper(false);
+                setLogoToProcess(null);
+              }}
+            />
+          )}
         </div>
 
         {/* Banner Upload */}
