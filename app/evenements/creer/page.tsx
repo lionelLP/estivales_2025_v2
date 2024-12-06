@@ -12,6 +12,7 @@ export default function CreerEvenement() {
     location: "",
     max_participants: "",
     is_public: true,
+    booking_link: "",
   });
   const [brochure, setBrochure] = useState<File[]>([]);
   const [images, setImages] = useState<File[]>([]);
@@ -165,6 +166,26 @@ export default function CreerEvenement() {
           <label htmlFor="is_public" className="text-sm font-medium">
             Événement public
           </label>
+        </div>
+
+        {/* Lien de réservation */}
+        <div className="space-y-2">
+          <label htmlFor="booking_link" className="block text-sm font-medium">
+            Lien de réservation
+          </label>
+          <input
+            id="booking_link"
+            type="url"
+            value={formData.booking_link}
+            onChange={(e) =>
+              setFormData({ ...formData, booking_link: e.target.value })
+            }
+            placeholder="https://..."
+            className="w-full rounded-lg border p-2"
+          />
+          <p className="text-sm text-gray-500">
+            Lien vers votre système de réservation externe (optionnel)
+          </p>
         </div>
 
         {/* Upload Brochure */}

@@ -9,4 +9,5 @@ export interface Event {
   max_participants?: number;
   is_public?: boolean;
   user_id: number;
+  booking_link?: string;
 }
