@@ -63,8 +63,8 @@ export default function CreatePartner() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Créer un nouveau partenaire</h1>
+    <div className="container mx-auto px-4 py-8 mt-20">
+      <h1 className="text-3xl font-bold text-center mb-12">Ajouter un partenaire</h1>
 
       <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
         {error && (

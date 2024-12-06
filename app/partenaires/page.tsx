@@ -86,14 +86,15 @@ export default function Partenaires() {
 
   return (
     <div className="container mx-auto px-4 py-8 mt-20">
-      <div className="flex justify-between items-center mb-12">
-        <h1 className="text-3xl font-bold">Nos Partenaires</h1>
-        <Link
-          href="/partenaires/creer"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-        >
-          Ajouter un partenaire
-        </Link>
+      <div className="relative mb-12">
+        <h1 className="text-3xl font-bold text-center">Nos Partenaires</h1>
+        <div className="absolute right-0 top-1/2 -translate-y-1/2">
+          <Link
+            href="/partenaires/creer"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+            Ajouter un partenaire
+          </Link>
+        </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

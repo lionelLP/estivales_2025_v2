@@ -16,7 +16,16 @@ export async function GET(
       [params.id]
     );
 
-    const partners = rows as any[];
+    interface Partner {
+      id: number;
+      name: string;
+      description: string;
+      website_url: string;
+      logo_url: string | null;
+      banner_url: string | null;
+    }
+
+    const partners = rows as Partner[];
     
     if (partners.length === 0) {
       return NextResponse.json(
@@ -49,7 +58,12 @@ export async function PUT(
       [params.id]
     );
     
-    const existingPartner = (existingPartners as any[])[0];
+    interface Partner {
+      logo_url: string | null;
+      banner_url: string | null;
+    }
+    
+    const existingPartner = (existingPartners as Partner[])[0];
     if (!existingPartner) {
       return NextResponse.json(
         { message: "Partenaire non trouvé" },
@@ -117,7 +131,12 @@ export async function DELETE(
       [params.id]
     );
     
-    const existingPartner = (existingPartners as any[])[0];
+    interface Partner {
+      logo_url: string | null;
+      banner_url: string | null;
+    }
+    
+    const existingPartner = (existingPartners as Partner[])[0];
     if (!existingPartner) {
       return NextResponse.json(
         { message: "Partenaire non trouvé" },
