@@ -38,25 +38,37 @@ export default function CreerEvenement() {
         }
       }
 
-      // Création de l'événement avec le chemin de la brochure
-      const eventData = {
-        ...formData,
-        brochure_path: brochurePath,
-      };
-
-      const response = await fetch("/api/evenements", {
+      // Création de l'événement
+      const eventResponse = await fetch("/api/evenements", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(eventData),
+        body: JSON.stringify({
+          ...formData,
+          brochure_path: brochurePath,
+        }),
       });
 
-      if (response.ok) {
+      if (eventResponse.ok) {
+        const eventData = await eventResponse.json();
+        const eventId = eventData.result.insertId;
+
+        // Upload des images si elles existent
+        if (images.length > 0) {
+          const imagesFormData = new FormData();
+          images.forEach((file) => {
+            imagesFormData.append("files", file);
+          });
+          imagesFormData.append("eventId", eventId);
+
+          await fetch("/api/upload/images", {
+            method: "POST",
+            body: imagesFormData,
+          });
+        }
+
         window.location.href = "/evenements";
-      } else {
-        const data = await response.json();
-        console.error("Erreur:", data.error);
       }
     } catch (error) {
       console.error("Erreur:", error);
