@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db/mysql";
 import { writeFile } from 'fs/promises';
 import path from 'path';
+import { unlink } from "fs/promises";
 
 export async function GET(
   request: NextRequest,
@@ -96,6 +97,60 @@ export async function PUT(
     console.error('Error updating partner:', error);
     return NextResponse.json(
       { message: "Erreur lors de la mise à jour du partenaire" },
+      { status: 500 }
+    );
+  } finally {
+    connection.release();
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const connection = await pool.getConnection();
+  
+  try {
+    // First, get the current files to delete them
+    const [existingPartners] = await connection.execute(
+      'SELECT logo_url, banner_url FROM Partenaire WHERE id = ?',
+      [params.id]
+    );
+    
+    const existingPartner = (existingPartners as any[])[0];
+    if (!existingPartner) {
+      return NextResponse.json(
+        { message: "Partenaire non trouvé" },
+        { status: 404 }
+      );
+    }
+
+    // Delete the files from the filesystem
+    const uploadsDir = path.join(process.cwd(), 'public');
+    
+    try {
+      if (existingPartner.logo_url) {
+        await unlink(path.join(uploadsDir, existingPartner.logo_url));
+      }
+      if (existingPartner.banner_url) {
+        await unlink(path.join(uploadsDir, existingPartner.banner_url));
+      }
+    } catch (error) {
+      console.error('Error deleting files:', error);
+      // Continue with deletion even if file deletion fails
+    }
+
+    // Delete from database
+    await connection.execute(
+      'DELETE FROM Partenaire WHERE id = ?',
+      [params.id]
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting partner:', error);
+    return NextResponse.json(
+      { message: "Erreur lors de la suppression du partenaire" },
       { status: 500 }
     );
   } finally {
