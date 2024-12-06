@@ -1,5 +1,8 @@
 import pool from "@/lib/db/mysql";
 import { NextResponse } from "next/server";
+import { writeFile } from 'fs/promises';
+import { NextRequest } from 'next/server';
+import path from 'path';
 
 export async function GET() {
   try {
@@ -37,5 +40,55 @@ export async function GET() {
       { error: "Erreur serveur", details: error.message },
       { status: 500 }
     );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  const connection = await pool.getConnection();
+  
+  try {
+    const data = await request.formData();
+    const name = data.get('name') as string;
+    const description = data.get('description') as string;
+    const website_url = data.get('website_url') as string;
+    const logo = data.get('logo') as File;
+    const banner = data.get('banner') as File;
+
+    // Create unique filenames
+    const logoFileName = `${Date.now()}-${logo.name}`;
+    const bannerFileName = `${Date.now()}-${banner.name}`;
+
+    // Define paths
+    const uploadsDir = path.join(process.cwd(), 'public/uploads/partners');
+    const logoPath = path.join(uploadsDir, logoFileName);
+    const bannerPath = path.join(uploadsDir, bannerFileName);
+
+    // Convert files to arrayBuffer and write them
+    const logoBuffer = Buffer.from(await logo.arrayBuffer());
+    const bannerBuffer = Buffer.from(await banner.arrayBuffer());
+    
+    await writeFile(logoPath, logoBuffer);
+    await writeFile(bannerPath, bannerBuffer);
+
+    // Store paths relative to public directory
+    const logoUrl = `/uploads/partners/${logoFileName}`;
+    const bannerUrl = `/uploads/partners/${bannerFileName}`;
+
+    // Insert into database
+    const [result] = await connection.execute(
+      'INSERT INTO Partenaire (name, description, website_url, logo_url, banner_url) VALUES (?, ?, ?, ?, ?)',
+      [name, description, website_url, logoUrl, bannerUrl]
+    );
+
+    return NextResponse.json({ success: true, result });
+
+  } catch (error) {
+    console.error('Error in partner creation:', error);
+    return NextResponse.json(
+      { error: 'Error creating partner' },
+      { status: 500 }
+    );
+  } finally {
+    connection.release();
   }
 } 

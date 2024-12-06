@@ -1,5 +1,6 @@
 "use client";
 
+import { FileUpload } from "@/components/common/file-upload";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -9,9 +10,9 @@ export default function CreatePartner() {
     name: "",
     description: "",
     website_url: "",
-    logo_url: "",
-    banner_url: "",
   });
+  const [logo, setLogo] = useState<File[]>([]);
+  const [banner, setBanner] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -20,13 +21,23 @@ export default function CreatePartner() {
     setIsSubmitting(true);
     setError("");
 
+    if (logo.length === 0 || banner.length === 0) {
+      setError("Le logo et la bannière sont requis");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("description", formData.description);
+    formDataToSend.append("website_url", formData.website_url);
+    formDataToSend.append("logo", logo[0]);
+    formDataToSend.append("banner", banner[0]);
+
     try {
       const response = await fetch("/api/partenaires", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        body: formDataToSend,
       });
 
       if (response.ok) {
@@ -109,38 +120,28 @@ export default function CreatePartner() {
           />
         </div>
 
-        {/* Logo URL */}
+        {/* Logo Upload */}
         <div className="space-y-2">
-          <label htmlFor="logo_url" className="block text-sm font-medium">
-            URL du logo
-          </label>
-          <input
-            id="logo_url"
-            type="url"
-            name="logo_url"
-            value={formData.logo_url}
-            onChange={handleChange}
-            className="w-full rounded-lg border p-2"
-            placeholder="https://"
-            required
+          <label className="block text-sm font-medium">Logo</label>
+          <FileUpload
+            onChange={(files) => setLogo(files)}
+            maxFiles={1}
+            accept="image/*"
+            multiple={false}
           />
+          <p className="text-sm text-gray-500">Format recommandé : PNG ou JPG, taille maximale : 2MB</p>
         </div>
 
-        {/* Banner URL */}
+        {/* Banner Upload */}
         <div className="space-y-2">
-          <label htmlFor="banner_url" className="block text-sm font-medium">
-            URL de la bannière
-          </label>
-          <input
-            id="banner_url"
-            type="url"
-            name="banner_url"
-            value={formData.banner_url}
-            onChange={handleChange}
-            className="w-full rounded-lg border p-2"
-            placeholder="https://"
-            required
+          <label className="block text-sm font-medium">Bannière</label>
+          <FileUpload
+            onChange={(files) => setBanner(files)}
+            maxFiles={1}
+            accept="image/*"
+            multiple={false}
           />
+          <p className="text-sm text-gray-500">Format recommandé : 1920x1080px, taille maximale : 5MB</p>
         </div>
 
         <div className="flex justify-end space-x-4">
