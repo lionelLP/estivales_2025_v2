@@ -1,5 +1,6 @@
 "use client";
 
+import { FileUpload } from "@/components/common/file-upload";
 import { useState } from "react";
 
 export default function CreerEvenement() {
@@ -11,10 +12,15 @@ export default function CreerEvenement() {
     location: "",
     max_participants: "",
     is_public: true,
+    booking_link: "",
   });
+  const [brochure, setBrochure] = useState<File[]>([]);
+  const [images, setImages] = useState<File[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Brochure:", brochure);
+    console.log("Images:", images);
 
     try {
       const response = await fetch("/api/evenements", {
@@ -160,6 +166,52 @@ export default function CreerEvenement() {
           <label htmlFor="is_public" className="text-sm font-medium">
             Événement public
           </label>
+        </div>
+
+        {/* Lien de réservation */}
+        <div className="space-y-2">
+          <label htmlFor="booking_link" className="block text-sm font-medium">
+            Lien de réservation
+          </label>
+          <input
+            id="booking_link"
+            type="url"
+            value={formData.booking_link}
+            onChange={(e) =>
+              setFormData({ ...formData, booking_link: e.target.value })
+            }
+            placeholder="https://..."
+            className="w-full rounded-lg border p-2"
+          />
+          <p className="text-sm text-gray-500">
+            Lien vers votre système de réservation externe (optionnel)
+          </p>
+        </div>
+
+        {/* Upload Brochure */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Brochure (PDF)</label>
+          <FileUpload
+            onChange={(files) => setBrochure(files)}
+            maxFiles={1}
+            accept=".pdf"
+            multiple={false}
+          />
+          <p className="text-sm text-gray-500">Un seul fichier PDF autorisé</p>
+        </div>
+
+        {/* Upload Images */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">
+            Images de l&apos;événement
+          </label>
+          <FileUpload
+            onChange={(files) => setImages(files)}
+            maxFiles={200}
+            accept="image/*"
+            multiple={true}
+          />
+          <p className="text-sm text-gray-500">Jusqu'à 200 images</p>
         </div>
 
         <button
