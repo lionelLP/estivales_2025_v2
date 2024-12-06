@@ -92,13 +92,17 @@ export function EventDetailModal({
         </div>
 
         <div className="mt-8 space-y-4">
-          <a
-            href="#"
-            className="flex items-center justify-center gap-2 text-center py-3 px-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
-          >
-            <Download className="w-5 h-5" />
-            <span>Brochure.pdf</span>
-          </a>
+          {event.brochure_path ? (
+            <a
+              href={event.brochure_path}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 text-center py-3 px-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
+            >
+              <Download className="w-5 h-5" />
+              <span>Télécharger la brochure</span>
+            </a>
+          ) : null}
 
           {event.booking_link && (
             <a

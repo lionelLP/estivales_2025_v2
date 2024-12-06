@@ -19,29 +19,47 @@ export default function CreerEvenement() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Brochure:", brochure);
-    console.log("Images:", images);
 
     try {
+      // Upload de la brochure si elle existe
+      let brochurePath = null;
+      if (brochure.length > 0) {
+        const formData = new FormData();
+        formData.append("file", brochure[0]);
+
+        const uploadResponse = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (uploadResponse.ok) {
+          const { path } = await uploadResponse.json();
+          brochurePath = path;
+        }
+      }
+
+      // Création de l'événement avec le chemin de la brochure
+      const eventData = {
+        ...formData,
+        brochure_path: brochurePath,
+      };
+
       const response = await fetch("/api/evenements", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(eventData),
       });
 
       if (response.ok) {
-        // Redirection vers la liste des événements après création
         window.location.href = "/evenements";
       } else {
         const data = await response.json();
         console.error("Erreur:", data.error);
-        // Ici vous pourriez ajouter une notification d'erreur pour l'utilisateur
       }
     } catch (error) {
       console.error("Erreur:", error);
-      // Ici vous pourriez ajouter une notification d'erreur pour l'utilisateur
     }
   };
 
