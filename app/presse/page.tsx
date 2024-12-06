@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 import { Newspaper } from "lucide-react";
 import Image from "next/image";
@@ -8,20 +8,96 @@ import ArticleEditor from "@/components/editor/ArticleEditor";
 import Link from "next/link";
 
 export default function PressePage() {
-  const [items, setItems] = useState([
-    /* vos items actuels */
-  ]);
+  const [items, setItems] = useState([]);
   const [showEditor, setShowEditor] = useState(false);
 
-  const handleSaveArticle = (article: any) => {
-    const position = items.length;
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const response = await fetch("/api/articles");
+        if (response.ok) {
+          const articles = await response.json();
+          const formattedItems = articles.map((article: any, index: number) =>
+            formatArticleToItem(article, index)
+          );
+          setItems(formattedItems);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement des articles:", error);
+      }
+    };
+
+    fetchArticles();
+  }, []);
+
+  const handleSaveArticle = async (article: any) => {
+    try {
+      console.log("Article à sauvegarder:", article); // Pour le debug
+
+      const response = await fetch("/api/articles", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: article.title,
+          link: article.url,
+          content: article.description,
+          Creation_article: article.publishDate,
+          is_published: 1,
+          user_id: 1,
+          event_id: null,
+          image: article.image,
+          favicon: article.favicon,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Erreur serveur:", errorData);
+        throw new Error(errorData.error || "Erreur lors de la sauvegarde");
+      }
+
+      const data = await response.json();
+      console.log("Réponse du serveur:", data);
+
+      const newItem = formatArticleToItem(
+        {
+          title: article.title,
+          link: article.url,
+          content: article.description,
+          Creation_article: article.publishDate,
+          image: article.image,
+          favicon: article.favicon,
+        },
+        0
+      );
+
+      setItems([newItem, ...items]);
+      setShowEditor(false);
+    } catch (error) {
+      console.error("Erreur complète:", error);
+    }
+  };
+
+  const formatArticleToItem = (article: any, index: number) => {
+    const formattedDate = new Date(article.Creation_article).toLocaleDateString(
+      "fr-FR",
+      {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }
+    );
+
+    const position = index;
     const rowIndex = Math.floor(position / 2);
     const isFirstInRow = position % 2 === 0;
     const isEvenRow = rowIndex % 2 === 0;
 
-    const isFullWidth = isEvenRow ? isFirstInRow : !isFirstInRow;
+    const isLarge = isEvenRow ? isFirstInRow : !isFirstInRow;
 
-    const newItem = {
+    return {
       title: (
         <div className="line-clamp-2 font-sans font-bold text-neutral-600 dark:text-neutral-200">
           {article.title}
@@ -30,11 +106,11 @@ export default function PressePage() {
       description: (
         <div className="relative">
           <div className="line-clamp-2 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300">
-            {article.description}
+            {article.content}
           </div>
-          {article.description.length > (isFullWidth ? 150 : 100) && (
+          {article.content.length > (isLarge ? 150 : 100) && (
             <Link
-              href={article.url}
+              href={article.link}
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline inline-block"
@@ -46,7 +122,7 @@ export default function PressePage() {
       ),
       header: (
         <Link
-          href={article.url}
+          href={article.link}
           target="_blank"
           rel="noopener noreferrer"
           className="block w-full h-full"
@@ -62,31 +138,35 @@ export default function PressePage() {
         </Link>
       ),
       className: `${
-        isFullWidth ? "md:col-span-2" : "md:col-span-1"
+        isLarge ? "md:col-span-2" : "md:col-span-1"
       } hover:scale-[1.02] transition-transform cursor-pointer`,
-      icon: article.favicon ? (
-        <div className="relative w-4 h-4">
-          <Image
-            src={article.favicon}
-            alt="Site favicon"
-            width={16}
-            height={16}
-            className="rounded-sm"
-          />
+      icon: (
+        <div className="flex items-center gap-2">
+          {article.favicon ? (
+            <div className="relative w-4 h-4">
+              <Image
+                src={article.favicon}
+                alt="Site favicon"
+                width={16}
+                height={16}
+                className="rounded-sm"
+              />
+            </div>
+          ) : (
+            <Newspaper className="h-4 w-4 text-bleu-fonce dark:text-bleu-clair" />
+          )}
+          <span className="text-xs text-neutral-500 dark:text-neutral-400">
+            {formattedDate}
+          </span>
         </div>
-      ) : (
-        <Newspaper className="h-4 w-4 text-bleu-fonce dark:text-bleu-clair" />
       ),
-      link: article.url,
+      link: article.link,
       onClick: () => {
-        if (article.url) {
-          window.open(article.url, "_blank", "noopener,noreferrer");
+        if (article.link) {
+          window.open(article.link, "_blank", "noopener,noreferrer");
         }
       },
     };
-
-    setItems([newItem, ...items]);
-    setShowEditor(false);
   };
 
   return (
@@ -113,7 +193,11 @@ export default function PressePage() {
           </button>
         </div>
 
-        {showEditor && <ArticleEditor onSave={handleSaveArticle} />}
+        {showEditor && (
+          <div className="mb-6">
+            <ArticleEditor onSave={handleSaveArticle} />
+          </div>
+        )}
 
         <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[20rem]">
           {items.map((item, i) => (

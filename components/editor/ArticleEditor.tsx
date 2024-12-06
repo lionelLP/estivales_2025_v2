@@ -8,6 +8,7 @@ interface ArticleMetadata {
   image: string;
   favicon?: string;
   url: string;
+  publishDate: string;
 }
 
 interface ArticleEditorProps {
@@ -38,6 +39,7 @@ export default function ArticleEditor({ onSave }: ArticleEditorProps) {
       }
 
       const data = await response.json();
+      console.log("ArticleMetadata après extraction:", data);
       setMetadata(data);
     } catch (err) {
       setError("Erreur lors de l'extraction des métadonnées");

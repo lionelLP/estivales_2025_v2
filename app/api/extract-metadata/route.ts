@@ -66,6 +66,13 @@ export async function POST(request: Request) {
       console.error("Erreur lors du téléchargement du favicon:", error);
     }
 
+    // Récupérer la date de publication
+    let publishDate =
+      ogTags["article:published_time"] ||
+      $('meta[property="article:published_time"]').attr("content") ||
+      $('meta[name="date"]').attr("content") ||
+      new Date().toISOString();
+
     const metadata = {
       title: ogTags["og:title"] || $("title").text(),
       description:
@@ -75,6 +82,7 @@ export async function POST(request: Request) {
       image: image,
       favicon: faviconBase64,
       url: url,
+      publishDate: publishDate,
     };
 
     return NextResponse.json(metadata);
