@@ -40,7 +40,7 @@ export default function MobileNavbar() {
         <div>
           <a href="/">
             <Image
-              src="/logoOpenWing.png"
+              src="/logo.png"
               alt="Logo"
               width={60}
               height={60}
@@ -78,10 +78,31 @@ export default function MobileNavbar() {
         className="overflow-y-auto bg-white dark:bg-dark-mode rounded-2xl -mt-12 max-h-[calc(100vh-5rem)] border"
       >
         <nav className="mt-14 flex flex-col space-y-4 p-2.5">
-          {/* Qui sommes-nous ? */}
+          {/* Actualités */}
           <div className="flex justify-between items-center">
-            <HoveredLink href="/about" onClick={handleLinkClick}>
-              <strong>Qui sommes-nous ?</strong>
+            <HoveredLink href="/actualites" onClick={handleLinkClick}>
+              <strong>Actualités</strong>
+            </HoveredLink>
+          </div>
+
+          {/* Programme */}
+          <div className="flex justify-between items-center">
+            <HoveredLink href="/programme" onClick={handleLinkClick}>
+              <strong>Programme de l&apos;année</strong>
+            </HoveredLink>
+          </div>
+
+          {/* Photos */}
+          <div className="flex justify-between items-center">
+            <HoveredLink href="/photos" onClick={handleLinkClick}>
+              <strong>Photos</strong>
+            </HoveredLink>
+          </div>
+
+          {/* Pratique */}
+          <div className="flex justify-between items-center">
+            <HoveredLink href="/pratique">
+              <strong>Pratique</strong>
             </HoveredLink>
             <motion.div
               animate={{ rotate: openSubMenu === 1 ? 180 : 0 }}
@@ -101,24 +122,35 @@ export default function MobileNavbar() {
             transition={{ duration: 0.3 }}
             className="overflow-hidden pl-4 space-y-3"
           >
-            <HoveredLink href="/about#notre-cabinet" onClick={handleLinkClick}>
-              Notre cabinet
-            </HoveredLink>
-            <HoveredLink href="/about#nous" onClick={handleLinkClick}>
-              Nous
-            </HoveredLink>
+            <HoveredLink href="/pratique/acces">Accès</HoveredLink>
+            <HoveredLink href="/pratique/billetterie">Billetterie</HoveredLink>
+            <HoveredLink href="/pratique/contact">Contact</HoveredLink>
           </motion.div>
 
-          {/* Partenaires */}
+          {/* Vidéos */}
           <div className="flex justify-between items-center">
-            <HoveredLink href="/service2">
-              <strong>Partenaires</strong>
+            <HoveredLink href="/videos" onClick={handleLinkClick}>
+              <strong>Vidéos</strong>
+            </HoveredLink>
+          </div>
+
+          {/* Revues de Presse */}
+          <div className="flex justify-between items-center">
+            <HoveredLink href="/presse" onClick={handleLinkClick}>
+              <strong>Revues de Presse</strong>
+            </HoveredLink>
+          </div>
+
+          {/* Mon profil */}
+          <div className="flex justify-between items-center">
+            <HoveredLink href="/login">
+              <strong>Mon profil</strong>
             </HoveredLink>
             <motion.div
               animate={{ rotate: openSubMenu === 2 ? 180 : 0 }}
               transition={{ duration: 0.3 }}
               className="cursor-pointer p-2"
-              onClick={() => toggleSubMenu(2)} // Toggle pour le sous-menu
+              onClick={() => toggleSubMenu(2)}
             >
               <FaChevronDown />
             </motion.div>
@@ -128,166 +160,6 @@ export default function MobileNavbar() {
             animate={{
               height: openSubMenu === 2 ? "auto" : 0,
               opacity: openSubMenu === 2 ? 1 : 0,
-            }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden pl-4 space-y-3"
-          >
-            <HoveredLink href="/partners/local">Nos partenaires</HoveredLink>
-            <HoveredLink href="/partners/global">
-              Devenir partenaire
-            </HoveredLink>
-          </motion.div>
-
-          {/* Contactez-nous */}
-          <div className="flex justify-between items-center">
-            <HoveredLink href="/service2">
-              <strong>Contactez-nous</strong>
-            </HoveredLink>
-            <motion.div
-              animate={{ rotate: openSubMenu === 3 ? 180 : 0 }}
-              transition={{ duration: 0.3 }}
-              className="cursor-pointer p-2"
-              onClick={() => toggleSubMenu(3)} // Toggle pour le sous-menu
-            >
-              <FaChevronDown />
-            </motion.div>
-          </div>
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{
-              height: openSubMenu === 3 ? "auto" : 0,
-              opacity: openSubMenu === 3 ? 1 : 0,
-            }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden pl-4 space-y-3"
-          >
-            <HoveredLink href="/partners/local">Suggestions</HoveredLink>
-            <HoveredLink href="/partners/global">Reclamations</HoveredLink>
-            <HoveredLink href="/partners/local">Demandes</HoveredLink>
-          </motion.div>
-
-          {/* Professionel */}
-          <div className="flex justify-between items-center">
-            <HoveredLink href="/service2">
-              <strong>Professionel</strong>
-            </HoveredLink>
-            <motion.div
-              animate={{ rotate: openSubMenu === 4 ? 180 : 0 }}
-              transition={{ duration: 0.3 }}
-              className="cursor-pointer p-2"
-              onClick={() => toggleSubMenu(4)}
-            >
-              <FaChevronDown />
-            </motion.div>
-          </div>
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{
-              height: openSubMenu === 4 ? "auto" : 0,
-              opacity: openSubMenu === 4 ? 1 : 0,
-            }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden pl-4 space-y-3"
-          >
-            <HoveredLink href="/">Agriculteur</HoveredLink>
-            <HoveredLink href="/">Artisan</HoveredLink>
-            <HoveredLink href="/">Commercant</HoveredLink>
-            <HoveredLink href="/">Profession libérale</HoveredLink>
-            <HoveredLink href="/">Autre</HoveredLink>
-          </motion.div>
-
-          {/* Particulier */}
-          <div className="flex justify-between items-center">
-            <HoveredLink href="/service2">
-              <strong>Particulier</strong>
-            </HoveredLink>
-            <motion.div
-              animate={{ rotate: openSubMenu === 5 ? 180 : 0 }}
-              transition={{ duration: 0.3 }}
-              className="cursor-pointer p-2"
-              onClick={() => toggleSubMenu(5)}
-            >
-              <FaChevronDown />
-            </motion.div>
-          </div>
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{
-              height: openSubMenu === 5 ? "auto" : 0,
-              opacity: openSubMenu === 5 ? 1 : 0,
-            }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden pl-4 space-y-3"
-          >
-            <HoveredLink href="/">Automobile</HoveredLink>
-            <HoveredLink href="/">Bateau</HoveredLink>
-            <HoveredLink href="/">Chien et Chat</HoveredLink>
-            <HoveredLink href="/">Décès</HoveredLink>
-            <HoveredLink href="/">Deux-Roues</HoveredLink>
-            <HoveredLink href="/">Assurance Emprunteur</HoveredLink>
-            <HoveredLink href="/">Equidé</HoveredLink>
-            <HoveredLink href="/">Habitation</HoveredLink>
-            <HoveredLink href="/">Instrument de musique</HoveredLink>
-            <HoveredLink href="/">Prévoyance</HoveredLink>
-            <HoveredLink href="/">Retraite</HoveredLink>
-            <HoveredLink href="/">Risques spéciaux</HoveredLink>
-            <HoveredLink href="/">Santé</HoveredLink>
-            <HoveredLink href="/">Scolaire</HoveredLink>
-            <HoveredLink href="/">Vie - Epargne</HoveredLink>
-            <HoveredLink href="/">Juridique</HoveredLink>
-            <HoveredLink href="/">Permis de conduire</HoveredLink>
-            <HoveredLink href="/">Protection juridique</HoveredLink>
-            <HoveredLink href="/">Protection sociale</HoveredLink>
-            <HoveredLink href="/">Protection vie privée</HoveredLink>
-            <HoveredLink href="/">Protection vie professionnelle</HoveredLink>
-          </motion.div>
-
-          {/* Association */}
-          <div className="flex justify-between items-center">
-            <HoveredLink href="/service2">
-              <strong>Association</strong>
-            </HoveredLink>
-            <motion.div
-              animate={{ rotate: openSubMenu === 7 ? 180 : 0 }}
-              transition={{ duration: 0.3 }}
-              className="cursor-pointer p-2"
-              onClick={() => toggleSubMenu(7)}
-            >
-              <FaChevronDown />
-            </motion.div>
-          </div>
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{
-              height: openSubMenu === 7 ? "auto" : 0,
-              opacity: openSubMenu === 7 ? 1 : 0,
-            }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden pl-4 space-y-3"
-          >
-            <HoveredLink href="/">Locaux</HoveredLink>
-            <HoveredLink href="/">Résponsabilité civile</HoveredLink>
-          </motion.div>
-
-          {/* Mon profil */}
-          <div className="flex justify-between items-center">
-            <HoveredLink href="/login">
-              <strong>Mon profil</strong>
-            </HoveredLink>
-            <motion.div
-              animate={{ rotate: openSubMenu === 6 ? 180 : 0 }}
-              transition={{ duration: 0.3 }}
-              className="cursor-pointer p-2"
-              onClick={() => toggleSubMenu(6)}
-            >
-              <FaChevronDown />
-            </motion.div>
-          </div>
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{
-              height: openSubMenu === 6 ? "auto" : 0,
-              opacity: openSubMenu === 6 ? 1 : 0,
             }}
             transition={{ duration: 0.3 }}
             className="overflow-hidden pl-4 space-y-3"

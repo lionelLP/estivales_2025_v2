@@ -1,0 +1,137 @@
+"use client";
+
+import { Timeline } from "@/components/ui/timeline";
+import { Event } from "@/lib/types/event";
+import { useEffect, useState } from "react";
+import { EventDetailModal } from "./EventDetailModal";
+
+export function TimelineHistory() {
+  const [evenements, setEvenements] = useState<Event[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchEvenements = async () => {
+      try {
+        const response = await fetch("/api/evenements");
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Données reçues:", data);
+
+          // Filtrer les événements futurs et publics
+          const now = new Date();
+          const futurePublicEvents = data.filter((event: Event) => {
+            const eventDate = new Date(event.event_date);
+            return eventDate > now && event.is_public;
+          });
+
+          if (futurePublicEvents.length === 0) {
+            setEvenements([]);
+            return;
+          }
+
+          // Grouper les événements par date
+          const eventsByDate = futurePublicEvents.reduce(
+            (acc: { [key: string]: Event[] }, event: Event) => {
+              const date = new Date(event.event_date).toLocaleDateString(
+                "fr-FR",
+                {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                }
+              );
+              if (!acc[date]) {
+                acc[date] = [];
+              }
+              acc[date].push(event);
+              return acc;
+            },
+            {}
+          );
+
+          // Transformer en format Timeline
+          const timelineData = Object.entries(eventsByDate)
+            .map(([date, events]) => ({
+              title: date,
+              content: (
+                <div>
+                  <div className="mb-8">
+                    {events.map((event: Event) => (
+                      <div key={event.id} className="mb-4">
+                        <h3 className="text-neutral-800 dark:text-neutral-200 text-sm font-semibold">
+                          {event.title}
+                        </h3>
+                        {event.subtitle && (
+                          <p className="text-neutral-700 dark:text-neutral-300 text-xs">
+                            {event.subtitle}
+                          </p>
+                        )}
+                        <button
+                          onClick={() => {
+                            setSelectedEvent(event);
+                            setIsModalOpen(true);
+                          }}
+                          className="inline-block mt-2 px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-medium hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                        >
+                          Voir le détaille
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ),
+            }))
+            .sort((a, b) => {
+              const dateA = new Date(a.title.split(" ").reverse().join(" "));
+              const dateB = new Date(b.title.split(" ").reverse().join(" "));
+              return dateA.getTime() - dateB.getTime();
+            });
+
+          setEvenements(timelineData);
+        } else {
+          setError("Erreur lors de la récupération des événements");
+        }
+      } catch (err) {
+        console.error("Erreur lors de la récupération des événements:", err);
+        setError("Erreur lors de la récupération des événements");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEvenements();
+  }, []);
+
+  if (isLoading) {
+    return <div>Chargement...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
+
+  if (evenements.length === 0) {
+    return (
+      <div className="text-center text-gray-500">Aucun événement à venir</div>
+    );
+  }
+
+  return (
+    <div className="w-full">
+      <Timeline data={evenements} />
+      {selectedEvent && (
+        <EventDetailModal
+          event={selectedEvent}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedEvent(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
