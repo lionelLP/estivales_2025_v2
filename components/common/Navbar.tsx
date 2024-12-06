@@ -1,7 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { CircleUser } from "lucide-react";
-import Image from "next/image";
 import { useState } from "react";
 import {
   HoveredLink,
@@ -23,13 +22,9 @@ export default function Navbar({ className }: { className?: string }) {
       <Menu setActive={setActive}>
         <div className="flex items-center space-x-3 ">
           <a href="/">
-            <Image
-              src="/logoOpenWing.png"
-              alt="Logo"
-              width={60}
-              height={60}
-              className="rounded-full"
-            />
+            <div className="w-[60px] h-[60px] bg-gray-200 rounded-full flex items-center justify-center">
+              <span className="text-sm">Logo</span>
+            </div>
           </a>
         </div>
 
