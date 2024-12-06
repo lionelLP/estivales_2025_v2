@@ -10,4 +10,5 @@ export interface Event {
   is_public?: boolean;
   user_id: number;
   booking_link?: string;
+  brochure_path?: string;
 }
