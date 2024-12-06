@@ -2,25 +2,21 @@
 import DisableShinyButton from "@/components/common/DisableShinyButton";
 import PasswordField from "@/components/common/PasswordField";
 import ShinyButton from "@/components/magicui/shiny-button";
-import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { IdCard } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import AnimatedCheckbox from "../../components/common/AnimatedCheckbox";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
+import { useAuthentication } from "../../hooks/useAuthentication";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
   const [isRememberChecked, setIsRememberChecked] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const router = useRouter();
-  const { setUser } = useAuth();
+  const { login, isLoading, error } = useAuthentication();
 
   useEffect(() => {
     setIsFormValid(email.trim() !== "" && password.trim() !== "");
@@ -41,52 +37,7 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isFormValid) return;
-
-    setIsLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        if (data.requireAuthenticator) {
-          sessionStorage.setItem(
-            "authState",
-            JSON.stringify({
-              email,
-              userId: data.userId,
-              timestamp: Date.now(),
-            })
-          );
-          router.push("/login/authenticator");
-        } else if (data.requireTotp) {
-          sessionStorage.setItem("tempEmail", email);
-          router.push("/login/totp");
-        } else {
-          const userResponse = await fetch("/api/user", { method: "GET" });
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            setUser(userData);
-          }
-          router.push("/");
-        }
-      } else {
-        setError(
-          data.message || "Une erreur s'est produite lors de la connexion"
-        );
-      }
-    } catch (error) {
-      console.error("Erreur lors de la connexion:", error);
-      setError("Une erreur s'est produite lors de la connexion");
-    } finally {
-      setIsLoading(false);
-    }
+    await login(email, password);
   };
 
   return (
@@ -144,11 +95,7 @@ export default function LoginForm() {
                 disabled={isLoading}
               />
             ) : (
-              <DisableShinyButton
-                text="SE CONNECTER"
-                className="w-full"
-                type="button"
-              />
+              <DisableShinyButton text="SE CONNECTER" className="w-full" />
             )}
           </div>
         </form>

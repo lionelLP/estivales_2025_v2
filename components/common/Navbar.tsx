@@ -76,6 +76,13 @@ export default function Navbar({ className }: { className?: string }) {
           href="/presse"
         />
 
+        <MenuItem
+          setActive={setActive}
+          active={active}
+          item="Partenaires"
+          href="/partenaires"
+        />
+
         <MenuItemWithIcon
           setActive={setActive}
           active={active}

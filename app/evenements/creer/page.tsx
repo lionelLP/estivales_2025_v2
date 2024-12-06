@@ -1,5 +1,6 @@
 "use client";
 
+import { FileUpload } from "@/components/common/file-upload";
 import { useState } from "react";
 
 export default function CreerEvenement() {
@@ -11,31 +12,66 @@ export default function CreerEvenement() {
     location: "",
     max_participants: "",
     is_public: true,
+    booking_link: "",
   });
+  const [brochure, setBrochure] = useState<File[]>([]);
+  const [images, setImages] = useState<File[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("/api/evenements", {
+      // Upload de la brochure si elle existe
+      let brochurePath = null;
+      if (brochure.length > 0) {
+        const formData = new FormData();
+        formData.append("file", brochure[0]);
+
+        const uploadResponse = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (uploadResponse.ok) {
+          const { path } = await uploadResponse.json();
+          brochurePath = path;
+        }
+      }
+
+      // Création de l'événement
+      const eventResponse = await fetch("/api/evenements", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          brochure_path: brochurePath,
+        }),
       });
 
-      if (response.ok) {
-        // Redirection vers la liste des événements après création
+      if (eventResponse.ok) {
+        const eventData = await eventResponse.json();
+        const eventId = eventData.result.insertId;
+
+        // Upload des images si elles existent
+        if (images.length > 0) {
+          const imagesFormData = new FormData();
+          images.forEach((file) => {
+            imagesFormData.append("files", file);
+          });
+          imagesFormData.append("eventId", eventId);
+
+          await fetch("/api/upload/images", {
+            method: "POST",
+            body: imagesFormData,
+          });
+        }
+
         window.location.href = "/evenements";
-      } else {
-        const data = await response.json();
-        console.error("Erreur:", data.error);
-        // Ici vous pourriez ajouter une notification d'erreur pour l'utilisateur
       }
     } catch (error) {
       console.error("Erreur:", error);
-      // Ici vous pourriez ajouter une notification d'erreur pour l'utilisateur
     }
   };
 
@@ -160,6 +196,52 @@ export default function CreerEvenement() {
           <label htmlFor="is_public" className="text-sm font-medium">
             Événement public
           </label>
+        </div>
+
+        {/* Lien de réservation */}
+        <div className="space-y-2">
+          <label htmlFor="booking_link" className="block text-sm font-medium">
+            Lien de réservation
+          </label>
+          <input
+            id="booking_link"
+            type="url"
+            value={formData.booking_link}
+            onChange={(e) =>
+              setFormData({ ...formData, booking_link: e.target.value })
+            }
+            placeholder="https://..."
+            className="w-full rounded-lg border p-2"
+          />
+          <p className="text-sm text-gray-500">
+            Lien vers votre système de réservation externe (optionnel)
+          </p>
+        </div>
+
+        {/* Upload Brochure */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Brochure (PDF)</label>
+          <FileUpload
+            onChange={(files) => setBrochure(files)}
+            maxFiles={1}
+            accept=".pdf"
+            multiple={false}
+          />
+          <p className="text-sm text-gray-500">Un seul fichier PDF autorisé</p>
+        </div>
+
+        {/* Upload Images */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">
+            Images de l&apos;événement
+          </label>
+          <FileUpload
+            onChange={(files) => setImages(files)}
+            maxFiles={200}
+            accept="image/*"
+            multiple={true}
+          />
+          <p className="text-sm text-gray-500">Jusqu'à 200 images</p>
         </div>
 
         <button

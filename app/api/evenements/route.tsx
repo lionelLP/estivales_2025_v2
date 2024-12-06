@@ -13,6 +13,8 @@ export async function POST(request: Request) {
       location,
       max_participants,
       is_public,
+      booking_link,
+      brochure_path,
     } = body;
 
     const connection = await pool.getConnection();
@@ -21,8 +23,8 @@ export async function POST(request: Request) {
       const [result] = await connection.execute(
         `INSERT INTO Event (
           title, subtitle, description, event_date, location, 
-          max_participants, is_public, user_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
+          max_participants, is_public, booking_link, brochure_path, user_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
         [
           title,
           subtitle,
@@ -31,6 +33,8 @@ export async function POST(request: Request) {
           location,
           max_participants,
           is_public,
+          booking_link,
+          brochure_path,
         ]
       );
 

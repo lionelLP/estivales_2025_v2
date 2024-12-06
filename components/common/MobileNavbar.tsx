@@ -141,6 +141,12 @@ export default function MobileNavbar() {
             </HoveredLink>
           </div>
 
+          <div className="flex justify-between items-center">
+            <HoveredLink href="/partenaires" onClick={handleLinkClick}>
+              <strong>Partenaires</strong>
+            </HoveredLink>
+          </div>
+
           {/* Mon profil */}
           <div className="flex justify-between items-center">
             <HoveredLink href="/login">
