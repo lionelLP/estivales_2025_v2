@@ -5,6 +5,7 @@ import { FileUpload } from "@/components/common/file-upload";
 import { Partner } from "@/lib/types/partner";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { CircularImageCropper } from "@/components/common/circular-image-cropper";
 
 export default function EditPartner({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -21,6 +22,8 @@ export default function EditPartner({ params }: { params: { id: string } }) {
   const [currentBannerUrl, setCurrentBannerUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showCropper, setShowCropper] = useState(false);
+  const [logoToProcess, setLogoToProcess] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchPartner = async () => {
@@ -118,6 +121,22 @@ export default function EditPartner({ params }: { params: { id: string } }) {
     }
   };
 
+  const handleLogoSelect = (files: File[]) => {
+    if (files.length > 0) {
+      setLogoToProcess(files[0]);
+      setShowCropper(true);
+    }
+  };
+
+  const handleCroppedLogo = (croppedBlob: Blob) => {
+    const croppedFile = new File([croppedBlob], logoToProcess?.name || 'logo.png', {
+      type: 'image/png'
+    });
+    setLogo([croppedFile]);
+    setShowCropper(false);
+    setLogoToProcess(null);
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 mt-20">
@@ -206,12 +225,19 @@ export default function EditPartner({ params }: { params: { id: string } }) {
             </div>
           )}
           <FileUpload
-            onChange={(files) => setLogo(files)}
+            onChange={handleLogoSelect}
             maxFiles={1}
             accept="image/*"
             multiple={false}
           />
           <p className="text-sm text-gray-500">Format recommandé : PNG ou JPG, taille maximale : 2MB</p>
+          {showCropper && (
+            <CircularImageCropper
+              imageFile={logoToProcess}
+              onCropComplete={handleCroppedLogo}
+              onCancel={() => setShowCropper(false)}
+            />
+          )}
         </div>
 
         {/* Banner Upload */}
