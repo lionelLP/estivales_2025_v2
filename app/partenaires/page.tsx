@@ -13,6 +13,7 @@ export default function Partenaires() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     const fetchPartenaires = async () => {
@@ -68,6 +69,20 @@ export default function Partenaires() {
     }
   };
 
+  const toggleDescription = (id: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setExpandedDescriptions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 mt-20">
@@ -91,7 +106,7 @@ export default function Partenaires() {
         <div className="absolute right-0 top-1/2 -translate-y-1/2">
           <Link
             href="/partenaires/creer"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"    >
             Ajouter un partenaire
           </Link>
         </div>
@@ -111,7 +126,7 @@ export default function Partenaires() {
                 </svg>
               </button>
               <button
-                onClick={() => handleDelete(partenaire.id)}
+                onClick={() => partenaire.id && handleDelete(partenaire.id)}
                 disabled={isDeleting === partenaire.id}
                 className="bg-white/90 hover:bg-white p-2 rounded-full transition-colors"
               >
@@ -171,9 +186,22 @@ export default function Partenaires() {
 
                   <div className="text content">
                     {partenaire.description && (
-                      <p className="font-normal text-sm text-gray-50 relative z-10 my-4 line-clamp-3 drop-shadow-md">
-                        {partenaire.description}
-                      </p>
+                      <>
+                        <p className={cn(
+                          "font-normal text-sm text-gray-50 relative z-10 my-4 drop-shadow-md",
+                          !expandedDescriptions.has(partenaire.id || 0) ? "line-clamp-3" : "max-h-48 overflow-y-auto"
+                        )}>
+                          {partenaire.description}
+                        </p>
+                        {partenaire.description.length > 150 && (
+                          <button
+                            onClick={(e) => partenaire.id && toggleDescription(partenaire.id, e)}
+                            className="text-blue-300 hover:text-blue-400 text-sm font-medium relative z-10"
+                          >
+                            {expandedDescriptions.has(partenaire.id || 0) ? "Voir moins" : "Voir plus"}
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -216,9 +244,22 @@ export default function Partenaires() {
 
                 <div className="text content">
                   {partenaire.description && (
-                    <p className="font-normal text-sm text-gray-50 relative z-10 my-4 line-clamp-3 drop-shadow-md">
-                      {partenaire.description}
-                    </p>
+                    <>
+                      <p className={cn(
+                        "font-normal text-sm text-gray-50 relative z-10 my-4 drop-shadow-md",
+                        !expandedDescriptions.has(partenaire.id || 0) ? "line-clamp-3" : "max-h-48 overflow-y-auto"
+                      )}>
+                        {partenaire.description}
+                      </p>
+                      {partenaire.description.length > 150 && (
+                        <button
+                          onClick={(e) => partenaire.id && toggleDescription(partenaire.id, e)}
+                          className="text-blue-300 hover:text-blue-400 text-sm font-medium relative z-10"
+                        >
+                          {expandedDescriptions.has(partenaire.id || 0) ? "Voir moins" : "Voir plus"}
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
