@@ -100,9 +100,16 @@ export function EventDetailModal({
             <span>Brochure.pdf</span>
           </a>
 
-          <button className="w-full py-3 px-4 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-lg hover:from-pink-600 hover:to-red-600 transition flex items-center justify-center gap-2">
-            <span>Réserver ma place</span>
-          </button>
+          {event.booking_link && (
+            <a
+              href={event.booking_link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full py-3 px-4 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-lg hover:from-pink-600 hover:to-red-600 transition text-center"
+            >
+              Réserver ma place
+            </a>
+          )}
         </div>
 
         <button
