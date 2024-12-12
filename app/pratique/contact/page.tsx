@@ -127,8 +127,6 @@ export default function Contact() {
               />
             </div>
 
-            
-
             {submitStatus === "success" && (
               <div className="bg-green-50 text-green-600 p-4 rounded-lg">
                 Message envoyé avec succès !
