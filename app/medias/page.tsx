@@ -65,7 +65,7 @@ export default function MediasPage() {
           className={`px-4 py-2 rounded-full ${
             filter === "all"
               ? "bg-pink-500 text-white"
-              : "bg-gray-200 hover:bg-gray-300"
+              : "bg-gray-200  dark:text-dark-mode-2 hover:bg-gray-300"
           }`}
         >
           Tous les médias
