@@ -120,7 +120,7 @@ export function TimelineHistory() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full ">
       <Timeline data={evenements} />
       {selectedEvent && (
         <EventDetailModal

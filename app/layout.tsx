@@ -1,4 +1,5 @@
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import DefaultLayout from "./Layouts/DefaultLayout";
 import { Poppins } from 'next/font/google';
@@ -24,7 +25,9 @@ export default function RootLayout({
     <html lang="fr" className={`${poppins.variable}`}>
       <body className={poppins.className}>
         <AuthProvider>
-          <DefaultLayout>{children}</DefaultLayout>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <DefaultLayout>{children}</DefaultLayout>
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>
