@@ -7,6 +7,7 @@ import {
   HoveredLink,
   Menu,
   MenuItem,
+  MenuItemNoHoverLink,
   MenuItemWithIcon,
 } from "../ui/navbar-menu";
 import UserMenu from "./UserMenu";
@@ -32,28 +33,21 @@ export default function Navbar({ className }: { className?: string }) {
             />
           </a>
         </div>
-
-        <MenuItem
+        <MenuItemNoHoverLink
           setActive={setActive}
-          active={active}
           item="Actualités"
           href="/actualites"
         />
-
-        <MenuItem
+        <MenuItemNoHoverLink
           setActive={setActive}
-          active={active}
           item="Programme"
           href="/programme"
         />
-
-        <MenuItem
+        <MenuItemNoHoverLink
           setActive={setActive}
-          active={active}
           item="Photos"
           href="/photos"
         />
-
         <MenuItem setActive={setActive} active={active} item="Pratique">
           <div className="flex flex-col space-y-4 text-sm">
             <HoveredLink href="/pratique/acces">Accès</HoveredLink>
@@ -61,28 +55,21 @@ export default function Navbar({ className }: { className?: string }) {
             <HoveredLink href="/pratique/contact">Contact</HoveredLink>
           </div>
         </MenuItem>
-
-        <MenuItem
+        <MenuItemNoHoverLink
           setActive={setActive}
-          active={active}
           item="Vidéos"
           href="/videos"
         />
-
-        <MenuItem
+        <MenuItemNoHoverLink
           setActive={setActive}
-          active={active}
           item="Presse"
           href="/presse"
         />
-
-        <MenuItem
+        <MenuItemNoHoverLink
           setActive={setActive}
-          active={active}
           item="Partenaires"
           href="/partenaires"
         />
-
         <MenuItemWithIcon
           setActive={setActive}
           active={active}
