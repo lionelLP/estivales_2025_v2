@@ -1,4 +1,5 @@
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import DefaultLayout from "./Layouts/DefaultLayout";
 
@@ -13,10 +14,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <body>
         <AuthProvider>
-          <DefaultLayout>{children}</DefaultLayout>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <DefaultLayout>{children}</DefaultLayout>
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>

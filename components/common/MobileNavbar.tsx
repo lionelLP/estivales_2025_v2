@@ -34,7 +34,7 @@ export default function MobileNavbar() {
   }, [isOpen]);
 
   return (
-    <div className="block lg:hidden fixed top-0 inset-x-0 z-50 dark:bg-dark-mode p-4">
+    <div className="block lg:hidden fixed top-0 inset-x-0 z-50 dark:bg-dark-mode-2 p-4">
       {/* Hamburger Button */}
       <div className="flex justify-between items-center border rounded-full px-3 py-1 bg-white dark:bg-dark-mode z-50 relative shadow-lg">
         <div>

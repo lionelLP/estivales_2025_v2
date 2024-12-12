@@ -2,11 +2,12 @@
 const nextConfig = {
   images: {
     domains: [
-      'images.unsplash.com',
-      'localhost',
-      'estivales-brou.vercel.app'
+      "images.unsplash.com",
+      "localhost",
+      "estivales-brou.vercel.app",
+      "img.youtube.com",
     ],
   },
-}
+};
 
-module.exports = nextConfig 
+module.exports = nextConfig;

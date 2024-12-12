@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
+import { CircularImageCropper } from "@/components/common/circular-image-cropper";
 import { FileUpload } from "@/components/common/file-upload";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Partner } from "@/lib/types/partner";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { CircularImageCropper } from "@/components/common/circular-image-cropper";
 
 export default function EditPartner({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -60,7 +62,7 @@ export default function EditPartner({ params }: { params: { id: string } }) {
     formDataToSend.append("name", formData.name);
     formDataToSend.append("description", formData.description);
     formDataToSend.append("website_url", formData.website_url);
-    
+
     if (logo.length > 0) {
       formDataToSend.append("logo", logo[0]);
     }
@@ -88,7 +90,9 @@ export default function EditPartner({ params }: { params: { id: string } }) {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -129,9 +133,13 @@ export default function EditPartner({ params }: { params: { id: string } }) {
   };
 
   const handleCroppedLogo = (croppedBlob: Blob) => {
-    const croppedFile = new File([croppedBlob], logoToProcess?.name || 'logo.png', {
-      type: 'image/png'
-    });
+    const croppedFile = new File(
+      [croppedBlob],
+      logoToProcess?.name || "logo.png",
+      {
+        type: "image/png",
+      }
+    );
     setLogo([croppedFile]);
     setShowCropper(false);
     setLogoToProcess(null);
@@ -155,7 +163,9 @@ export default function EditPartner({ params }: { params: { id: string } }) {
 
   return (
     <div className="container mx-auto px-4 py-8 mt-20">
-      <h1 className="text-3xl font-bold text-center mb-12">Modifier le partenaire</h1>
+      <h1 className="text-3xl font-bold text-center mb-12">
+        Modifier le partenaire
+      </h1>
 
       <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-8">
         {error && (
@@ -164,61 +174,53 @@ export default function EditPartner({ params }: { params: { id: string } }) {
 
         {/* Nom */}
         <div className="space-y-2">
-          <label htmlFor="name" className="block text-sm font-medium">
-            Nom
-          </label>
-          <input
+          <Label htmlFor="name">Nom</Label>
+          <Input
             id="name"
             name="name"
             type="text"
             value={formData.name}
             onChange={handleChange}
-            className="w-full rounded-lg border p-3 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 transition"
             required
           />
         </div>
 
         {/* Description */}
         <div className="space-y-2">
-          <label htmlFor="description" className="block text-sm font-medium">
-            Description
-          </label>
+          <Label htmlFor="description">Description</Label>
           <textarea
             id="description"
             name="description"
             value={formData.description}
             onChange={handleChange}
             rows={4}
-            className="w-full rounded-lg border p-3 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 transition"
+            className="w-full rounded-lg border p-3 bg-gray-50 dark:bg-zinc-800 shadow-sm focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-600 transition dark:text-white"
           />
         </div>
 
         {/* Site web */}
         <div className="space-y-2">
-          <label htmlFor="website_url" className="block text-sm font-medium">
-            Site web
-          </label>
-          <input
+          <Label htmlFor="website_url">Site web</Label>
+          <Input
             id="website_url"
             name="website_url"
             type="url"
             value={formData.website_url}
             onChange={handleChange}
             placeholder="https://"
-            className="w-full rounded-lg border p-3 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 transition"
           />
         </div>
 
         {/* Logo Upload */}
         <div className="space-y-4">
-          <label className="block text-sm font-medium">Logo</label>
+          <Label>Logo</Label>
           {currentLogoUrl && (
             <div className="mb-4">
               <p className="text-sm text-gray-500 mb-2">Logo actuel :</p>
               <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200">
-                <img 
-                  src={currentLogoUrl} 
-                  alt="Logo actuel" 
+                <img
+                  src={currentLogoUrl}
+                  alt="Logo actuel"
                   className="object-cover w-full h-full"
                 />
               </div>
@@ -230,28 +232,33 @@ export default function EditPartner({ params }: { params: { id: string } }) {
             accept="image/*"
             multiple={false}
           />
-          <p className="text-sm text-gray-500">Format recommandé : PNG ou JPG, taille maximale : 2MB</p>
-          {showCropper && (
+          <p className="text-sm text-gray-500">
+            Format recommandé : PNG ou JPG, taille maximale : 2MB
+          </p>
+          {showCropper && logoToProcess && (
             <CircularImageCropper
               imageFile={logoToProcess}
               onCropComplete={handleCroppedLogo}
-              onCancel={() => setShowCropper(false)}
+              onCancel={() => {
+                setShowCropper(false);
+                setLogoToProcess(null);
+              }}
             />
           )}
         </div>
 
         {/* Banner Upload */}
-        <div className="space-y-4">
-          <label className="block text-sm font-medium">Bannière</label>
+        <div className="space-y-2">
+          <Label>Bannière</Label>
           {currentBannerUrl && (
             <div className="mb-4">
               <p className="text-sm text-gray-500 mb-2">Bannière actuelle :</p>
-              <div className="relative h-96 w-full rounded-lg overflow-hidden">
-                <div 
-                  className="absolute inset-0 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${currentBannerUrl})` }}
+              <div className="relative w-full h-40 rounded-lg overflow-hidden border-2 border-gray-200">
+                <img
+                  src={currentBannerUrl}
+                  alt="Bannière actuelle"
+                  className="object-cover w-full h-full"
                 />
-                <div className="absolute inset-0 bg-black/30"></div>
               </div>
             </div>
           )}
@@ -261,50 +268,35 @@ export default function EditPartner({ params }: { params: { id: string } }) {
             accept="image/*"
             multiple={false}
           />
-          <p className="text-sm text-gray-500">Format recommandé : PNG ou JPG, taille maximale : 5MB</p>
+          <p className="text-sm text-gray-500">
+            Format recommandé : 1920x1080px, taille maximale : 5MB
+          </p>
         </div>
 
-        <div className="flex flex-col space-y-4 pt-6">
-          <div className="flex justify-end space-x-4">
+        <div className="flex justify-between space-x-4">
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="px-4 py-2 text-red-600 hover:text-red-800 transition disabled:opacity-50"
+          >
+            {isDeleting ? "Suppression..." : "Supprimer"}
+          </button>
+
+          <div className="flex space-x-4">
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-6 py-3 text-gray-600 hover:text-gray-800 transition"
+              className="px-4 py-2 text-gray-600 hover:text-gray-800 transition"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
             >
-              {isSubmitting ? "Modification..." : "Enregistrer les modifications"}
-            </button>
-          </div>
-
-          <div className="border-t pt-6">
-            <button
-              type="button"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="w-full bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-            >
-              {isDeleting ? (
-                <>
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span>Suppression...</span>
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  <span>Supprimer le partenaire</span>
-                </>
-              )}
+              {isSubmitting ? "Enregistrement..." : "Enregistrer"}
             </button>
           </div>
         </div>

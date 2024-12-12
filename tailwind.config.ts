@@ -71,6 +71,8 @@ const config: Config = {
         },
         "red-brou": "#ED057B",
         "red-brou-2": "#EA1A2F",
+        "dark-mode": "#24292f",
+        "dark-mode-2": "#1F2428",
       },
       borderRadius: {
         lg: "var(--radius)",
