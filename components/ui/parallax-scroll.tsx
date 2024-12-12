@@ -43,7 +43,7 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
   return (
     <>
       <div
-        className="h-[300vh] overflow-hidden antialiased relative flex flex-col gap-4"
+        className="h-[200vh] md:h-[300vh] overflow-hidden antialiased relative flex flex-col gap-4"
         ref={gridRef}
       >
         <div className="sticky top-0 flex h-screen items-center overflow-hidden">
