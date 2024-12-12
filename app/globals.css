@@ -83,7 +83,23 @@ body {
   }
 
   .prose p {
-    @apply text-gray-600 dark:text-gray-300 text-justify;
+    @apply text-gray-600 dark:text-gray-300;
+  }
+
+  .prose .ql-align-center {
+    @apply text-center;
+  }
+
+  .prose .ql-align-right {
+    @apply text-right;
+  }
+
+  .prose .ql-align-justify {
+    @apply text-justify;
+  }
+
+  .prose .ql-align-left {
+    @apply text-left;
   }
 
   .shadow-xl {
