@@ -1,9 +1,11 @@
 "use client";
 
-import { FileUpload } from "@/components/common/file-upload";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { CircularImageCropper } from "@/components/common/circular-image-cropper";
+import { FileUpload } from "@/components/common/file-upload";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function CreatePartner() {
   const router = useRouter();
@@ -57,7 +59,9 @@ export default function CreatePartner() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -73,9 +77,13 @@ export default function CreatePartner() {
   };
 
   const handleCroppedLogo = (croppedBlob: Blob) => {
-    const croppedFile = new File([croppedBlob], logoToProcess?.name || 'logo.png', {
-      type: 'image/png'
-    });
+    const croppedFile = new File(
+      [croppedBlob],
+      logoToProcess?.name || "logo.png",
+      {
+        type: "image/png",
+      }
+    );
     setLogo([croppedFile]);
     setShowCropper(false);
     setLogoToProcess(null);
@@ -83,72 +91,66 @@ export default function CreatePartner() {
 
   return (
     <div className="container mx-auto px-4 py-8 mt-20">
-      <h1 className="text-3xl font-bold text-center mb-12">Ajouter un partenaire</h1>
+      <h1 className="text-3xl font-bold text-center mb-12">
+        Ajouter un partenaire
+      </h1>
 
       <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-8">
         {error && (
-          <div className="bg-red-50 text-red-500 p-4 rounded-lg">
-            {error}
-          </div>
+          <div className="bg-red-50 text-red-500 p-4 rounded-lg">{error}</div>
         )}
 
         {/* Nom */}
         <div className="space-y-2">
-          <label htmlFor="name" className="block text-sm font-medium">
-            Nom
-          </label>
-          <input
+          <Label htmlFor="name">Nom</Label>
+          <Input
             id="name"
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full rounded-lg border p-2"
             required
           />
         </div>
 
         {/* Description */}
         <div className="space-y-2">
-          <label htmlFor="description" className="block text-sm font-medium">
-            Description
-          </label>
+          <Label htmlFor="description">Description</Label>
           <textarea
             id="description"
             name="description"
             value={formData.description}
             onChange={handleChange}
             rows={4}
-            className="w-full rounded-lg border p-2"
+            className="w-full rounded-lg border p-3 bg-gray-50 dark:bg-zinc-800 shadow-sm focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-600 transition dark:text-white"
           />
         </div>
 
         {/* Site web */}
         <div className="space-y-2">
-          <label htmlFor="website_url" className="block text-sm font-medium">
-            Site web
-          </label>
-          <input
+          <Label htmlFor="website_url">Site web</Label>
+          <Input
             id="website_url"
             type="url"
             name="website_url"
             value={formData.website_url}
             onChange={handleChange}
-            className="w-full rounded-lg border p-2"
             placeholder="https://"
           />
         </div>
 
         {/* Logo Upload */}
         <div className="space-y-4">
-          <label className="block text-sm font-medium">Logo</label>
+          <Label>Logo</Label>
           <FileUpload
             onChange={handleLogoSelect}
             maxFiles={1}
             accept="image/*"
             multiple={false}
           />
-          <p className="text-sm text-gray-500">Format recommandé : PNG ou JPG, taille maximale : 2MB</p>
+          <p className="text-sm text-gray-500">
+            Format recommandé : PNG ou JPG, taille maximale : 2MB
+          </p>
           {showCropper && logoToProcess && (
             <CircularImageCropper
               imageFile={logoToProcess}
@@ -163,14 +165,16 @@ export default function CreatePartner() {
 
         {/* Banner Upload */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium">Bannière</label>
+          <Label>Bannière</Label>
           <FileUpload
             onChange={(files) => setBanner(files)}
             maxFiles={1}
             accept="image/*"
             multiple={false}
           />
-          <p className="text-sm text-gray-500">Format recommandé : 1920x1080px, taille maximale : 5MB</p>
+          <p className="text-sm text-gray-500">
+            Format recommandé : 1920x1080px, taille maximale : 5MB
+          </p>
         </div>
 
         <div className="flex justify-end space-x-4">
@@ -192,4 +196,4 @@ export default function CreatePartner() {
       </form>
     </div>
   );
-} 
+}
