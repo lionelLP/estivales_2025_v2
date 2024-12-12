@@ -22,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" suppressHydrationWarning>
-      <body>
+    <html lang="fr" className={`${poppins.variable}`}>
+      <body className={poppins.className}>
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <MainLayout>{children}</MainLayout>
