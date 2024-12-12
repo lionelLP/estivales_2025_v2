@@ -48,11 +48,11 @@ export default function MediaPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto pt-20 px-4">
-        <h1 className="text-4xl font-bold text-center mb-12 text-bleu-fonce dark:text-bleu-clair">
+        <h1 className="text-4xl font-bold text-center text-bleu-fonce dark:text-bleu-clair">
           Galerie Média
         </h1>
-        <div className="flex justify-center">
-          <div className="w-full max-w-6xl">
+        <div className="flex justify-center items-center">
+          <div className="w-full">
             <ParallaxScroll media={media} />
           </div>
         </div>
