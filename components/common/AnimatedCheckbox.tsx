@@ -28,19 +28,19 @@ const AnimatedCheckbox: React.FC<{
           transition: all 0.2s linear;
         }
         .animated-checkbox:hover svg {
-          stroke: #003465;
+          stroke: var(--red-brou);
         }
         input:checked + .animated-checkbox svg {
-          stroke: #003465;
+          stroke: var(--red-brou);
         }
         @media (prefers-color-scheme: dark) {
           input:checked + .animated-checkbox svg {
-            stroke: #015b9a;
+            stroke: var(--red-brou);
           }
         }
         @media (prefers-color-scheme: dark) {
           .animated-checkbox:hover svg {
-            stroke: #015b9a;
+            stroke: var(--red-brou);
           }
         }
         input:checked + .animated-checkbox svg path {
