@@ -2,7 +2,6 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "next-themes";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import DefaultLayout from "./Layouts/DefaultLayout";
 import MainLayout from "./Layouts/MainLayout";
 
 const poppins = Poppins({
@@ -27,9 +26,8 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <DefaultLayout>{children}</DefaultLayout>
+            <MainLayout>{children}</MainLayout>
           </ThemeProvider>
-          <MainLayout>{children}</MainLayout>
         </AuthProvider>
       </body>
     </html>
