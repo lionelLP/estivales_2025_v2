@@ -26,13 +26,13 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">Liens Rapides</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/events" className="hover:text-white/80 transition">
-                  Événements
+                <Link href="/programme/passes" className="hover:text-white/80 transition">
+                  Événements précédents
                 </Link>
               </li>
               <li>
-                <Link href="/news" className="hover:text-white/80 transition">
-                  Actualités
+                <Link href="/programme/futur" className="hover:text-white/80 transition">
+                  Programmes à venir
                 </Link>
               </li>
               <li>
@@ -42,7 +42,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/contact"
+                  href="/pratique/contact"
                   className="hover:text-white/80 transition"
                 >
                   Contact
