@@ -4,14 +4,14 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen dark:bg-dark-mode">
       <ImageCarousel />
 
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-16 ">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
             {/* Texte à gauche */}
-            <div className="text-left col-span-2">
+            <div className="text-left col-span-2 ">
               <h1 className="text-4xl font-bold mb-8 text-bleu-fonce dark:text-bleu-clair">
                 Les Estivales de Brou
               </h1>

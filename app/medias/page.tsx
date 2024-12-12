@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
 import { Heart } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
 interface Media {
   id: number;
@@ -14,12 +14,12 @@ interface Media {
 
 export default function MediasPage() {
   const [medias, setMedias] = useState<Media[]>([]);
-  const [filter, setFilter] = useState<'all' | 'favorites'>('all');
+  const [filter, setFilter] = useState<"all" | "favorites">("all");
 
   useEffect(() => {
     const fetchMedias = async () => {
       try {
-        const response = await fetch('/api/medias');
+        const response = await fetch("/api/medias");
         if (response.ok) {
           const data = await response.json();
           setMedias(data);
@@ -35,46 +35,47 @@ export default function MediasPage() {
   const toggleFavorite = async (mediaId: number) => {
     try {
       const response = await fetch(`/api/medias/${mediaId}/favorite`, {
-        method: 'PUT'
+        method: "PUT",
       });
-      
+
       if (response.ok) {
-        setMedias(medias.map(media => 
-          media.id === mediaId 
-            ? { ...media, is_favorite: !media.is_favorite }
-            : media
-        ));
+        setMedias(
+          medias.map((media) =>
+            media.id === mediaId
+              ? { ...media, is_favorite: !media.is_favorite }
+              : media
+          )
+        );
       }
     } catch (error) {
       console.error("Erreur lors de la mise à jour du favori:", error);
     }
   };
 
-  const filteredMedias = filter === 'all' 
-    ? medias 
-    : medias.filter(media => media.is_favorite);
+  const filteredMedias =
+    filter === "all" ? medias : medias.filter((media) => media.is_favorite);
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8 text-center">Médiathèque 📸</h1>
-      
+
       <div className="flex justify-center gap-4 mb-8">
         <button
-          onClick={() => setFilter('all')}
+          onClick={() => setFilter("all")}
           className={`px-4 py-2 rounded-full ${
-            filter === 'all' 
-              ? 'bg-pink-500 text-white' 
-              : 'bg-gray-200 hover:bg-gray-300'
+            filter === "all"
+              ? "bg-pink-500 text-white"
+              : "bg-gray-200 hover:bg-gray-300"
           }`}
         >
           Tous les médias
         </button>
         <button
-          onClick={() => setFilter('favorites')}
+          onClick={() => setFilter("favorites")}
           className={`px-4 py-2 rounded-full ${
-            filter === 'favorites' 
-              ? 'bg-pink-500 text-white' 
-              : 'bg-gray-200 hover:bg-gray-300'
+            filter === "favorites"
+              ? "bg-pink-500 text-white "
+              : "bg-gray-200 dark:text-dark-mode-2 hover:bg-gray-300"
           }`}
         >
           Favoris
@@ -97,9 +98,9 @@ export default function MediasPage() {
               >
                 <Heart
                   className={`w-5 h-5 ${
-                    media.is_favorite 
-                      ? 'fill-pink-500 text-pink-500' 
-                      : 'text-gray-600'
+                    media.is_favorite
+                      ? "fill-pink-500 text-pink-500"
+                      : "text-gray-600"
                   }`}
                 />
               </button>
@@ -110,4 +111,4 @@ export default function MediasPage() {
       </div>
     </div>
   );
-} 
+}
