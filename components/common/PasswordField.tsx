@@ -68,7 +68,7 @@ const Input = styled.input`
 
   &::selection {
     color: white;
-    background: #015b9a;
+    background: var(--red-brou);
   }
 
   @media (prefers-color-scheme: dark) {
@@ -328,7 +328,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
               ${
                 visible ? radius + "px" : "0px"
               } circle at ${mouseX}px ${mouseY}px,
-              rgba(0,91,155, 0.6),
+              rgba(237, 5, 123, 0.6),
               transparent 80%
             )
           `,
