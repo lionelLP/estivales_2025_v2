@@ -329,3 +329,26 @@ export const HoveredLink = ({
     </Link>
   );
 };
+
+export const MenuItemNoHoverLink = ({
+  setActive,
+  item,
+  href,
+}: {
+  setActive: (item: string) => void;
+  item: string;
+  href: string;
+}) => {
+  return (
+    <div onMouseEnter={() => setActive(item)} className="relative">
+      <Link href={href} className="block">
+        <motion.p
+          transition={{ duration: 0.3 }}
+          className="cursor-pointer text-black hover:opacity-[0.9] dark:text-white"
+        >
+          {item}
+        </motion.p>
+      </Link>
+    </div>
+  );
+};
