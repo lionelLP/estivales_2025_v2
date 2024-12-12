@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${poppins.variable}`}>
+    <html lang="fr" className={`${poppins.variable}`}>
       <body className={poppins.className}>
         <AuthProvider>
           <DefaultLayout>{children}</DefaultLayout>
