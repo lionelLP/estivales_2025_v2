@@ -1,14 +1,15 @@
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "next-themes";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import DefaultLayout from "./Layouts/DefaultLayout";
-import { Poppins } from 'next/font/google';
+import MainLayout from "./Layouts/MainLayout";
 
 const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-  display: 'swap',
-  variable: '--font-poppins',
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+  variable: "--font-poppins",
 });
 
 export const metadata = {
@@ -28,6 +29,7 @@ export default function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <DefaultLayout>{children}</DefaultLayout>
           </ThemeProvider>
+          <MainLayout>{children}</MainLayout>
         </AuthProvider>
       </body>
     </html>
