@@ -1,6 +1,6 @@
 import { AuthProvider } from "@/contexts/AuthContext";
 import "./globals.css";
-import DefaultLayout from "./Layouts/DefaultLayout";
+import MainLayout from "./Layouts/MainLayout";
 
 export const metadata = {
   title: "Next.js",
@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="fr">
       <body>
         <AuthProvider>
-          <DefaultLayout>{children}</DefaultLayout>
+          <MainLayout>{children}</MainLayout>
         </AuthProvider>
       </body>
     </html>
