@@ -51,12 +51,11 @@ export default function Navbar({ className }: { className?: string }) {
             <HoveredLink href="/pratique/contact">Contact</HoveredLink>
           </div>
         </MenuItem>
-        <MenuItem setActive={setActive} active={active} item="Medias">
-          <div className="flex flex-col space-y-4 text-sm">
-            <HoveredLink href="/medias/photos">Photos</HoveredLink>
-            <HoveredLink href="/medias/videos">Vidéos</HoveredLink>
-          </div>
-        </MenuItem>
+        <MenuItemNoHoverLink 
+        setActive={setActive}
+        item="Medias"
+        href="/media"
+        />
         <MenuItemNoHoverLink
           setActive={setActive}
           item="Presse"
