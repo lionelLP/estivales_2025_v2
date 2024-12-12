@@ -4,6 +4,9 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 
 export default function Footer() {
+  const addressForMaps = encodeURIComponent("13 avenue Alsace Lorraine, 01000 Bourg en Bresse, France");
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${addressForMaps}`;
+
   return (
     <footer className="bg-gradient-to-r from-rose-600 to-pink-600 text-white">
       <div className="container mx-auto px-4 py-12">
@@ -68,13 +71,20 @@ export default function Footer() {
               </a>
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 flex-shrink-0" />
-                <span>
-                  Soirées Estivales de Brou
-                  <br />
-                  13 avenue Alsace Lorraine
-                  <br />
-                  01000 Bourg en Bresse
-                </span>
+                <a 
+                  href={googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white/80 transition"
+                >
+                  <span>
+                    Soirées Estivales de Brou
+                    <br />
+                    13 avenue Alsace Lorraine
+                    <br />
+                    01000 Bourg en Bresse
+                  </span>
+                </a>
               </div>
             </div>
           </div>
