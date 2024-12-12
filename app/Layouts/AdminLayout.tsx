@@ -5,12 +5,12 @@ import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { IconHome, IconSearch } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import {
-  Bell,
   ChevronDown,
   FileText,
   LogOut,
+  Newspaper,
+  PartyPopper,
   User,
-  UserRoundSearch,
   Users,
 } from "lucide-react";
 import Image from "next/image";
@@ -28,7 +28,7 @@ export default function AdminLayout({
     userType: string;
   };
 }) {
-  const linksAdmin = [
+  const links = [
     {
       label: "",
       href: "#",
@@ -45,88 +45,31 @@ export default function AdminLayout({
       ),
     },
     {
-      label: "Gestion des utilisateurs",
+      label: "Partenaires",
       href: "/admin/users",
       icon: (
         <Users className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
     {
-      label: "Gestion des certifications",
+      label: "A propos",
       href: "/admin/certification",
       icon: (
         <FileText className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
     {
-      label: "Gestion des alertes",
+      label: "Evenements",
       href: "/admin/alertes",
       icon: (
-        <Bell className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
-    },
-  ];
-
-  const linksMandataire = [
-    {
-      label: "",
-      href: "#",
-      icon: (
-        <IconSearch className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
-      searchBar: true,
-    },
-    {
-      label: "Tableau de bord",
-      href: "/mandataire",
-      icon: (
-        <IconHome className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <PartyPopper className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
     {
-      label: "Prospects",
-      href: "/mandataire/prospects",
+      label: "Revue de presse",
+      href: "/admin/alertes",
       icon: (
-        <UserRoundSearch className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
-    },
-    {
-      label: "Clients",
-      href: "/mandataire/clients",
-      icon: (
-        <Users className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
-    },
-  ];
-
-  const linksPersonnel = [
-    {
-      label: "",
-      href: "#",
-      icon: (
-        <IconSearch className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
-      searchBar: true,
-    },
-    {
-      label: "Tableau de bord",
-      href: "/personnel",
-      icon: (
-        <IconHome className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
-    },
-    {
-      label: "Prospects",
-      href: "/personnel/prospects",
-      icon: (
-        <UserRoundSearch className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
-    },
-    {
-      label: "Clients",
-      href: "/personnel/clients",
-      icon: (
-        <Users className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <Newspaper className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
   ];
@@ -141,12 +84,7 @@ export default function AdminLayout({
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             <Logo />
             <div className="mt-8 flex flex-col gap-2">
-              {(currentUser.userType === "Administrateur"
-                ? linksAdmin
-                : currentUser.userType === "Personnel"
-                ? linksPersonnel
-                : linksMandataire
-              ).map((link, idx) => (
+              {links.map((link, idx) => (
                 <div key={idx}>
                   {link.searchBar ? (
                     open ? (
@@ -200,8 +138,8 @@ export const Logo = () => {
       className="font-normal flex items-center space-x-2 text-sm text-black dark:text-white py-1 relative z-20"
     >
       <Image
-        src="/modernOwl.svg"
-        alt="Logo Hibou"
+        src="/logo.png"
+        alt="Logo"
         width={24}
         height={24}
         className="flex-shrink-0"
@@ -216,6 +154,7 @@ export const Logo = () => {
     </a>
   );
 };
+
 export const LogoIcon = () => {
   return (
     <a
