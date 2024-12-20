@@ -110,9 +110,6 @@ export function TimelineHistory() {
     fetchEvenements();
   }, []);
 
-  if (isLoading) {
-    return <div>Chargement...</div>;
-  }
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
