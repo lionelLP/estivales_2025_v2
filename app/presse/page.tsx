@@ -10,12 +10,11 @@ import { useEffect, useState } from "react";
 
 export default function PressePage() {
   const [items, setItems] = useState([]);
-  const [showEditor, setShowEditor] = useState(false);
   const { registerLoadingComponent, componentLoaded } = useLoading();
 
   useEffect(() => {
     const loadingId = registerLoadingComponent();
-    
+
     const fetchArticles = async () => {
       try {
         const response = await fetch("/api/articles");
@@ -34,7 +33,7 @@ export default function PressePage() {
     };
 
     fetchArticles();
-    
+
     return () => {
       componentLoaded(loadingId);
     };
@@ -194,21 +193,6 @@ export default function PressePage() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-end mb-6">
-          <button
-            onClick={() => setShowEditor(!showEditor)}
-            className="bg-black text-white px-4 py-2 rounded-lg hover:bg-opacity-80 transition"
-          >
-            {showEditor ? "Fermer" : "Ajouter un article"}
-          </button>
-        </div>
-
-        {showEditor && (
-          <div className="mb-6">
-            <ArticleEditor onSave={handleSaveArticle} />
-          </div>
-        )}
-
         <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[20rem]">
           {items.map((item, i) => (
             <BentoGridItem key={i} {...item} />
