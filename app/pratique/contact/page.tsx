@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { FileUpload } from "@/components/common/file-upload";
 import { Input } from "@/components/ui/input";
+import { motion } from "framer-motion";
+import { useState } from "react";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -14,7 +13,9 @@ export default function Contact() {
   });
   const [attachments, setAttachments] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
+  const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(
+    null
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +27,7 @@ export default function Contact() {
     formDataToSend.append("email", formData.email);
     formDataToSend.append("subject", formData.subject);
     formDataToSend.append("message", formData.message);
-    
+
     attachments.forEach((file) => {
       formDataToSend.append("attachments", file);
     });
@@ -51,7 +52,9 @@ export default function Contact() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -67,7 +70,7 @@ export default function Contact() {
         className="max-w-2xl mx-auto"
       >
         <h1 className="text-3xl font-bold text-center mb-12">Contactez-nous</h1>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-8">
             {submitStatus === "error" && (
@@ -147,4 +150,4 @@ export default function Contact() {
       </motion.div>
     </div>
   );
-} 
+}

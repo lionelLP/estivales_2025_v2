@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import Page from "./connexion";
+import LoginForm from "./login";
 
 export const metadata: Metadata = {
-  title: "Connexion | Estivle de Brou",
+  title: "Connexion | Estivales de Brou",
+  description: "Connectez-vous à votre compte Estivales de Brou",
 };
 
-export default function MetaPage() {
-  return <Page />;
+export default function Page() {
+  return <LoginForm />;
 }
