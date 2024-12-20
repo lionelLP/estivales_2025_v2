@@ -15,6 +15,8 @@ interface Media {
 export default function ImageCarousel() {
   const [images, setImages] = useState<Media[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchFavoriteImages = async () => {
@@ -29,39 +31,67 @@ export default function ImageCarousel() {
         }
       } catch (error) {
         console.error("Erreur lors du chargement des images favorites:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchFavoriteImages();
   }, []);
 
-  const paginate = (direction: number) => {
+  const paginate = (newDirection: number) => {
+    setDirection(newDirection);
     setCurrentIndex((prevIndex) => {
-      const newIndex = prevIndex + direction;
+      const newIndex = prevIndex + newDirection;
       if (newIndex >= images.length) return 0;
       if (newIndex < 0) return images.length - 1;
       return newIndex;
     });
   };
 
+  const swipeVariants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 1000 : -1000,
+      opacity: 0
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? 1000 : -1000,
+      opacity: 0
+    })
+  };
+
   if (images.length === 0) return null;
 
   return (
-    <div className="relative w-full h-[600px]">
-      <AnimatePresence mode="wait">
+    <div className="relative w-full h-[600px] overflow-hidden">
+      <AnimatePresence initial={false} custom={direction} mode="popLayout">
         <motion.div
           key={currentIndex}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="relative w-full h-full"
+          custom={direction}
+          variants={swipeVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{
+            x: { type: "spring", stiffness: 300, damping: 30 },
+            opacity: { duration: 0.2 }
+          }}
+          className="absolute w-full h-full"
         >
           <Image
             src={images[currentIndex].url}
             alt={images[currentIndex].title}
             fill
             priority
+            sizes="100vw"
             className="object-cover"
+            quality={100}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50" />
         </motion.div>
@@ -89,7 +119,10 @@ export default function ImageCarousel() {
             {images.map((_, index) => (
               <button
                 key={index}
-                onClick={() => setCurrentIndex(index)}
+                onClick={() => {
+                  setDirection(index > currentIndex ? 1 : -1);
+                  setCurrentIndex(index);
+                }}
                 className={`w-3 h-3 rounded-full transition-all duration-300 
                   ${
                     index === currentIndex

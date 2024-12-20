@@ -1,6 +1,15 @@
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "next-themes";
+import { Poppins } from "next/font/google";
 import "./globals.css";
-import DefaultLayout from "./Layouts/DefaultLayout";
+import MainLayout from "./Layouts/MainLayout";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+  variable: "--font-poppins",
+});
 
 export const metadata = {
   title: "Next.js",
@@ -13,10 +22,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr">
-      <body>
+    <html lang="fr" className={`${poppins.variable}`}>
+      <body className={poppins.className}>
         <AuthProvider>
-          <DefaultLayout>{children}</DefaultLayout>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <MainLayout>{children}</MainLayout>
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>

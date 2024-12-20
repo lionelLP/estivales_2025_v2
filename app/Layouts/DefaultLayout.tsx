@@ -31,7 +31,7 @@ const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
       <div className="block lg:hidden">
         <MobileNavbar />
       </div>
-      <main className="flex-grow lg:mt-20">{children}</main>
+      <main className="flex-grow lg:mt-20 dark:bg-dark-mode">{children}</main>
       <Footer />
     </div>
   );

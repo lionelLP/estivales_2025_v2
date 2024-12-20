@@ -71,6 +71,8 @@ const config: Config = {
         },
         "red-brou": "#ED057B",
         "red-brou-2": "#EA1A2F",
+        "dark-mode": "#24292f",
+        "dark-mode-2": "#1F2428",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -82,6 +84,9 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      fontFamily: {
+        poppins: ["var(--font-poppins)"],
+      },  
     },
   },
   plugins: [require("tailwindcss-animate"), addVariablesForColors],

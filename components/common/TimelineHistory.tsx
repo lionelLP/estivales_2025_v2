@@ -85,8 +85,13 @@ export function TimelineHistory() {
               ),
             }))
             .sort((a, b) => {
-              const dateA = new Date(a.title.split(" ").reverse().join(" "));
-              const dateB = new Date(b.title.split(" ").reverse().join(" "));
+              // Find the first event from each group to compare dates
+              const eventsA = eventsByDate[a.title];
+              const eventsB = eventsByDate[b.title];
+              
+              const dateA = new Date(eventsA[0].event_date);
+              const dateB = new Date(eventsB[0].event_date);
+              
               return dateA.getTime() - dateB.getTime();
             });
 
@@ -120,7 +125,7 @@ export function TimelineHistory() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full ">
       <Timeline data={evenements} />
       {selectedEvent && (
         <EventDetailModal

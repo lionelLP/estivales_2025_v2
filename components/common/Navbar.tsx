@@ -38,16 +38,12 @@ export default function Navbar({ className }: { className?: string }) {
           item="Actualités"
           href="/actualites"
         />
-        <MenuItemNoHoverLink
-          setActive={setActive}
-          item="Programme"
-          href="/programme"
-        />
-        <MenuItemNoHoverLink
-          setActive={setActive}
-          item="Photos"
-          href="/photos"
-        />
+        <MenuItem setActive={setActive} active={active} item="Programme">
+          <div className="flex flex-col space-y-4 text-sm">
+            <HoveredLink href="/programme/futur">A venir</HoveredLink>
+            <HoveredLink href="/programme/passes">Précédents</HoveredLink>
+          </div>
+        </MenuItem>
         <MenuItem setActive={setActive} active={active} item="Pratique">
           <div className="flex flex-col space-y-4 text-sm">
             <HoveredLink href="/pratique/acces">Accès</HoveredLink>
@@ -55,10 +51,10 @@ export default function Navbar({ className }: { className?: string }) {
             <HoveredLink href="/pratique/contact">Contact</HoveredLink>
           </div>
         </MenuItem>
-        <MenuItemNoHoverLink
-          setActive={setActive}
-          item="Vidéos"
-          href="/videos"
+        <MenuItemNoHoverLink 
+        setActive={setActive}
+        item="Medias"
+        href="/media"
         />
         <MenuItemNoHoverLink
           setActive={setActive}
