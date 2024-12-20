@@ -86,7 +86,7 @@ const config: Config = {
       },
       fontFamily: {
         poppins: ["var(--font-poppins)"],
-      },  
+      },
     },
   },
   plugins: [require("tailwindcss-animate"), addVariablesForColors],

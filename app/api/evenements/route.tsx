@@ -1,5 +1,6 @@
 import pool from "@/lib/db/mysql";
 import { NextResponse } from "next/server";
+import { notifySubscribersAboutNewEvent } from '@/lib/notifications/eventNotifications';
 
 export async function POST(request: Request) {
   try {
@@ -37,6 +38,24 @@ export async function POST(request: Request) {
           brochure_path,
         ]
       );
+
+      // If event is public, send notifications immediately
+      if (is_public) {
+        try {
+          await notifySubscribersAboutNewEvent({
+            id: result.insertId,
+            title,
+            subtitle,
+            description,
+            event_date,
+            location,
+            booking_link
+          });
+          console.log('Notifications sent successfully for event:', title);
+        } catch (notifyError) {
+          console.error('Failed to send notifications:', notifyError);
+        }
+      }
 
       return NextResponse.json({
         message: "Événement créé avec succès",

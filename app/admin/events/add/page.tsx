@@ -1,9 +1,28 @@
 "use client";
 
 import { FileUpload } from "@/components/common/file-upload";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
+interface Suggestion {
+  properties: {
+    label: string;
+    city: string;
+    postcode: string;
+  };
+  geometry: {
+    coordinates: [number, number];
+  };
+}
+
 export default function CreerEvenement() {
+  const [currentUser] = useState({
+    id: 1,
+    firstName: "Admin",
+    lastName: "User",
+    userType: "Administrateur",
+  });
+
   const [formData, setFormData] = useState({
     title: "",
     subtitle: "",
@@ -16,6 +35,8 @@ export default function CreerEvenement() {
   });
   const [brochure, setBrochure] = useState<File[]>([]);
   const [images, setImages] = useState<File[]>([]);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +94,37 @@ export default function CreerEvenement() {
     } catch (error) {
       console.error("Erreur:", error);
     }
+  };
+
+  const handleAddressSearch = async (query: string) => {
+    setFormData({ ...formData, location: query });
+
+    if (query.length > 2) {
+      try {
+        const response = await fetch(
+          `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(
+            query
+          )}&limit=5`
+        );
+        const data = await response.json();
+        setSuggestions(data.features);
+        setShowSuggestions(true);
+      } catch (error) {
+        console.error("Erreur lors de la recherche d'adresse:", error);
+      }
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleAddressSelect = (suggestion: Suggestion) => {
+    setFormData({
+      ...formData,
+      location: suggestion.properties.label,
+    });
+    setSuggestions([]);
+    setShowSuggestions(false);
   };
 
   return (
@@ -146,20 +198,43 @@ export default function CreerEvenement() {
           />
         </div>
 
-        {/* Lieu */}
+        {/* Lieu avec autocomplétion */}
         <div className="space-y-2">
           <label htmlFor="location" className="block text-sm font-medium">
             Lieu
           </label>
-          <input
-            id="location"
-            type="text"
-            value={formData.location}
-            onChange={(e) =>
-              setFormData({ ...formData, location: e.target.value })
-            }
-            className="w-full rounded-lg border p-2"
-          />
+          <div className="relative">
+            <Input
+              id="location"
+              type="text"
+              value={formData.location}
+              onChange={(e) => handleAddressSearch(e.target.value)}
+              onFocus={() =>
+                formData.location.length > 2 && setShowSuggestions(true)
+              }
+              placeholder="Entrez une adresse"
+            />
+
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute z-50 w-full mt-1 bg-white dark:bg-zinc-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700">
+                {suggestions.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-zinc-700 cursor-pointer"
+                    onClick={() => handleAddressSelect(suggestion)}
+                  >
+                    <div className="font-medium">
+                      {suggestion.properties.label}
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {suggestion.properties.postcode}{" "}
+                      {suggestion.properties.city}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Nombre maximum de participants */}
