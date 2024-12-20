@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import LoginForm from "./login";
+import LoginForm from "./connexion";
 
 export const metadata: Metadata = {
   title: "Connexion | Estivales de Brou",

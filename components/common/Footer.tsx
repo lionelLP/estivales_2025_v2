@@ -4,7 +4,9 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 
 export default function Footer() {
-  const addressForMaps = encodeURIComponent("13 avenue Alsace Lorraine, 01000 Bourg en Bresse, France");
+  const addressForMaps = encodeURIComponent(
+    "13 avenue Alsace Lorraine, 01000 Bourg en Bresse, France"
+  );
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${addressForMaps}`;
 
   return (
@@ -26,12 +28,18 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">Liens Rapides</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/programme/passes" className="hover:text-white/80 transition">
+                <Link
+                  href="/programme/passes"
+                  className="hover:text-white/80 transition"
+                >
                   Événements précédents
                 </Link>
               </li>
               <li>
-                <Link href="/programme/futur" className="hover:text-white/80 transition">
+                <Link
+                  href="/programme/futur"
+                  className="hover:text-white/80 transition"
+                >
                   Programmes à venir
                 </Link>
               </li>
@@ -42,7 +50,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/pratique/contact"
+                  href="/contact"
                   className="hover:text-white/80 transition"
                 >
                   Contact
@@ -71,7 +79,7 @@ export default function Footer() {
               </a>
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 flex-shrink-0" />
-                <a 
+                <a
                   href={googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
