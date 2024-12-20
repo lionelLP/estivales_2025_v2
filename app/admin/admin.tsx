@@ -6,7 +6,6 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulation d'un chargement
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);
