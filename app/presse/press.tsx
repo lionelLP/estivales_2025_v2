@@ -1,9 +1,11 @@
 "use client";
+import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 import { useLoading } from "@/contexts/LoadingContext";
 import { useEffect, useState } from "react";
 
 export default function PressePage() {
   const [items, setItems] = useState([]);
+  const [showEditor, setShowEditor] = useState(false);
   const { registerLoadingComponent, componentLoaded } = useLoading();
 
   useEffect(() => {
@@ -84,22 +86,21 @@ export default function PressePage() {
   };
 
   const formatArticleToItem = (article: any, index: number) => {
-    const formattedDate = new Date(article.Creation_article).toLocaleDateString(
-      "fr-FR",
->>>>>>> main
-      {
-        url: "/homepage/banner/estivale3.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Actualités Estivales de Brou",
-      },
-    ],
-  },
-};
+    return {
+      title: article.title,
+      description: article.content,
+      header: new Date(article.Creation_article).toLocaleDateString("fr-FR", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+      className: "md:col-span-1",
+      icon: article.favicon,
+      image: article.image,
+      link: article.link,
+    };
+  };
 
-<<<<<<< HEAD
-export { default } from "./press";
-=======
   return (
     <div className="min-h-screen pt-20">
       <div className="container mx-auto px-4">
