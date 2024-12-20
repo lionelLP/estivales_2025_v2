@@ -23,7 +23,7 @@ export async function notifySubscribersAboutNewEvent(event: any) {
       console.log(`Sending notification to: ${subscriber.email}`);
       return sendEmail(
         subscriber.email,
-        `Nouvel événement : ${event.title}`,
+        `Nouvel événement aux Estivales ! : ${event.title}`,
         createEventNotificationEmail(event, subscriber.email),
         true
       ).then(result => {
