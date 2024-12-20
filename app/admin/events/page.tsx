@@ -4,6 +4,13 @@ import { FileUpload } from "@/components/common/file-upload";
 import { useState } from "react";
 
 export default function CreerEvenement() {
+  const [currentUser] = useState({
+    id: 1,
+    firstName: "Admin",
+    lastName: "User",
+    userType: "Administrateur",
+  });
+
   const [formData, setFormData] = useState({
     title: "",
     subtitle: "",

@@ -7,10 +7,10 @@ import { motion } from "framer-motion";
 import {
   ChevronDown,
   FileText,
+  Images,
   LogOut,
   Newspaper,
   PartyPopper,
-  User,
   Users,
 } from "lucide-react";
 import Image from "next/image";
@@ -62,6 +62,13 @@ export default function AdminLayout({
       href: "/admin/news",
       icon: (
         <Newspaper className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+    },
+    {
+      label: "Gestion des medias",
+      href: "/admin/medias",
+      icon: (
+        <Images className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
   ];
@@ -230,13 +237,6 @@ const AdminMenu = ({
       transition={{ duration: 0.3 }}
       className="absolute bottom-full left-0 right-0 mb-8 bg-white dark:bg-dark-mode-2 rounded-lg shadow-lg p-2"
     >
-      <a
-        href="/user/profile"
-        className="flex items-center gap-2 p-2 hover:bg-neutral-100 dark:hover:bg-dark-mode-2 rounded"
-      >
-        <User className="h-5 w-5" />
-        <span>Mon compte</span>
-      </a>
       <Logout className="flex items-center gap-2 p-2 hover:bg-neutral-100 dark:hover:bg-dark-mode-2 rounded text-red-500 w-full">
         <LogOut className="h-5 w-5" />
         <span>Se déconnecter</span>

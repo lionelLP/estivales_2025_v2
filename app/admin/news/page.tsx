@@ -10,6 +10,12 @@ export default function PressePage() {
   const [items, setItems] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [currentUser] = useState({
+    id: 1,
+    firstName: "Admin",
+    lastName: "User",
+    userType: "Administrateur",
+  });
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -181,7 +187,7 @@ export default function PressePage() {
   };
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">

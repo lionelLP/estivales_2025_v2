@@ -9,6 +9,12 @@ import { useState } from "react";
 
 export default function CreatePartner() {
   const router = useRouter();
+  const [currentUser] = useState({
+    id: 1,
+    firstName: "Admin",
+    lastName: "User",
+    userType: "Administrateur",
+  });
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -90,7 +96,7 @@ export default function CreatePartner() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-20">
+    <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-12">
         Ajouter un partenaire
       </h1>

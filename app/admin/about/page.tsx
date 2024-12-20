@@ -1,8 +1,9 @@
 "use client";
 
+import AdminLayout from "@/app/Layouts/AdminLayout";
 import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const ReactQuill = dynamic(() => import("react-quill"), {
   ssr: false,
@@ -21,7 +22,7 @@ const modules = {
     ["link", "image"],
     ["clean"],
     ["code-block"],
-    ],
+  ],
 };
 
 export default function EditAbout() {
@@ -29,6 +30,12 @@ export default function EditAbout() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
+  const [currentUser] = useState({
+    id: 1,
+    firstName: "Admin",
+    lastName: "User",
+    userType: "Administrateur",
+  });
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -70,12 +77,18 @@ export default function EditAbout() {
   };
 
   if (isLoading) {
-    return <div>Chargement...</div>;
+    return (
+      <AdminLayout currentUser={currentUser}>
+        <div>Chargement...</div>
+      </AdminLayout>
+    );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-center mb-12 mt-12">Éditer la page À propos</h1>
+      <h1 className="text-3xl font-bold text-center mb-12">
+        Éditer la page À propos
+      </h1>
       <div className="mb-6">
         <ReactQuill
           theme="snow"

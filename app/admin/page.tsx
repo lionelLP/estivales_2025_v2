@@ -1,6 +1,7 @@
 "use client";
 
-import AdminLayout from "@/app/Layouts/AdminLayout";
+import { FileText, Images, Newspaper, PartyPopper, Users } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function AdminPage() {
@@ -12,6 +13,44 @@ export default function AdminPage() {
     userType: "Administrateur",
   });
 
+  const adminLinks = [
+    {
+      label: "Partenaires",
+      href: "/admin/partenaires",
+      icon: <Users className="h-12 w-12" />,
+      description: "Gérer les partenaires de l'événement",
+      color: "bg-blue-500",
+    },
+    {
+      label: "À propos",
+      href: "/admin/about",
+      icon: <FileText className="h-12 w-12" />,
+      description: "Modifier la page À propos",
+      color: "bg-green-500",
+    },
+    {
+      label: "Événements",
+      href: "/admin/events",
+      icon: <PartyPopper className="h-12 w-12" />,
+      description: "Gérer les événements",
+      color: "bg-purple-500",
+    },
+    {
+      label: "Revue de presse",
+      href: "/admin/news",
+      icon: <Newspaper className="h-12 w-12" />,
+      description: "Gérer les articles de presse",
+      color: "bg-orange-500",
+    },
+    {
+      label: "Gestion des médias",
+      href: "/admin/medias",
+      icon: <Images className="h-12 w-12" />,
+      description: "Gérer les médias du site",
+      color: "bg-pink-500",
+    },
+  ];
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -21,29 +60,32 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <AdminLayout currentUser={currentUser}>
-        <div>
-          <h1 className="text-3xl font-bold mb-12">
-            Tableau de bord administrateur
-          </h1>
+    <div>
+      <h1 className="text-3xl font-bold mb-12">
+        Tableau de bord administrateur
+      </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-4">Statistiques</h2>
-              <p className="text-gray-600">Contenu à venir...</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {adminLinks.map((link, index) => (
+          <Link
+            key={index}
+            href={link.href}
+            className="group transform transition-all duration-300 hover:scale-105"
+          >
+            <div
+              className={`${link.color} p-8 rounded-xl shadow-lg text-white h-full`}
+            >
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="transform transition-transform duration-300 group-hover:scale-110">
+                  {link.icon}
+                </div>
+                <h2 className="text-2xl font-bold">{link.label}</h2>
+                <p className="text-white/80">{link.description}</p>
+              </div>
             </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-4">Activités récentes</h2>
-              <p className="text-gray-600">Contenu à venir...</p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-4">Notifications</h2>
-              <p className="text-gray-600">Contenu à venir...</p>
-            </div>
-          </div>
-        </div>
-    </AdminLayout>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }
