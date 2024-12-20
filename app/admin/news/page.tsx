@@ -1,23 +1,22 @@
 "use client";
 
-import ArticleEditor from "@/components/editor/ArticleEditor";
-import { Newspaper } from "lucide-react";
+import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
+import { useLoading } from "@/contexts/LoadingContext";
+import { Edit, Newspaper, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function PressePage() {
   const [items, setItems] = useState([]);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [currentUser] = useState({
-    id: 1,
-    firstName: "Admin",
-    lastName: "User",
-    userType: "Administrateur",
-  });
+  const { registerLoadingComponent, componentLoaded } = useLoading();
+  const [showEditor, setShowEditor] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
+    const loadingId = registerLoadingComponent();
+
     const fetchArticles = async () => {
       try {
         const response = await fetch("/api/articles");
@@ -30,10 +29,16 @@ export default function PressePage() {
         }
       } catch (error) {
         console.error("Erreur lors du chargement des articles:", error);
+      } finally {
+        componentLoaded(loadingId);
       }
     };
 
     fetchArticles();
+
+    return () => {
+      componentLoaded(loadingId);
+    };
   }, []);
 
   const handleSaveArticle = async (article: any) => {
@@ -60,7 +65,7 @@ export default function PressePage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setErrorMessage(errorData.error || "Erreur lors de la sauvegarde");
+        console.error("Erreur serveur:", errorData);
         throw new Error(errorData.error || "Erreur lors de la sauvegarde");
       }
 
@@ -80,20 +85,9 @@ export default function PressePage() {
       );
 
       setItems([newItem, ...items]);
-      setSuccessMessage("Article ajouté avec succès !");
-
-      // Effacer le message de succès après 3 secondes
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 3000);
+      setShowEditor(false);
     } catch (error) {
       console.error("Erreur complète:", error);
-      setErrorMessage("Une erreur est survenue lors de l'ajout de l'article");
-
-      // Effacer le message d'erreur après 3 secondes
-      setTimeout(() => {
-        setErrorMessage("");
-      }, 3000);
     }
   };
 
@@ -125,16 +119,48 @@ export default function PressePage() {
           <div className="line-clamp-2 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300">
             {article.content}
           </div>
-          {article.content.length > (isLarge ? 150 : 100) && (
-            <Link
-              href={article.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline inline-block"
-            >
-              Voir plus
-            </Link>
-          )}
+          <div className="flex justify-between items-center mt-2">
+            <div>
+              {article.content.length > (isLarge ? 150 : 100) && (
+                <Link
+                  href={article.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline inline-block"
+                >
+                  Voir plus
+                </Link>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/admin/news/edit/${article.id}`);
+                }}
+                className="p-1 text-bleu-fonce hover:text-bleu-clair transition-colors"
+                title="Modifier"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (
+                    window.confirm(
+                      "Voulez-vous vraiment supprimer cet article ?"
+                    )
+                  ) {
+                    handleDeleteArticle(article.id);
+                  }
+                }}
+                className="p-1 text-rouge hover:text-rouge/80 transition-colors"
+                title="Supprimer"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
       ),
       header: (
@@ -186,8 +212,28 @@ export default function PressePage() {
     };
   };
 
+  const handleDeleteArticle = async (articleId: number) => {
+    try {
+      const response = await fetch(`/api/articles/${articleId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la suppression");
+      }
+
+      setItems((prevItems) =>
+        prevItems.filter((item) => {
+          return item.id !== articleId;
+        })
+      );
+    } catch (error) {
+      console.error("Erreur lors de la suppression:", error);
+    }
+  };
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-20">
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
@@ -195,27 +241,32 @@ export default function PressePage() {
               <h1 className="text-4xl font-bold mb-8 text-bleu-fonce dark:text-bleu-clair">
                 Revues de presse & actualités
               </h1>
+              <div className="flex justify-end">
+                <Link
+                  href="/admin/news/add"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+                >
+                  <Newspaper className="w-5 h-5 mr-2" />
+                  Ajouter une revue de presse
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        {successMessage && (
-          <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
-            {successMessage}
-          </div>
-        )}
-
-        {errorMessage && (
-          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
-            {errorMessage}
-          </div>
-        )}
-
-        <div className="mb-6">
+      {showEditor && (
+        <div className="container mx-auto px-4 py-8">
           <ArticleEditor onSave={handleSaveArticle} />
         </div>
+      )}
+
+      <div className="container mx-auto px-4 py-8">
+        <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[20rem]">
+          {items.map((item, i) => (
+            <BentoGridItem key={i} {...item} />
+          ))}
+        </BentoGrid>
       </div>
     </div>
   );

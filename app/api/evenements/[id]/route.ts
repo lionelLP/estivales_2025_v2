@@ -1,3 +1,4 @@
+import { db } from "@/lib/db";
 import pool from "@/lib/db/mysql";
 import { NextResponse } from "next/server";
 
@@ -62,6 +63,8 @@ export async function PUT(
       location,
       max_participants,
       is_public,
+      booking_link,
+      brochure_path,
     } = body;
 
     const connection = await pool.getConnection();
@@ -74,7 +77,9 @@ export async function PUT(
           event_date = ?, 
           location = ?, 
           max_participants = ?, 
-          is_public = ?
+          is_public = ?,
+          booking_link = ?,
+          brochure_path = ?
         WHERE id = ?`,
         [
           title,
@@ -84,6 +89,8 @@ export async function PUT(
           location,
           max_participants,
           is_public,
+          booking_link,
+          brochure_path,
           params.id,
         ]
       );
@@ -109,5 +116,28 @@ export async function PUT(
   } catch (error) {
     console.error("Erreur:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    // Suppression des images associées
+    await db.execute("DELETE FROM event_media WHERE event_id = ?", [params.id]);
+
+    // Suppression de l'événement
+    const [result] = await db.execute("DELETE FROM events WHERE id = ?", [
+      params.id,
+    ]);
+
+    return NextResponse.json({ message: "Événement supprimé avec succès" });
+  } catch (error) {
+    console.error("Erreur lors de la suppression de l'événement:", error);
+    return NextResponse.json(
+      { error: "Erreur lors de la suppression de l'événement" },
+      { status: 500 }
+    );
   }
 }
