@@ -52,8 +52,12 @@ export default function CreatePartner() {
         const data = await response.json();
         setError(data.message || "Une erreur est survenue");
       }
-    } catch (err) {
-      setError("Une erreur est survenue lors de la création du partenaire");
+    } catch (err: Error | unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Une erreur est survenue lors de la création du partenaire"
+      );
     } finally {
       setIsSubmitting(false);
     }
