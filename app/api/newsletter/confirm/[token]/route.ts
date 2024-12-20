@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db/mysql';
 import { sendEmail } from '@/lib/email';
+import { createEmailTemplate } from '@/lib/templates/emailTemplate';
 
 export async function GET(
   request: Request,
@@ -68,10 +69,16 @@ export async function GET(
       await sendEmail(
         pendingSubscription.email,
         'Bienvenue dans notre newsletter !',
-        `
-        <h1>Merci de votre inscription !</h1>
-        <p>Vous êtes maintenant inscrit à la newsletter des Estivales de Brou.</p>
-        `
+        createEmailTemplate({
+          title: 'Bienvenue dans notre newsletter !',
+          content: `
+            <p>Votre inscription à la newsletter des Estivales de Brou a été confirmée avec succès.</p>
+            <p>Vous recevrez désormais nos actualités et informations importantes directement dans votre boîte mail.</p>
+            <p>Merci de votre confiance !</p>
+          `,
+          email: pendingSubscription.email,
+          isNewsletter: true
+        })
       );
 
       return new Response(
