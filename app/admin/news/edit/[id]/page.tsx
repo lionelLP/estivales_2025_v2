@@ -1,117 +1,213 @@
 "use client";
 
-import { useLoading } from "@/contexts/LoadingContext";
-import { Newspaper } from "lucide-react";
-import Image from "next/image";
-import { useParams } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-interface Article {
-  id: number;
-  title: string;
-  content: string;
-  link: string;
-  Creation_article: string;
-  image: string;
-  favicon: string;
-}
-
-export default function EditArticlePage() {
-  const [article, setArticle] = useState<Article | null>(null);
-  const { registerLoadingComponent, componentLoaded } = useLoading();
-  const params = useParams();
+export default function EditNews({ params }: { params: { id: string } }) {
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    title: "",
+    link: "",
+    content: "",
+    image: "",
+    favicon: "",
+    Creation_article: new Date().toISOString().slice(0, 16),
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    const loadingId = registerLoadingComponent();
-
     const fetchArticle = async () => {
       try {
         const response = await fetch(`/api/articles/${params.id}`);
         if (response.ok) {
           const data = await response.json();
-          setArticle(data);
+          const creationDate = new Date(data.Creation_article)
+            .toISOString()
+            .slice(0, 16);
+          setFormData({
+            ...data,
+            Creation_article: creationDate,
+          });
+        } else {
+          setError("Article non trouvé");
         }
-      } catch (error) {
-        console.error("Erreur lors du chargement de l'article:", error);
+      } catch {
+        setError("Erreur lors de la récupération de l'article");
       } finally {
-        componentLoaded(loadingId);
+        setIsLoading(false);
       }
     };
 
     fetchArticle();
-
-    return () => {
-      componentLoaded(loadingId);
-    };
   }, [params.id]);
 
-  if (!article) {
-    return <div>Chargement...</div>;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/articles/${params.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        router.push("/admin/news");
+      } else {
+        const data = await response.json();
+        setError(data.error || "Erreur lors de la mise à jour");
+      }
+    } catch {
+      setError("Erreur lors de la mise à jour");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">Chargement...</div>
+      </div>
+    );
   }
 
-  const formattedDate = new Date(article.Creation_article).toLocaleDateString(
-    "fr-FR",
-    {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }
-  );
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-red-500 text-center">{error}</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen pt-20">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-          <div className="relative w-full h-64 mb-6">
-            <Image
-              src={article.image}
-              alt={article.title}
-              fill
-              className="object-cover rounded-lg"
-            />
-          </div>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">Modifier l&apos;article</h1>
 
-          <div className="flex items-center gap-2 mb-4">
-            {article.favicon ? (
-              <div className="relative w-6 h-6">
-                <Image
-                  src={article.favicon}
-                  alt="Site favicon"
-                  width={24}
-                  height={24}
-                  className="rounded-sm"
-                />
-              </div>
-            ) : (
-              <Newspaper className="h-6 w-6 text-bleu-fonce dark:text-bleu-clair" />
-            )}
-            <span className="text-sm text-neutral-500 dark:text-neutral-400">
-              {formattedDate}
-            </span>
-          </div>
-
-          <h1 className="text-3xl font-bold mb-4 text-bleu-fonce dark:text-bleu-clair">
-            {article.title}
-          </h1>
-
-          <div className="prose dark:prose-invert max-w-none">
-            <p className="text-gray-700 dark:text-gray-300">
-              {article.content}
-            </p>
-          </div>
-
-          {article.link && (
-            <a
-              href={article.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block mt-6 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              Lire l'article original
-            </a>
-          )}
+      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+        {/* Titre */}
+        <div className="space-y-2">
+          <label htmlFor="title" className="block text-sm font-medium">
+            Titre
+          </label>
+          <Input
+            id="title"
+            name="title"
+            type="text"
+            value={formData.title}
+            onChange={handleChange}
+            required
+          />
         </div>
-      </div>
+
+        {/* Lien */}
+        <div className="space-y-2">
+          <label htmlFor="link" className="block text-sm font-medium">
+            Lien de l&apos;article
+          </label>
+          <Input
+            id="link"
+            name="link"
+            type="url"
+            value={formData.link}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        {/* Description */}
+        <div className="space-y-2">
+          <label htmlFor="content" className="block text-sm font-medium">
+            Description
+          </label>
+          <textarea
+            id="content"
+            name="content"
+            value={formData.content}
+            onChange={handleChange}
+            rows={4}
+            className="w-full rounded-lg border p-2"
+          />
+        </div>
+
+        {/* Image URL */}
+        <div className="space-y-2">
+          <label htmlFor="image" className="block text-sm font-medium">
+            URL de l&apos;image
+          </label>
+          <Input
+            id="image"
+            name="image"
+            type="url"
+            value={formData.image}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Favicon URL */}
+        <div className="space-y-2">
+          <label htmlFor="favicon" className="block text-sm font-medium">
+            URL du favicon
+          </label>
+          <Input
+            id="favicon"
+            name="favicon"
+            type="url"
+            value={formData.favicon}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Date de création */}
+        <div className="space-y-2">
+          <label
+            htmlFor="Creation_article"
+            className="block text-sm font-medium"
+          >
+            Date de publication
+          </label>
+          <Input
+            id="Creation_article"
+            name="Creation_article"
+            type="datetime-local"
+            value={formData.Creation_article}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="flex justify-end gap-4">
+          <button
+            type="button"
+            onClick={() => router.push("/admin/news")}
+            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+          >
+            Annuler
+          </button>
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          >
+            {isSaving ? "Enregistrement..." : "Enregistrer"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

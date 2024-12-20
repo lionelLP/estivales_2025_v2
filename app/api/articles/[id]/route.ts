@@ -26,38 +26,28 @@ export async function GET(
     );
   }
 }
-
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
     const body = await request.json();
-    const {
-      title,
-      link,
-      content,
-      Creation_article,
-      is_published,
-      user_id,
-      event_id,
-      image,
-      favicon,
-    } = body;
+    const { title, link, content, Creation_article, image, favicon } = body;
 
     await query(
       `UPDATE articles 
-       SET title = ?, link = ?, content = ?, Creation_article = ?, 
-           is_published = ?, user_id = ?, event_id = ?, image = ?, favicon = ?
+       SET title = ?, 
+           link = ?, 
+           content = ?, 
+           Creation_article = ?, 
+           image = ?, 
+           favicon = ?
        WHERE id = ?`,
       [
         title,
         link,
         content,
         Creation_article,
-        is_published,
-        user_id,
-        event_id,
         image,
         favicon,
         parseInt(params.id),
