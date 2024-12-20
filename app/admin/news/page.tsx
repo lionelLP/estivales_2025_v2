@@ -1,6 +1,5 @@
 "use client";
 
-import AdminLayout from "@/app/Layouts/AdminLayout";
 import ArticleEditor from "@/components/editor/ArticleEditor";
 import { Newspaper } from "lucide-react";
 import Image from "next/image";
@@ -188,38 +187,36 @@ export default function PressePage() {
   };
 
   return (
-    <AdminLayout currentUser={currentUser}>
-      <div className="min-h-screen">
-        <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-              <div className="text-left col-span-2">
-                <h1 className="text-4xl font-bold mb-8 text-bleu-fonce dark:text-bleu-clair">
-                  Revues de presse & actualités
-                </h1>
-              </div>
+    <div className="min-h-screen">
+      <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+            <div className="text-left col-span-2">
+              <h1 className="text-4xl font-bold mb-8 text-bleu-fonce dark:text-bleu-clair">
+                Revues de presse & actualités
+              </h1>
             </div>
-          </div>
-        </div>
-
-        <div className="container mx-auto px-4 py-8">
-          {successMessage && (
-            <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
-              {successMessage}
-            </div>
-          )}
-
-          {errorMessage && (
-            <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
-              {errorMessage}
-            </div>
-          )}
-
-          <div className="mb-6">
-            <ArticleEditor onSave={handleSaveArticle} />
           </div>
         </div>
       </div>
-    </AdminLayout>
+
+      <div className="container mx-auto px-4 py-8">
+        {successMessage && (
+          <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
+            {successMessage}
+          </div>
+        )}
+
+        {errorMessage && (
+          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+            {errorMessage}
+          </div>
+        )}
+
+        <div className="mb-6">
+          <ArticleEditor onSave={handleSaveArticle} />
+        </div>
+      </div>
+    </div>
   );
 }

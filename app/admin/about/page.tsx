@@ -85,36 +85,34 @@ export default function EditAbout() {
   }
 
   return (
-    <AdminLayout currentUser={currentUser}>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mb-12">
-          Éditer la page À propos
-        </h1>
-        <div className="mb-6">
-          <ReactQuill
-            theme="snow"
-            value={content}
-            onChange={setContent}
-            modules={modules}
-            className="h-[500px] mb-12"
-          />
-        </div>
-        <div className="flex justify-end gap-4">
-          <button
-            onClick={() => router.push("/about")}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
-          >
-            Annuler
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-          >
-            {isSaving ? "Enregistrement..." : "Enregistrer"}
-          </button>
-        </div>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-center mb-12">
+        Éditer la page À propos
+      </h1>
+      <div className="mb-6">
+        <ReactQuill
+          theme="snow"
+          value={content}
+          onChange={setContent}
+          modules={modules}
+          className="h-[500px] mb-12"
+        />
       </div>
-    </AdminLayout>
+      <div className="flex justify-end gap-4">
+        <button
+          onClick={() => router.push("/about")}
+          className="px-4 py-2 text-gray-600 hover:text-gray-800"
+        >
+          Annuler
+        </button>
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        >
+          {isSaving ? "Enregistrement..." : "Enregistrer"}
+        </button>
+      </div>
+    </div>
   );
 }

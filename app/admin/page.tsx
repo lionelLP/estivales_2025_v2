@@ -1,6 +1,5 @@
 "use client";
 
-import AdminLayout from "@/app/Layouts/AdminLayout";
 import { FileText, Images, Newspaper, PartyPopper, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -61,34 +60,32 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <AdminLayout currentUser={currentUser}>
-        <div>
-          <h1 className="text-3xl font-bold mb-12">
-            Tableau de bord administrateur
-          </h1>
+    <div>
+      <h1 className="text-3xl font-bold mb-12">
+        Tableau de bord administrateur
+      </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {adminLinks.map((link, index) => (
-              <Link
-                key={index}
-                href={link.href}
-                className="group transform transition-all duration-300 hover:scale-105"
-              >
-                <div
-                  className={`${link.color} p-8 rounded-xl shadow-lg text-white h-full`}
-                >
-                  <div className="flex flex-col items-center text-center space-y-4">
-                    <div className="transform transition-transform duration-300 group-hover:scale-110">
-                      {link.icon}
-                    </div>
-                    <h2 className="text-2xl font-bold">{link.label}</h2>
-                    <p className="text-white/80">{link.description}</p>
-                  </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {adminLinks.map((link, index) => (
+          <Link
+            key={index}
+            href={link.href}
+            className="group transform transition-all duration-300 hover:scale-105"
+          >
+            <div
+              className={`${link.color} p-8 rounded-xl shadow-lg text-white h-full`}
+            >
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="transform transition-transform duration-300 group-hover:scale-110">
+                  {link.icon}
                 </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-    </AdminLayout>
+                <h2 className="text-2xl font-bold">{link.label}</h2>
+                <p className="text-white/80">{link.description}</p>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }
