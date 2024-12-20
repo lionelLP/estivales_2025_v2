@@ -24,7 +24,10 @@ export default function Footer() {
       });
       const data = await response.json();
       if (data.success) {
-        setSubmitStatus({ type: "success", message: "Vous êtes maintenant inscrit à la newsletter des Estivales de Brou." });
+        setSubmitStatus({ 
+          type: "success", 
+          message: "Un email de confirmation vous a été envoyé. Veuillez vérifier votre boîte de réception." 
+        });
         setEmail("");
       } else {
         setSubmitStatus({ type: "error", message: "Erreur lors de l'inscription" });
