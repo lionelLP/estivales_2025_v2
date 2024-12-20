@@ -47,7 +47,10 @@ export async function GET(
   }
 }
 
-export async function PUT(request: Request) {
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   const middlewareResponse = await apiMiddleware(request);
   if (middlewareResponse.status !== 200) {
     return middlewareResponse;
@@ -55,6 +58,7 @@ export async function PUT(request: Request) {
   const connection = await pool.getConnection();
 
   try {
+    // Vérifier si le partenaire existe
     const [existingPartners] = await connection.execute(
       "SELECT logo_url, banner_url FROM Partenaire WHERE id = ?",
       [params.id]
@@ -67,6 +71,7 @@ export async function PUT(request: Request) {
 
     const existingPartner = (existingPartners as Partner[])[0];
     if (!existingPartner) {
+      connection.release();
       return NextResponse.json(
         { message: "Partenaire non trouvé" },
         { status: 404 }
@@ -83,48 +88,68 @@ export async function PUT(request: Request) {
     let logoUrl = existingPartner.logo_url;
     let bannerUrl = existingPartner.banner_url;
 
-    // Handle new file uploads if provided
+    const uploadsDir = path.join(process.cwd(), "public/uploads/partners");
+
+    // Gérer le nouveau logo si fourni
     if (logo) {
+      // Supprimer l'ancien logo si existe
+      if (existingPartner.logo_url) {
+        try {
+          await unlink(
+            path.join(process.cwd(), "public", existingPartner.logo_url)
+          );
+        } catch (error) {
+          console.error("Error deleting old logo:", error);
+        }
+      }
       const logoFileName = `${Date.now()}-${logo.name}`;
-      const uploadsDir = path.join(process.cwd(), "public/uploads/partners");
       const logoPath = path.join(uploadsDir, logoFileName);
       const logoBuffer = Buffer.from(await logo.arrayBuffer());
       await writeFile(logoPath, logoBuffer);
       logoUrl = `/uploads/partners/${logoFileName}`;
     }
 
+    // Gérer la nouvelle bannière si fournie
     if (banner) {
+      // Supprimer l'ancienne bannière si existe
+      if (existingPartner.banner_url) {
+        try {
+          await unlink(
+            path.join(process.cwd(), "public", existingPartner.banner_url)
+          );
+        } catch (error) {
+          console.error("Error deleting old banner:", error);
+        }
+      }
       const bannerFileName = `${Date.now()}-${banner.name}`;
-      const uploadsDir = path.join(process.cwd(), "public/uploads/partners");
       const bannerPath = path.join(uploadsDir, bannerFileName);
       const bannerBuffer = Buffer.from(await banner.arrayBuffer());
       await writeFile(bannerPath, bannerBuffer);
       bannerUrl = `/uploads/partners/${bannerFileName}`;
     }
 
-    // Update database
+    // Mettre à jour la base de données
     await connection.execute(
       "UPDATE Partenaire SET name = ?, description = ?, website_url = ?, logo_url = ?, banner_url = ? WHERE id = ?",
       [name, description, website_url, logoUrl, bannerUrl, params.id]
     );
 
+    connection.release();
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error updating partner:", error);
+    connection.release();
     return NextResponse.json(
       { message: "Erreur lors de la mise à jour du partenaire" },
       { status: 500 }
     );
-  } finally {
-    connection.release();
   }
 }
 
-export async function DELETE(request: Request) {
-  const middlewareResponse = await apiMiddleware(request);
-  if (middlewareResponse.status !== 200) {
-    return middlewareResponse;
-  }
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   const connection = await pool.getConnection();
 
   try {
@@ -141,6 +166,7 @@ export async function DELETE(request: Request) {
 
     const existingPartner = (existingPartners as Partner[])[0];
     if (!existingPartner) {
+      connection.release();
       return NextResponse.json(
         { message: "Partenaire non trouvé" },
         { status: 404 }
@@ -166,15 +192,14 @@ export async function DELETE(request: Request) {
     await connection.execute("DELETE FROM Partenaire WHERE id = ?", [
       params.id,
     ]);
-
+    connection.release();
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting partner:", error);
+    connection.release();
     return NextResponse.json(
       { message: "Erreur lors de la suppression du partenaire" },
       { status: 500 }
     );
-  } finally {
-    connection.release();
   }
 }

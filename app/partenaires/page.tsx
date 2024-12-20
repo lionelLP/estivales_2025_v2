@@ -13,12 +13,14 @@ export default function Partenaires() {
   const [partenaires, setPartenaires] = useState<Partner[]>([]);
   const [error, setError] = useState("");
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
-  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<number>>(new Set());
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<number>>(
+    new Set()
+  );
   const { registerLoadingComponent, componentLoaded } = useLoading();
 
   useEffect(() => {
     const loadingId = registerLoadingComponent();
-    
+
     const fetchPartenaires = async () => {
       try {
         const response = await fetch("/api/partenaires");
@@ -27,7 +29,7 @@ export default function Partenaires() {
           setPartenaires(data);
         } else {
           const errorData = await response.json();
-          setError("Erreur lors de la récupération des partenaires");
+          setError("Erreur lors de la récup��ration des partenaires");
         }
       } catch (error) {
         console.error("Fetch error:", error);
@@ -38,14 +40,17 @@ export default function Partenaires() {
     };
 
     fetchPartenaires();
-    
+
     return () => {
       componentLoaded(loadingId);
     };
   }, []);
 
   // Debug logs for render state
-  console.log("Current state:", { error, partenairesCount: partenaires.length });
+  console.log("Current state:", {
+    error,
+    partenairesCount: partenaires.length,
+  });
 
   const handleDelete = async (id: number) => {
     if (!confirm("Êtes-vous sûr de vouloir supprimer ce partenaire ?")) {
@@ -58,14 +63,20 @@ export default function Partenaires() {
         method: "DELETE",
       });
 
-      if (response.ok) {
-        setPartenaires((prev) => prev.filter((p) => p.id !== id));
-      } else {
-        alert("Erreur lors de la suppression du partenaire");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erreur lors de la suppression");
       }
+
+      setPartenaires((prev) => prev.filter((p) => p.id !== id));
+      router.refresh();
     } catch (error) {
       console.error("Error deleting partner:", error);
-      alert("Erreur lors de la suppression du partenaire");
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de la suppression du partenaire"
+      );
     } finally {
       setIsDeleting(null);
     }
@@ -74,7 +85,7 @@ export default function Partenaires() {
   const toggleDescription = (id: number, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setExpandedDescriptions(prev => {
+    setExpandedDescriptions((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(id)) {
         newSet.delete(id);
@@ -100,23 +111,39 @@ export default function Partenaires() {
         <div className="absolute right-0 top-1/2 -translate-y-1/2">
           <Link
             href="/partenaires/creer"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"    >
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          >
             Ajouter un partenaire
           </Link>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {partenaires.map((partenaire) => (
-          <div key={partenaire.id} className="max-w-xs w-full group/card mx-auto relative">
+          <div
+            key={partenaire.id}
+            className="max-w-xs w-full group/card mx-auto relative"
+          >
             {/* Admin Controls */}
             <div className="absolute top-4 right-4 z-20 flex gap-2">
               <button
-                onClick={() => router.push(`/partenaires/${partenaire.id}/modifier`)}
+                onClick={() =>
+                  router.push(`/partenaires/${partenaire.id}/modifier`)
+                }
                 className="bg-white/90 hover:bg-white p-2 rounded-full transition-colors"
               >
-                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                <svg
+                  className="w-5 h-5 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
                 </svg>
               </button>
               <button
@@ -125,20 +152,44 @@ export default function Partenaires() {
                 className="bg-white/90 hover:bg-white p-2 rounded-full transition-colors"
               >
                 {isDeleting === partenaire.id ? (
-                  <svg className="w-5 h-5 text-red-600 animate-spin" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <svg
+                    className="w-5 h-5 text-red-600 animate-spin"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
                   </svg>
                 ) : (
-                  <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  <svg
+                    className="w-5 h-5 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
                   </svg>
                 )}
               </button>
             </div>
 
             {partenaire.website_url ? (
-              <Link 
+              <Link
                 href={partenaire.website_url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -164,8 +215,8 @@ export default function Partenaires() {
                             fill
                             sizes="64px"
                             className="object-cover p-[2px] rounded-full"
-                            style={{ 
-                              objectFit: 'cover'
+                            style={{
+                              objectFit: "cover",
                             }}
                           />
                         </div>
@@ -181,18 +232,27 @@ export default function Partenaires() {
                   <div className="text content">
                     {partenaire.description && (
                       <>
-                        <p className={cn(
-                          "font-normal text-sm text-gray-50 relative z-10 my-4 drop-shadow-md",
-                          !expandedDescriptions.has(partenaire.id || 0) ? "line-clamp-3" : "max-h-48 overflow-y-auto"
-                        )}>
+                        <p
+                          className={cn(
+                            "font-normal text-sm text-gray-50 relative z-10 my-4 drop-shadow-md",
+                            !expandedDescriptions.has(partenaire.id || 0)
+                              ? "line-clamp-3"
+                              : "max-h-48 overflow-y-auto"
+                          )}
+                        >
                           {partenaire.description}
                         </p>
                         {partenaire.description.length > 150 && (
                           <button
-                            onClick={(e) => partenaire.id && toggleDescription(partenaire.id, e)}
+                            onClick={(e) =>
+                              partenaire.id &&
+                              toggleDescription(partenaire.id, e)
+                            }
                             className="text-blue-300 hover:text-blue-400 text-sm font-medium relative z-10"
                           >
-                            {expandedDescriptions.has(partenaire.id || 0) ? "Voir moins" : "Voir plus"}
+                            {expandedDescriptions.has(partenaire.id || 0)
+                              ? "Voir moins"
+                              : "Voir plus"}
                           </button>
                         )}
                       </>
@@ -222,8 +282,8 @@ export default function Partenaires() {
                           fill
                           sizes="64px"
                           className="object-cover p-[2px] rounded-full"
-                          style={{ 
-                            objectFit: 'cover'
+                          style={{
+                            objectFit: "cover",
                           }}
                         />
                       </div>
@@ -239,18 +299,26 @@ export default function Partenaires() {
                 <div className="text content">
                   {partenaire.description && (
                     <>
-                      <p className={cn(
-                        "font-normal text-sm text-gray-50 relative z-10 my-4 drop-shadow-md",
-                        !expandedDescriptions.has(partenaire.id || 0) ? "line-clamp-3" : "max-h-48 overflow-y-auto"
-                      )}>
+                      <p
+                        className={cn(
+                          "font-normal text-sm text-gray-50 relative z-10 my-4 drop-shadow-md",
+                          !expandedDescriptions.has(partenaire.id || 0)
+                            ? "line-clamp-3"
+                            : "max-h-48 overflow-y-auto"
+                        )}
+                      >
                         {partenaire.description}
                       </p>
                       {partenaire.description.length > 150 && (
                         <button
-                          onClick={(e) => partenaire.id && toggleDescription(partenaire.id, e)}
+                          onClick={(e) =>
+                            partenaire.id && toggleDescription(partenaire.id, e)
+                          }
                           className="text-blue-300 hover:text-blue-400 text-sm font-medium relative z-10"
                         >
-                          {expandedDescriptions.has(partenaire.id || 0) ? "Voir moins" : "Voir plus"}
+                          {expandedDescriptions.has(partenaire.id || 0)
+                            ? "Voir moins"
+                            : "Voir plus"}
                         </button>
                       )}
                     </>
