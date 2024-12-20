@@ -1,51 +1,27 @@
-"use client";
+import { Metadata } from "next";
 
-import { useEffect, useState } from "react";
-import parse from "html-react-parser";
-import Link from "next/link";
+export const metadata: Metadata = {
+  title: "À Propos | Estivales de Brou",
+  description:
+    "Découvrez l'histoire et la mission des Estivales de Brou, festival de musique lyrique engagé dans la promotion de jeunes artistes professionnels depuis plus de 20 ans.",
+  keywords:
+    "à propos, histoire, mission, estivales de brou, festival lyrique, association culturelle, musique classique",
+  openGraph: {
+    title: "À Propos | Estivales de Brou",
+    description:
+      "L'histoire et les valeurs qui animent les Estivales de Brou depuis plus de 20 ans",
+    images: [
+      {
+        url: "/homepage/banner/estivale2.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Histoire des Estivales de Brou",
+      },
+    ],
+  },
+  alternates: {
+    canonical: "https://estivalesdebrou.fr/about",
+  },
+};
 
-export default function About() {
-  const [content, setContent] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const response = await fetch("/api/about");
-        if (response.ok) {
-          const data = await response.json();
-          setContent(data.html_content || "");
-        }
-      } catch (error) {
-        console.error("Erreur lors du chargement du contenu:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchContent();
-  }, []);
-
-  if (isLoading) {
-    return <div>Chargement...</div>;
-  }
-
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="relative mb-12 mt-12">
-        <h1 className="text-3xl font-bold text-center">À propos</h1>
-        <div className="absolute right-0 top-1/2 -translate-y-1/2">
-          <Link
-            href="/about/edit"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            Modifier
-          </Link>
-        </div>
-      </div>
-      <div className="prose prose-lg max-w-none">
-        {content ? parse(content) : <p>Aucun contenu disponible</p>}
-      </div>
-    </div>
-  );
-}
+export { default } from "./about";
