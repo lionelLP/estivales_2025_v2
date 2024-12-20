@@ -57,10 +57,6 @@ export default function ArticleEditor({ onSave }: ArticleEditorProps) {
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-dark-mode rounded-xl shadow-lg">
-      <h2 className="text-2xl font-bold mb-6 text-bleu-fonce dark:text-bleu-clair">
-        Ajouter un article
-      </h2>
-
       <div className="space-y-6">
         <div>
           <label htmlFor="url" className="block text-sm font-medium mb-2">

@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { ParallaxScroll } from "@/components/ui/parallax-scroll";
-
+import { useEffect, useState } from "react";
 export default function MediaPage() {
   const [media, setMedia] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,14 +27,6 @@ export default function MediaPage() {
 
     fetchMedia();
   }, []);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">Chargement des médias...</div>
-      </div>
-    );
-  }
 
   if (error) {
     return (

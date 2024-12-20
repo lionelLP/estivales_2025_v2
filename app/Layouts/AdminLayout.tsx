@@ -2,15 +2,15 @@
 import Logout from "@/components/common/Logout";
 import { PlaceholdersAndVanishInput } from "@/components/ui/placeholders-and-vanish-input";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
-import { IconHome, IconSearch } from "@tabler/icons-react";
+import { IconHome } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import {
   ChevronDown,
   FileText,
+  Images,
   LogOut,
   Newspaper,
   PartyPopper,
-  User,
   Users,
 } from "lucide-react";
 import Image from "next/image";
@@ -30,14 +30,6 @@ export default function AdminLayout({
 }) {
   const links = [
     {
-      label: "",
-      href: "#",
-      icon: (
-        <IconSearch className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
-      searchBar: true,
-    },
-    {
       label: "Tableau de bord",
       href: "/admin",
       icon: (
@@ -46,30 +38,37 @@ export default function AdminLayout({
     },
     {
       label: "Partenaires",
-      href: "/admin/users",
+      href: "/admin/partenaires",
       icon: (
         <Users className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
     {
       label: "A propos",
-      href: "/admin/certification",
+      href: "/admin/about",
       icon: (
         <FileText className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
     {
       label: "Evenements",
-      href: "/admin/alertes",
+      href: "/admin/events",
       icon: (
         <PartyPopper className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
     {
       label: "Revue de presse",
-      href: "/admin/alertes",
+      href: "/admin/news",
       icon: (
         <Newspaper className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+    },
+    {
+      label: "Gestion des medias",
+      href: "/admin/medias",
+      icon: (
+        <Images className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
   ];
@@ -238,13 +237,6 @@ const AdminMenu = ({
       transition={{ duration: 0.3 }}
       className="absolute bottom-full left-0 right-0 mb-8 bg-white dark:bg-dark-mode-2 rounded-lg shadow-lg p-2"
     >
-      <a
-        href="/user/profile"
-        className="flex items-center gap-2 p-2 hover:bg-neutral-100 dark:hover:bg-dark-mode-2 rounded"
-      >
-        <User className="h-5 w-5" />
-        <span>Mon compte</span>
-      </a>
       <Logout className="flex items-center gap-2 p-2 hover:bg-neutral-100 dark:hover:bg-dark-mode-2 rounded text-red-500 w-full">
         <LogOut className="h-5 w-5" />
         <span>Se déconnecter</span>

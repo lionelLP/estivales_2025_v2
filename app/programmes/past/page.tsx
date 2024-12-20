@@ -1,39 +1,41 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Timeline } from "@/components/ui/timeline";
 import { Event } from "@/lib/types/event";
-import { useEffect, useState } from "react";
-import { EventDetailModal } from "./EventDetailModal";
+import { useLoading } from "@/contexts/LoadingContext";
+import { EventDetailModal } from "@/components/common/EventDetailModal";
 
-export function TimelineHistory() {
+export default function ProgrammesPast() {
   const [evenements, setEvenements] = useState<Event[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { registerLoadingComponent, componentLoaded } = useLoading();
 
   useEffect(() => {
+    const loadingId = registerLoadingComponent();
+    
     const fetchEvenements = async () => {
       try {
         const response = await fetch("/api/evenements");
         if (response.ok) {
           const data = await response.json();
-          console.log("Données reçues:", data);
-
-          // Filtrer les événements futurs et publics
+          
+          // Filtrer les événements passés
           const now = new Date();
-          const futurePublicEvents = data.filter((event: Event) => {
+          const pastEvents = data.filter((event: Event) => {
             const eventDate = new Date(event.event_date);
-            return eventDate > now && event.is_public;
+            return eventDate <= now;
           });
 
-          if (futurePublicEvents.length === 0) {
+          if (pastEvents.length === 0) {
             setEvenements([]);
             return;
           }
 
           // Grouper les événements par date
-          const eventsByDate = futurePublicEvents.reduce(
+          const eventsByDate = pastEvents.reduce(
             (acc: { [key: string]: Event[] }, event: Event) => {
               const date = new Date(event.event_date).toLocaleDateString(
                 "fr-FR",
@@ -69,6 +71,15 @@ export function TimelineHistory() {
                             {event.subtitle}
                           </p>
                         )}
+                        <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
+                          {new Date(event.event_date).toLocaleTimeString("fr-FR", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                        <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
+                          {event.location}
+                        </p>
                         <button
                           onClick={() => {
                             setSelectedEvent(event);
@@ -76,7 +87,7 @@ export function TimelineHistory() {
                           }}
                           className="inline-block mt-2 px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-medium hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
                         >
-                          Voir le détaille
+                          Voir les détails
                         </button>
                       </div>
                     ))}
@@ -85,14 +96,9 @@ export function TimelineHistory() {
               ),
             }))
             .sort((a, b) => {
-              // Find the first event from each group to compare dates
-              const eventsA = eventsByDate[a.title];
-              const eventsB = eventsByDate[b.title];
-              
-              const dateA = new Date(eventsA[0].event_date);
-              const dateB = new Date(eventsB[0].event_date);
-              
-              return dateA.getTime() - dateB.getTime();
+              const dateA = new Date(eventsByDate[a.title][0].event_date);
+              const dateB = new Date(eventsByDate[b.title][0].event_date);
+              return dateB.getTime() - dateA.getTime(); // Tri inversé pour avoir les plus récents en premier
             });
 
           setEvenements(timelineData);
@@ -103,13 +109,16 @@ export function TimelineHistory() {
         console.error("Erreur lors de la récupération des événements:", err);
         setError("Erreur lors de la récupération des événements");
       } finally {
-        setIsLoading(false);
+        componentLoaded(loadingId);
       }
     };
 
     fetchEvenements();
+    
+    return () => {
+      componentLoaded(loadingId);
+    };
   }, []);
-
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
@@ -117,23 +126,37 @@ export function TimelineHistory() {
 
   if (evenements.length === 0) {
     return (
-      <div className="text-center text-gray-500">Aucun événement à venir</div>
+      <div className="text-center text-gray-500">Aucun événement passé</div>
     );
   }
 
   return (
-    <div className="w-full ">
-      <Timeline data={evenements} />
-      {selectedEvent && (
-        <EventDetailModal
-          event={selectedEvent}
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-            setSelectedEvent(null);
-          }}
-        />
-      )}
+    <div className="min-h-screen pt-20">
+      <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+            <div className="text-left col-span-2">
+              <h1 className="text-4xl font-bold mb-8 text-bleu-fonce dark:text-bleu-clair">
+                Programmes passés
+              </h1>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4">
+        <Timeline data={evenements} />
+        {selectedEvent && (
+          <EventDetailModal
+            event={selectedEvent}
+            isOpen={isModalOpen}
+            onClose={() => {
+              setIsModalOpen(false);
+              setSelectedEvent(null);
+            }}
+          />
+        )}
+      </div>
     </div>
   );
-}
+} 

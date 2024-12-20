@@ -1,5 +1,5 @@
 "use client";
-
+import { useLoading } from "@/contexts/LoadingContext";
 import { Partner } from "@/lib/types/partner";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -10,43 +10,43 @@ import { useEffect, useState } from "react";
 export default function Partenaires() {
   const router = useRouter();
   const [partenaires, setPartenaires] = useState<Partner[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<number>>(
     new Set()
   );
+  const { registerLoadingComponent, componentLoaded } = useLoading();
 
   useEffect(() => {
+    const loadingId = registerLoadingComponent();
+
     const fetchPartenaires = async () => {
-      console.log("Fetching partenaires...");
       try {
         const response = await fetch("/api/partenaires");
-        console.log("Response status:", response.status);
-
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched data:", data);
           setPartenaires(data);
         } else {
           const errorData = await response.json();
-          console.error("Error response:", errorData);
           setError("Erreur lors de la récupération des partenaires");
         }
       } catch (error) {
         console.error("Fetch error:", error);
         setError("Erreur lors de la récupération des partenaires");
       } finally {
-        setIsLoading(false);
+        componentLoaded(loadingId);
       }
     };
 
     fetchPartenaires();
+
+    return () => {
+      componentLoaded(loadingId);
+    };
   }, []);
 
   // Debug logs for render state
   console.log("Current state:", {
-    isLoading,
     error,
     partenairesCount: partenaires.length,
   });
@@ -88,14 +88,6 @@ export default function Partenaires() {
       return newSet;
     });
   };
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8 mt-20">
-        <div className="text-center">Chargement des partenaires...</div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
