@@ -56,13 +56,15 @@ export function EventDetailModal({
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg max-w-3xl w-full p-6 relative">
         <div className="flex flex-col items-center relative">
-          <div className="absolute left-0 flex items-center gap-1 text-gray-500">
+          <div className="absolute left-0 flex items-center gap-1 text-gray-300">
             <Armchair className="w-5 h-5" />
             <span>{event.max_participants}</span>
           </div>
           <h2 className="text-2xl font-bold text-center">{event.title}</h2>
           {event.subtitle && (
-            <p className="text-gray-600 mt-2 text-center">{event.subtitle}</p>
+            <p className="text-gray-600 mt-2 text-center dark:text-gray-300">
+              {event.subtitle}
+            </p>
           )}
 
           {/* Carrousel d'images */}
@@ -77,7 +79,7 @@ export function EventDetailModal({
 
           {/* Reste du contenu */}
           {event.description && (
-            <p className="mt-6 text-gray-800 whitespace-pre-wrap text-center">
+            <p className="mt-6 text-gray-800 dark:text-gray-200 whitespace-pre-wrap text-center">
               {event.description}
             </p>
           )}
