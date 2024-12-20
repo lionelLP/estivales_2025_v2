@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import {
   ChevronDown,
   FileText,
+  Images,
   LogOut,
   Newspaper,
   PartyPopper,
@@ -62,6 +63,13 @@ export default function AdminLayout({
       href: "/admin/news",
       icon: (
         <Newspaper className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+    },
+    {
+      label: "Gestion des medias",
+      href: "/admin/medias",
+      icon: (
+        <Images className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
   ];
