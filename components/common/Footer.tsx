@@ -2,10 +2,39 @@
 
 import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function Footer() {
   const addressForMaps = encodeURIComponent("13 avenue Alsace Lorraine, 01000 Bourg en Bresse, France");
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${addressForMaps}`;
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setSubmitStatus({ type: "success", message: "Vous êtes maintenant inscrit à la newsletter des Estivales de Brou." });
+        setEmail("");
+      } else {
+        setSubmitStatus({ type: "error", message: "Erreur lors de l'inscription" });
+      }
+    } catch (error) {
+      setSubmitStatus({ type: "error", message: "Erreur lors de l'inscription" });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <footer className="bg-gradient-to-r from-rose-600 to-pink-600 text-white">
@@ -92,18 +121,26 @@ export default function Footer() {
           {/* Newsletter */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Newsletter</h3>
-            <form className="space-y-3">
+            <form className="space-y-3" onSubmit={handleNewsletterSubmit}>
               <input
                 type="email"
                 placeholder="Votre email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2 rounded bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30 transition"
               />
               <button
                 type="submit"
-                className="w-full px-4 py-2 bg-white text-rose-600 rounded font-medium hover:bg-white/90 transition"
+                disabled={isSubmitting}
+                className="w-full px-4 py-2 bg-white text-rose-600 rounded font-medium hover:bg-white/90 transition disabled:opacity-50"
               >
-                S&apos;abonner
+                {isSubmitting ? "Inscription..." : "S'abonner"}
               </button>
+              {submitStatus && (
+                <p className={`text-sm ${submitStatus.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                  {submitStatus.message}
+                </p>
+              )}
             </form>
           </div>
         </div>
