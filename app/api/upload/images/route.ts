@@ -1,16 +1,24 @@
-import { writeFile } from 'fs/promises';
-import { NextResponse } from 'next/server';
-import path from 'path';
+import { writeFile } from "fs/promises";
+import { NextResponse } from "next/server";
+import path from "path";
 import pool from "@/lib/db/mysql";
-
+import { apiMiddleware } from "../../middleware";
 export async function POST(request: Request) {
+  const middlewareResponse = await apiMiddleware(request);
+  if (middlewareResponse.status !== 200) {
+    return middlewareResponse;
+  }
+
   try {
     const formData = await request.formData();
-    const files = formData.getAll('files') as File[];
-    const eventId = formData.get('eventId');
+    const files = formData.getAll("files") as File[];
+    const eventId = formData.get("eventId");
 
     if (!files || files.length === 0) {
-      return NextResponse.json({ error: "Aucun fichier fourni" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Aucun fichier fourni" },
+        { status: 400 }
+      );
     }
 
     const connection = await pool.getConnection();
@@ -20,7 +28,13 @@ export async function POST(request: Request) {
       for (const file of files) {
         const buffer = Buffer.from(await file.arrayBuffer());
         const filename = `${Date.now()}_${file.name}`;
-        const filepath = path.join(process.cwd(), 'public', 'uploads', 'events', filename);
+        const filepath = path.join(
+          process.cwd(),
+          "public",
+          "uploads",
+          "events",
+          filename
+        );
         const relativePath = `/uploads/events/${filename}`;
 
         await writeFile(filepath, buffer);
@@ -44,7 +58,7 @@ export async function POST(request: Request) {
         uploadedFiles.push({
           id: mediaId,
           url: relativePath,
-          name: file.name
+          name: file.name,
         });
       }
 
@@ -53,7 +67,10 @@ export async function POST(request: Request) {
       connection.release();
     }
   } catch (error) {
-    console.error('Erreur upload:', error);
-    return NextResponse.json({ error: "Erreur lors de l'upload" }, { status: 500 });
+    console.error("Erreur upload:", error);
+    return NextResponse.json(
+      { error: "Erreur lors de l'upload" },
+      { status: 500 }
+    );
   }
-} 
+}
