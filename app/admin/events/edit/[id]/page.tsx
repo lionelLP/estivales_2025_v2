@@ -15,9 +15,13 @@ export default function EditEvent({ params }: { params: { id: string } }) {
     max_participants: 0,
     is_public: true,
     user_id: 1,
+    booking_link: "",
   });
+  const [brochure, setBrochure] = useState<File[]>([]);
+  const [images, setImages] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentBrochurePath, setCurrentBrochurePath] = useState("");
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -25,11 +29,11 @@ export default function EditEvent({ params }: { params: { id: string } }) {
         const response = await fetch(`/api/evenements/${params.id}`);
         if (response.ok) {
           const data = await response.json();
-          // Formatage de la date pour l'input datetime-local
           const eventDate = new Date(data.event_date)
             .toISOString()
             .slice(0, 16);
           setFormData({ ...data, event_date: eventDate });
+          setCurrentBrochurePath(data.brochure_path || "");
         } else {
           setError("Événement non trouvé");
         }
@@ -46,15 +50,50 @@ export default function EditEvent({ params }: { params: { id: string } }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Gérer l'upload de la brochure si elle existe
+      let brochurePath = currentBrochurePath;
+      if (brochure.length > 0) {
+        const formDataBrochure = new FormData();
+        formDataBrochure.append("file", brochure[0]);
+
+        const uploadResponse = await fetch("/api/upload", {
+          method: "POST",
+          body: formDataBrochure,
+        });
+
+        if (uploadResponse.ok) {
+          const { path } = await uploadResponse.json();
+          brochurePath = path;
+        }
+      }
+
+      // Mise à jour de l'événement
       const response = await fetch(`/api/evenements/${params.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          brochure_path: brochurePath,
+        }),
       });
 
       if (response.ok) {
+        // Upload des nouvelles images si elles existent
+        if (images.length > 0) {
+          const imagesFormData = new FormData();
+          images.forEach((file) => {
+            imagesFormData.append("files", file);
+          });
+          imagesFormData.append("eventId", params.id);
+
+          await fetch("/api/upload/images", {
+            method: "POST",
+            body: imagesFormData,
+          });
+        }
+
         router.push("/evenements");
       } else {
         const data = await response.json();

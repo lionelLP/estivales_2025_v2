@@ -16,7 +16,7 @@ export default function AdminPage() {
   const adminLinks = [
     {
       label: "Partenaires",
-      href: "/admin/partenaires",
+      href: "/admin/partners",
       icon: <Users className="h-12 w-12" />,
       description: "Gérer les partenaires de l'événement",
       color: "bg-blue-500",
