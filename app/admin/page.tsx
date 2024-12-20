@@ -62,11 +62,6 @@ export default function AdminPage() {
 
   return (
     <AdminLayout currentUser={currentUser}>
-      {isLoading ? (
-        <div className="text-center">
-          <div className="text-center">Chargement...</div>
-        </div>
-      ) : (
         <div>
           <h1 className="text-3xl font-bold mb-12">
             Tableau de bord administrateur
@@ -94,7 +89,6 @@ export default function AdminPage() {
             ))}
           </div>
         </div>
-      )}
     </AdminLayout>
   );
 }

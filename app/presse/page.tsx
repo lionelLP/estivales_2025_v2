@@ -5,13 +5,17 @@ import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 import { Newspaper } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useLoading } from "@/contexts/LoadingContext";
 import { useEffect, useState } from "react";
 
 export default function PressePage() {
   const [items, setItems] = useState([]);
   const [showEditor, setShowEditor] = useState(false);
+  const { registerLoadingComponent, componentLoaded } = useLoading();
 
   useEffect(() => {
+    const loadingId = registerLoadingComponent();
+    
     const fetchArticles = async () => {
       try {
         const response = await fetch("/api/articles");
@@ -24,10 +28,16 @@ export default function PressePage() {
         }
       } catch (error) {
         console.error("Erreur lors du chargement des articles:", error);
+      } finally {
+        componentLoaded(loadingId);
       }
     };
 
     fetchArticles();
+    
+    return () => {
+      componentLoaded(loadingId);
+    };
   }, []);
 
   const handleSaveArticle = async (article: any) => {

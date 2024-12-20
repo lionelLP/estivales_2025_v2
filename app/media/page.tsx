@@ -29,13 +29,6 @@ export default function MediaPage() {
     fetchMedia();
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">Chargement des médias...</div>
-      </div>
-    );
-  }
 
   if (error) {
     return (

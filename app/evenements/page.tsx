@@ -30,13 +30,6 @@ export default function Evenements() {
     fetchEvenements();
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">Chargement des événements...</div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
