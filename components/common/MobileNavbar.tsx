@@ -78,13 +78,6 @@ export default function MobileNavbar() {
         className="overflow-y-auto bg-white dark:bg-dark-mode rounded-2xl -mt-12 max-h-[calc(100vh-5rem)] border"
       >
         <nav className="mt-14 flex flex-col space-y-4 p-2.5">
-          {/* Actualités */}
-          <div className="flex justify-between items-center">
-            <HoveredLink href="/actualites" onClick={handleLinkClick}>
-              <strong>Actualités</strong>
-            </HoveredLink>
-          </div>
-
           {/* Programme */}
           <div className="flex justify-between items-center">
             <HoveredLink href="/programme" onClick={handleLinkClick}>

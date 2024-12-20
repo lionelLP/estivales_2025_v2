@@ -33,11 +33,6 @@ export default function Navbar({ className }: { className?: string }) {
             />
           </a>
         </div>
-        <MenuItemNoHoverLink
-          setActive={setActive}
-          item="Actualités"
-          href="/actualites"
-        />
         <MenuItem setActive={setActive} active={active} item="Programmes">
           <div className="flex flex-col space-y-4 text-sm">
             <HoveredLink href="/programmes/to-come">À venir</HoveredLink>
@@ -51,10 +46,10 @@ export default function Navbar({ className }: { className?: string }) {
             <HoveredLink href="/pratique/contact">Contact</HoveredLink>
           </div>
         </MenuItem>
-        <MenuItemNoHoverLink 
-        setActive={setActive}
-        item="Medias"
-        href="/media"
+        <MenuItemNoHoverLink
+          setActive={setActive}
+          item="Medias"
+          href="/media"
         />
         <MenuItemNoHoverLink
           setActive={setActive}
