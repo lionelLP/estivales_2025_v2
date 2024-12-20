@@ -36,7 +36,9 @@ export function createEmailTemplate({
               <!-- Header with logo -->
               <tr>
                 <td style="padding: 30px 40px; text-align: center; background-color: #E11D48; border-radius: 8px 8px 0 0;">
-                  <img src="${process.env.NEXT_PUBLIC_BASE_URL}/images/logo-white.png" alt="Les Estivales de Brou" style="height: 60px;">
+                  <h1 style="margin: 0; color: white; font-size: 24px; font-weight: 600;">
+                    Les Estivales de Brou
+                  </h1>
                 </td>
               </tr>
               

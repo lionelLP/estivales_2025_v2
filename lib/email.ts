@@ -32,8 +32,6 @@ export async function sendEmail(to: string, subject: string, html: string, isNew
       const unsubscribeUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/newsletter/unsubscribe/${generateUnsubscribeToken(to)}`;
       headers['List-Unsubscribe'] = `<${unsubscribeUrl}>`;
       headers['List-Unsubscribe-Post'] = 'List-Unsubscribe=One-Click';
-      headers['Precedence'] = 'bulk';
-      headers['X-Mailer'] = 'Les Estivales de Brou Newsletter';
     }
     
     console.log('Attempting to send email with nodemailer...');

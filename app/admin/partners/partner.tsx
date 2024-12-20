@@ -101,9 +101,9 @@ export default function Partenaires() {
     <div className="container mx-auto px-4 py-8 mt-20">
       <div className="relative mb-12">
         <h1 className="text-3xl font-bold text-center">Nos Partenaires</h1>
-        <div className="absolute right-0 top-1/2 -translate-y-1/2">
+        <div className="absolute right-0  -translate-y-1/2">
           <Link
-            href="/partenaires/creer"
+            href="/admin/partners/add"
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
           >
             Ajouter un partenaire
