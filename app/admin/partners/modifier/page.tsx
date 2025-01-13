@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Modifier la Page À Propos | Estivales de Brou",
+  title: "Modifier un Partenaire | Estivales de Brou",
   description:
-    "Interface d'administration pour la modification du contenu de la page À Propos",
+    "Interface d'administration pour la modification des informations d'un partenaire",
   robots: {
     index: false,
     follow: false,

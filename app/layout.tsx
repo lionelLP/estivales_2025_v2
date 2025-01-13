@@ -1,3 +1,4 @@
+import { LoadingProvider } from "@/components/LoadingProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "next-themes";
 import { Poppins } from "next/font/google";
@@ -24,11 +25,13 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${poppins.variable}`}>
       <body className={poppins.className}>
-        <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <MainLayout>{children}</MainLayout>
-          </ThemeProvider>
-        </AuthProvider>
+        <LoadingProvider>
+          <AuthProvider>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <MainLayout>{children}</MainLayout>
+            </ThemeProvider>
+          </AuthProvider>
+        </LoadingProvider>
       </body>
     </html>
   );

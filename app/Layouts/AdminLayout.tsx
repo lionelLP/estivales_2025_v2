@@ -175,8 +175,7 @@ const AdminProfile = ({
   showMenu: boolean;
   setShowMenu: (show: boolean) => void;
   currentUser: {
-    firstName: string;
-    lastName: string;
+    username: string;
     userType: string;
   };
 }) => {
@@ -185,8 +184,8 @@ const AdminProfile = ({
       <div className="flex items-center justify-between -ml-[7px] bg-neutral-100 dark:bg-dark-mode-2 rounded-lg cursor-pointer">
         <div className="flex items-center gap-2">
           <img
-            src={`https://api.dicebear.com/6.x/micah/svg?seed=${encodeURIComponent(
-              `${currentUser.firstName?.toLowerCase()}-${currentUser.lastName?.toLowerCase()}`
+            src={`https://api.dicebear.com/6.x/miniavs/svg?seed=${encodeURIComponent(
+              `${currentUser.username?.toLowerCase()}`
             )}`}
             alt="Admin Avatar"
             width={40}
@@ -196,7 +195,7 @@ const AdminProfile = ({
           {open && (
             <div className="flex flex-col">
               <span className="font-medium text-sm">
-                {currentUser.firstName} {currentUser.lastName}
+                {currentUser.username}
               </span>
               <span className="text-xs text-neutral-500">
                 {currentUser.userType}
