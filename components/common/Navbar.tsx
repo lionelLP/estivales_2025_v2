@@ -58,6 +58,11 @@ export default function Navbar({ className }: { className?: string }) {
         />
         <MenuItemNoHoverLink
           setActive={setActive}
+          item="A propos"
+          href="/about"
+        />
+        <MenuItemNoHoverLink
+          setActive={setActive}
           item="Partenaires"
           href="/partners"
         />

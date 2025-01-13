@@ -1,6 +1,10 @@
 "use client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useAuthentication } from "@/hooks/useAuthentication";
 import { motion } from "framer-motion";
+import { CircleUser, LogOut, User, UserPlus } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { HoveredLink } from "../ui/navbar-menu";
@@ -8,6 +12,8 @@ import { HoveredLink } from "../ui/navbar-menu";
 export default function MobileNavbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState<number | null>(null);
+  const { user } = useAuth();
+  const { logout } = useAuthentication();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -15,7 +21,6 @@ export default function MobileNavbar() {
     setOpenSubMenu(openSubMenu === index ? null : index);
   };
 
-  // Ajoutez cette nouvelle fonction
   const handleLinkClick = () => {
     setIsOpen(false);
     setOpenSubMenu(null);
@@ -78,6 +83,57 @@ export default function MobileNavbar() {
         className="overflow-y-auto bg-white dark:bg-dark-mode rounded-2xl -mt-12 max-h-[calc(100vh-5rem)] border"
       >
         <nav className="mt-14 flex flex-col space-y-4 p-2.5">
+          {/* Boutons de connexion/inscription */}
+          <div className="flex gap-2 mb-4">
+            {user ? (
+              <>
+                <Link
+                  href="/admin"
+                  className="flex items-center justify-center gap-2 w-1/2 bg-white dark:bg-dark-mode text-red-brou border-2 border-red-brou hover:bg-gray-50 dark:hover:bg-dark-mode rounded-full py-2 px-4 transition-colors duration-200"
+                  onClick={handleLinkClick}
+                >
+                  <User className="w-5 h-5 text-red-brou" />
+                  <span className="font-medium text-red-brou">Mon Espace</span>
+                </Link>
+                <button
+                  onClick={() => {
+                    logout();
+                    handleLinkClick();
+                  }}
+                  className="flex items-center justify-center gap-2 w-1/2 bg-primary text-white bg-red-brou rounded-full py-2 px-4 transition-colors duration-200"
+                >
+                  <LogOut className="w-5 h-5 text-white dark:text-dark-mode" />
+                  <span className="font-medium text-white dark:text-dark-mode">
+                    Se déconnecter
+                  </span>
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/register"
+                  className="flex items-center justify-center gap-2 w-1/2 bg-white dark:bg-dark-mode text-red-brou border-2 border-red-brou hover:bg-gray-50 dark:hover:bg-dark-mode rounded-full py-2 px-4 transition-colors duration-200"
+                  onClick={handleLinkClick}
+                >
+                  <UserPlus className="w-5 h-5 text-red-brou" />
+                  <span className="font-medium text-red-brou">
+                    S&apos;inscrire
+                  </span>
+                </Link>
+                <Link
+                  href="/login"
+                  className="flex items-center justify-center gap-2 w-1/2 bg-primary text-white bg-red-brou rounded-full py-2 px-4 transition-colors duration-200"
+                  onClick={handleLinkClick}
+                >
+                  <CircleUser className="w-5 h-5 text-white dark:text-dark-mode" />
+                  <span className="font-medium text-white dark:text-dark-mode">
+                    Se connecter
+                  </span>
+                </Link>
+              </>
+            )}
+          </div>
+
           {/* Programme */}
           <div className="flex justify-between items-center">
             <HoveredLink href="/programme" onClick={handleLinkClick}>
@@ -141,31 +197,6 @@ export default function MobileNavbar() {
           </div>
 
           {/* Mon profil */}
-          <div className="flex justify-between items-center">
-            <HoveredLink href="/login">
-              <strong>Mon profil</strong>
-            </HoveredLink>
-            <motion.div
-              animate={{ rotate: openSubMenu === 2 ? 180 : 0 }}
-              transition={{ duration: 0.3 }}
-              className="cursor-pointer p-2"
-              onClick={() => toggleSubMenu(2)}
-            >
-              <FaChevronDown />
-            </motion.div>
-          </div>
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{
-              height: openSubMenu === 2 ? "auto" : 0,
-              opacity: openSubMenu === 2 ? 1 : 0,
-            }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden pl-4 space-y-3"
-          >
-            <HoveredLink href="/login">Se connecter</HoveredLink>
-            <HoveredLink href="/register">S&apos;inscrire</HoveredLink>
-          </motion.div>
         </nav>
       </motion.div>
 
