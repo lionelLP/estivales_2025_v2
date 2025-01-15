@@ -1,6 +1,6 @@
 import pool from "@/lib/db";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import * as jose from "jose";
 import { RowDataPacket } from "mysql2";
 import { NextResponse } from "next/server";
 
@@ -9,6 +9,7 @@ interface User extends RowDataPacket {
   email: string;
   password: string;
   username: string;
+  userType: string;
 }
 
 export async function POST(request: Request) {
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
     try {
       // Récupérer l'utilisateur par email
       const [users] = await connection.query<User[]>(
-        "SELECT id, email, password, username FROM User WHERE email = ?",
+        "SELECT id, email, password, username, userType FROM User WHERE email = ?",
         [email]
       );
 
@@ -52,11 +53,22 @@ export async function POST(request: Request) {
       }
 
       // Générer le token JWT
-      const token = jwt.sign(
-        { userId: user.id },
-        process.env.JWT_SECRET || "votre_secret",
-        { expiresIn: "7d" }
-      );
+      const token = await new jose.SignJWT({
+        userId: user.id,
+        userType: user.userType,
+      })
+        .setProtectedHeader({ alg: "HS256" })
+        .setExpirationTime("7d")
+        .sign(
+          new TextEncoder().encode(process.env.JWT_SECRET || "votre_secret")
+        );
+
+      // Pour déboguer
+      console.log("User data:", {
+        id: user.id,
+        userType: user.userType,
+        email: user.email,
+      });
 
       const response = NextResponse.json(
         {

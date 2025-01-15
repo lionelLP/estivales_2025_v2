@@ -1,3 +1,4 @@
+import { verifyToken } from "@/lib/auth/jwt";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -10,12 +11,17 @@ export async function GET() {
       return NextResponse.json({ message: "Non authentifié" }, { status: 401 });
     }
 
-    // TODO: Vérifier le token JWT
-    // Pour l'exemple :
+    // Vérifier le token
+    const decoded = await verifyToken(token.value);
+
+    if (!decoded) {
+      return NextResponse.json({ message: "Token invalide" }, { status: 401 });
+    }
+
     return NextResponse.json({
-      id: "1",
-      email: "test@test.com",
-      name: "Utilisateur Test",
+      id: decoded.userId,
+      email: decoded.email,
+      userType: decoded.userType,
     });
   } catch (error) {
     console.error("Erreur auth/check:", error);
