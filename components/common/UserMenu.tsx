@@ -13,16 +13,18 @@ export default function UserMenu() {
       {!user ? (
         <>
           <HoveredLink href="/login">Se connecter</HoveredLink>
-          <HoveredLink href="/register">S&apos;inscrire</HoveredLink>
+          {/* <HoveredLink href="/register">S&apos;inscrire</HoveredLink> */}
         </>
       ) : (
         <>
-          <Link
-            href="/admin"
-            className="flex items-center gap-2 hover:text-neutral-500"
-          >
-            <span>Panneau de configuration</span>
-          </Link>
+          {user.userType === 0 && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-2 hover:text-neutral-500"
+            >
+              <span>Panneau de configuration</span>
+            </Link>
+          )}
           <button onClick={logout} className="text-left hover:text-neutral-500">
             Se déconnecter
           </button>

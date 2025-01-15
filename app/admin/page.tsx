@@ -17,7 +17,7 @@ export default function AdminPage() {
     id: 1,
     firstName: "Admin",
     lastName: "User",
-    userType: "Administrateur",
+    userType: "1",
   });
 
   const adminLinks = [
@@ -72,6 +72,10 @@ export default function AdminPage() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  if (currentUser.userType !== "0") {
+    return <UnauthorizedPage />;
+  }
 
   return (
     <div>
