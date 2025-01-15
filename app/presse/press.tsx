@@ -1,6 +1,5 @@
 "use client";
 
-import ArticleEditor from "@/components/editor/ArticleEditor";
 import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 import { useLoading } from "@/contexts/LoadingContext";
 import { Newspaper } from "lucide-react";
@@ -8,9 +7,27 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+interface Article {
+  title: string;
+  content: string;
+  Creation_article: string;
+  favicon: string;
+  image: string;
+  link: string;
+}
+
+interface FormattedItem {
+  title: React.ReactNode;
+  description: React.ReactNode;
+  header: React.ReactNode;
+  className: string;
+  icon: React.ReactNode;
+  link: string;
+  onClick: () => void;
+}
+
 export default function PressePage() {
-  const [items, setItems] = useState([]);
-  const [showEditor, setShowEditor] = useState(false);
+  const [items, setItems] = useState<FormattedItem[]>([]);
   const { registerLoadingComponent, componentLoaded } = useLoading();
 
   useEffect(() => {
@@ -20,8 +37,8 @@ export default function PressePage() {
       try {
         const response = await fetch("/api/articles");
         if (response.ok) {
-          const articles = await response.json();
-          const formattedItems = articles.map((article: any, index: number) =>
+          const articles = await response.json() as Article[];
+          const formattedItems = articles.map((article: Article, index: number) =>
             formatArticleToItem(article, index)
           );
           setItems(formattedItems);
@@ -40,57 +57,8 @@ export default function PressePage() {
     };
   }, []);
 
-  const handleSaveArticle = async (article: any) => {
-    try {
-      console.log("Article à sauvegarder:", article); // Pour le debug
 
-      const response = await fetch("/api/articles", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: article.title,
-          link: article.url,
-          content: article.description,
-          Creation_article: article.publishDate,
-          is_published: 1,
-          user_id: 1,
-          event_id: null,
-          image: article.image,
-          favicon: article.favicon,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Erreur serveur:", errorData);
-        throw new Error(errorData.error || "Erreur lors de la sauvegarde");
-      }
-
-      const data = await response.json();
-      console.log("Réponse du serveur:", data);
-
-      const newItem = formatArticleToItem(
-        {
-          title: article.title,
-          link: article.url,
-          content: article.description,
-          Creation_article: article.publishDate,
-          image: article.image,
-          favicon: article.favicon,
-        },
-        0
-      );
-
-      setItems([newItem, ...items]);
-      setShowEditor(false);
-    } catch (error) {
-      console.error("Erreur complète:", error);
-    }
-  };
-
-  const formatArticleToItem = (article: any, index: number) => {
+  const formatArticleToItem = (article: Article, index: number) => {
     const formattedDate = new Date(article.Creation_article).toLocaleDateString(
       "fr-FR",
       {
@@ -192,23 +160,7 @@ export default function PressePage() {
           </div>
         </div>
       </div>
-
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-end mb-6">
-          <button
-            onClick={() => setShowEditor(!showEditor)}
-            className="bg-black text-white px-4 py-2 rounded-lg hover:bg-opacity-80 transition"
-          >
-            {showEditor ? "Fermer" : "Ajouter un article"}
-          </button>
-        </div>
-
-        {showEditor && (
-          <div className="mb-6">
-            <ArticleEditor onSave={handleSaveArticle} />
-          </div>
-        )}
-
+      <div>
         <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[20rem]">
           {items.map((item, i) => (
             <BentoGridItem key={i} {...item} />
