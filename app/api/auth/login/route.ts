@@ -17,6 +17,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { email, password } = body;
 
+    console.log("Tentative de connexion pour:", email);
+
     if (!email || !password) {
       return NextResponse.json(
         { message: "Email et mot de passe requis" },
@@ -33,7 +35,10 @@ export async function POST(request: Request) {
         [email]
       );
 
+      console.log("Résultat de la requête:", users);
+
       if (!Array.isArray(users) || users.length === 0) {
+        console.log("Aucun utilisateur trouvé avec cet email");
         return NextResponse.json(
           { message: "Email ou mot de passe incorrect" },
           { status: 401 }
@@ -41,9 +46,15 @@ export async function POST(request: Request) {
       }
 
       const user = users[0];
+      console.log("Utilisateur trouvé:", {
+        id: user.id,
+        email: user.email,
+        userType: user.userType,
+      });
 
       // Vérifier le mot de passe
       const isPasswordValid = await bcrypt.compare(password, user.password);
+      console.log("Mot de passe valide:", isPasswordValid);
 
       if (!isPasswordValid) {
         return NextResponse.json(
