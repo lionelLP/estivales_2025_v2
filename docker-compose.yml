@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        - GITLAB_TOKEN=${GITLAB_TOKEN}
+    container_name: estivales_app
+    volumes:
+      - estivales_source:/app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+volumes:
+  estivales_source:
