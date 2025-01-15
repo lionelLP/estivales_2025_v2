@@ -14,14 +14,16 @@ RUN git config --global url."https://oauth2:${GITLAB_TOKEN}@iutbg-gitlab.iutbour
 # Créer le script d'entrée
 COPY <<'EOF' /entrypoint.sh
 #!/bin/sh
-if [ -d "/app/node_modules" ]; then
-    echo "Le projet existe déjà"
+if [ -d "/app/.git" ]; then
+    echo "Le projet existe déjà, mise à jour..."
+    git pull
+    npm install
 else
     echo "Clonage du projet..."
     git clone https://iutbg-gitlab.iutbourg.univ-lyon1.fr/sae-but31/2024-25-web/estivales-brou.git .
     npm install
 fi
-tail -f /dev/null
+npm run dev
 EOF
 
 # Rendre le script exécutable
