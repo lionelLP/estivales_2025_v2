@@ -1,11 +1,33 @@
 "use client";
+
 import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 import { useLoading } from "@/contexts/LoadingContext";
+import { Newspaper } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
+interface Article {
+  title: string;
+  content: string;
+  Creation_article: string;
+  favicon: string;
+  image: string;
+  link: string;
+}
+
+interface FormattedItem {
+  title: React.ReactNode;
+  description: React.ReactNode;
+  header: React.ReactNode;
+  className: string;
+  icon: React.ReactNode;
+  link: string;
+  onClick: () => void;
+}
+
 export default function PressePage() {
-  const [items, setItems] = useState([]);
-  const [showEditor, setShowEditor] = useState(false);
+  const [items, setItems] = useState<FormattedItem[]>([]);
   const { registerLoadingComponent, componentLoaded } = useLoading();
 
   useEffect(() => {
@@ -15,8 +37,8 @@ export default function PressePage() {
       try {
         const response = await fetch("/api/articles");
         if (response.ok) {
-          const articles = await response.json();
-          const formattedItems = articles.map((article: any, index: number) =>
+          const articles = await response.json() as Article[];
+          const formattedItems = articles.map((article: Article, index: number) =>
             formatArticleToItem(article, index)
           );
           setItems(formattedItems);
@@ -35,69 +57,93 @@ export default function PressePage() {
     };
   }, []);
 
-  const handleSaveArticle = async (article: any) => {
-    try {
-      console.log("Article à sauvegarder:", article); // Pour le debug
 
-      const response = await fetch("/api/articles", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: article.title,
-          link: article.url,
-          content: article.description,
-          Creation_article: article.publishDate,
-          is_published: 1,
-          user_id: 1,
-          event_id: null,
-          image: article.image,
-          favicon: article.favicon,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Erreur serveur:", errorData);
-        throw new Error(errorData.error || "Erreur lors de la sauvegarde");
-      }
-
-      const data = await response.json();
-      console.log("Réponse du serveur:", data);
-
-      const newItem = formatArticleToItem(
-        {
-          title: article.title,
-          link: article.url,
-          content: article.description,
-          Creation_article: article.publishDate,
-          image: article.image,
-          favicon: article.favicon,
-        },
-        0
-      );
-
-      setItems([newItem, ...items]);
-      setShowEditor(false);
-    } catch (error) {
-      console.error("Erreur complète:", error);
-    }
-  };
-
-  const formatArticleToItem = (article: any, index: number) => {
-    return {
-      title: article.title,
-      description: article.content,
-      header: new Date(article.Creation_article).toLocaleDateString("fr-FR", {
-        year: "numeric",
-        month: "long",
+  const formatArticleToItem = (article: Article, index: number) => {
+    const formattedDate = new Date(article.Creation_article).toLocaleDateString(
+      "fr-FR",
+      {
         day: "numeric",
-      }),
-      className: "md:col-span-1",
-      icon: article.favicon,
-      image: article.image,
+        month: "long",
+        year: "numeric",
+      }
+    );
+
+    const position = index;
+    const rowIndex = Math.floor(position / 2);
+    const isFirstInRow = position % 2 === 0;
+    const isEvenRow = rowIndex % 2 === 0;
+
+    const isLarge = isEvenRow ? isFirstInRow : !isFirstInRow;
+
+    return {
+      title: (
+        <div className="line-clamp-2 font-sans font-bold text-neutral-600 dark:text-neutral-200">
+          {article.title}
+        </div>
+      ),
+      description: (
+        <div className="relative">
+          <div className="line-clamp-2 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300">
+            {article.content}
+          </div>
+          {article.content.length > (isLarge ? 150 : 100) && (
+            <Link
+              href={article.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline inline-block"
+            >
+              Voir plus
+            </Link>
+          )}
+        </div>
+      ),
+      header: (
+        <Link
+          href={article.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full h-full"
+        >
+          <div className="relative w-full h-40">
+            <Image
+              src={article.image}
+              alt={article.title}
+              fill
+              className="object-cover rounded-lg"
+            />
+          </div>
+        </Link>
+      ),
+      className: `${
+        isLarge ? "md:col-span-2" : "md:col-span-1"
+      } hover:scale-[1.02] transition-transform cursor-pointer`,
+      icon: (
+        <div className="flex items-center gap-2">
+          {article.favicon ? (
+            <div className="relative w-4 h-4">
+              <Image
+                src={article.favicon}
+                alt="Site favicon"
+                width={16}
+                height={16}
+                className="rounded-sm"
+              />
+            </div>
+          ) : (
+            <Newspaper className="h-4 w-4 text-bleu-fonce dark:text-bleu-clair" />
+          )}
+          <span className="text-xs text-neutral-500 dark:text-neutral-400">
+            {formattedDate}
+          </span>
+        </div>
+      ),
       link: article.link,
+      onClick: () => {
+        if (article.link) {
+          window.open(article.link, "_blank", "noopener,noreferrer");
+        }
+      },
     };
   };
 
@@ -114,8 +160,7 @@ export default function PressePage() {
           </div>
         </div>
       </div>
-
-      <div className="container mx-auto px-4 py-8">
+      <div>
         <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[20rem]">
           {items.map((item, i) => (
             <BentoGridItem key={i} {...item} />
