@@ -1,6 +1,13 @@
 "use client";
 
-import { FileText, Images, Newspaper, PartyPopper, Users } from "lucide-react";
+import {
+  FileText,
+  Images,
+  Newspaper,
+  PartyPopper,
+  Users,
+  UserPlus,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -48,6 +55,13 @@ export default function AdminPage() {
       icon: <Images className="h-12 w-12" />,
       description: "Gérer les médias du site",
       color: "bg-pink-500",
+    },
+    {
+      label: "Utilisateurs",
+      href: "/admin/users/add",
+      icon: <UserPlus className="h-12 w-12" />,
+      description: "Gérer les comptes utilisateurs",
+      color: "bg-teal-500",
     },
   ];
 
