@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       // Insérer le nouvel utilisateur
       const [result] = await connection.query<ResultSetHeader>(
         "INSERT INTO User (username, password, email, userType, description) VALUES (?, ?, ?, ?, ?)",
-        [username, hashedPassword, email, 1, null] // userType 1 pour utilisateur standard
+        [username, hashedPassword, email, 1, null] // userType 1 pour utilisateur standard (0 pour admin)
       );
 
       const token = jwt.sign(

@@ -24,7 +24,7 @@ export function useAuthentication() {
 
       if (response.ok) {
         setUser(data.user);
-        router.push("/");
+        router.push(data.user.userType === 0 ? "/admin" : "/");
       } else {
         setError(data.message || "Erreur lors de la connexion");
       }

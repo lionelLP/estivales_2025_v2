@@ -1,20 +1,13 @@
+import { verifyToken } from "@/lib/auth/jwt";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const token = request.cookies.get("token");
   const path = request.nextUrl.pathname;
 
-  // Routes qui nécessitent une authentification
-  const protectedRoutes = [
-    "/admin",
-    "/profil",
-    "/evenements/creer",
-    "/evenements/*/edit",
-    "/partenaires/creer",
-    "/partenaires/*/modifier",
-    "/medias",
-  ];
+  // Routes qui nécessitent une authentification administrateur
+  const adminRoutes = ["/admin"];
 
   // Ne pas appliquer le middleware aux routes statiques et API
   if (
@@ -25,18 +18,28 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Vérifier si la route actuelle correspond à une route protégée
-  const isProtectedRoute = protectedRoutes.some((route) => {
-    if (route.includes("*")) {
-      const routePattern = new RegExp(route.replace("*", ".*"));
-      return routePattern.test(path);
-    }
-    return path.startsWith(route);
-  });
+  // Vérifier si c'est une route admin
+  const isAdminRoute = adminRoutes.some((route) => path.startsWith(route));
 
-  // Si l'utilisateur n'est pas connecté et essaie d'accéder à une route protégée
-  if (!token && isProtectedRoute) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  if (isAdminRoute) {
+    if (!token) {
+      console.log("No token found");
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    try {
+      // Vérifier le token et le rôle (userType = 0 pour admin)
+      const decoded = await verifyToken(token.value);
+      console.log("Decoded token:", decoded); // Pour voir le contenu du token
+
+      if (!decoded || decoded.userType !== 0) {
+        console.log("Unauthorized access - userType:", decoded?.userType);
+        return NextResponse.redirect(new URL("/unauthorized", request.url));
+      }
+    } catch (error) {
+      console.error("Token verification error:", error);
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
   }
 
   return NextResponse.next();
