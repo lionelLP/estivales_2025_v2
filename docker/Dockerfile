@@ -11,11 +11,20 @@ ARG GITLAB_TOKEN
 # Configuration de git pour utiliser le token avec votre GitLab IUT
 RUN git config --global url."https://oauth2:${GITLAB_TOKEN}@iutbg-gitlab.iutbourg.univ-lyon1.fr/".insteadOf "https://iutbg-gitlab.iutbourg.univ-lyon1.fr/"
 
-# Cloner le projet avec l'URL complète
-RUN git clone https://iutbg-gitlab.iutbourg.univ-lyon1.fr/sae-but31/2024-25-web/estivales-brou.git .
+# Créer le script d'entrée
+COPY <<'EOF' /entrypoint.sh
+#!/bin/sh
+if [ -d "/app/node_modules" ]; then
+    echo "Le projet existe déjà"
+else
+    echo "Clonage du projet..."
+    git clone https://iutbg-gitlab.iutbourg.univ-lyon1.fr/sae-but31/2024-25-web/estivales-brou.git .
+    npm install
+fi
+tail -f /dev/null
+EOF
 
-# Installer les dépendances
-RUN npm install
+# Rendre le script exécutable
+RUN chmod +x /entrypoint.sh
 
-# Garder le conteneur en vie
-CMD ["sh", "-c", "tail -f /dev/null"]
+CMD ["/entrypoint.sh"]
