@@ -152,12 +152,14 @@ interface PasswordFieldProps {
   onChange: (value: string, isValid: boolean) => void;
   className?: string;
   value?: string;
+  showValidation?: boolean;
 }
 
 const PasswordField: React.FC<PasswordFieldProps> = ({
   onChange,
   className,
   value = "",
+  showValidation = true,
 }) => {
   const [show, setShow] = useState(false);
   const [inputValue, setInputValue] = useState(value);
@@ -382,24 +384,26 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
           </EyeSVG>
         </Button>
       </FormField>
-      <div className="mt-2 text-sm">
-        <p className={`${isValid ? "text-green-500" : "text-red-500"}`}>
-          {isValid
-            ? "Mot de passe valide"
-            : "Le mot de passe doit contenir au moins 14 caractères, une majuscule et un caractère spécial"}
-        </p>
-        {passwordStrength && (
-          <p
-            className={`
-            ${passwordStrength === "Fort" ? "text-green-500" : ""}
-            ${passwordStrength === "Moyen" ? "text-yellow-500" : ""}
-            ${passwordStrength === "Faible" ? "text-red-500" : ""}
-          `}
-          >
-            Force du mot de passe : {passwordStrength}
+      {showValidation && (
+        <div className="mt-2 text-sm">
+          <p className={`${isValid ? "text-green-500" : "text-red-500"}`}>
+            {isValid
+              ? "Mot de passe valide"
+              : "Le mot de passe doit contenir au moins 14 caractères, une majuscule et un caractère spécial"}
           </p>
-        )}
-      </div>
+          {passwordStrength && (
+            <p
+              className={`
+              ${passwordStrength === "Fort" ? "text-green-500" : ""}
+              ${passwordStrength === "Moyen" ? "text-yellow-500" : ""}
+              ${passwordStrength === "Faible" ? "text-red-500" : ""}
+            `}
+            >
+              Force du mot de passe : {passwordStrength}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 };

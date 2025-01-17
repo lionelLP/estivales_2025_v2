@@ -160,6 +160,7 @@ export default function ProfilePage() {
                           onChange={(value) =>
                             setFormData({ ...formData, currentPassword: value })
                           }
+                          showValidation={false}
                         />
                       </div>
 
