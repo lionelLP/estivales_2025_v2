@@ -4,18 +4,18 @@ import { Event } from "@/lib/types/event";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export default function Evenements() {
-  const [evenements, setEvenements] = useState<Event[]>([]);
+export default function Events() {
+  const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchEvenements = async () => {
+    const fetchEvents = async () => {
       try {
-        const response = await fetch("/api/evenements");
+        const response = await fetch("/api/events");
         if (response.ok) {
           const data = await response.json();
-          setEvenements(data);
+          setEvents(data);
         } else {
           setError("Erreur lors de la récupération des événements");
         }
@@ -27,7 +27,7 @@ export default function Evenements() {
       }
     };
 
-    fetchEvenements();
+    fetchEvents();
   }, []);
 
   if (error) {
@@ -43,7 +43,7 @@ export default function Evenements() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Liste des événements</h1>
         <Link
-          href="/evenements/creer"
+          href="/events/creer"
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
         >
           Créer un événement
@@ -51,7 +51,7 @@ export default function Evenements() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {evenements.map((event) => (
+        {events.map((event) => (
           <div
             key={event.id}
             className="border rounded-lg p-6 shadow-md hover:shadow-lg transition"
@@ -90,7 +90,7 @@ export default function Evenements() {
             </div>
             <div className="flex justify-end mt-4">
               <Link
-                href={`/evenements/${event.id}/edit`}
+                href={`/events/${event.id}/edit`}
                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
               >
                 Modifier

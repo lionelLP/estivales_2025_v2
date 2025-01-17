@@ -6,16 +6,16 @@ import { useEffect, useState } from "react";
 import { EventDetailModal } from "./EventDetailModal";
 
 export function TimelineHistory() {
-  const [evenements, setEvenements] = useState<Event[]>([]);
+  const [events, setevents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const fetchEvenements = async () => {
+    const fetchevents = async () => {
       try {
-        const response = await fetch("/api/evenements");
+        const response = await fetch("/api/events");
         if (response.ok) {
           const data = await response.json();
           console.log("Données reçues:", data);
@@ -28,7 +28,7 @@ export function TimelineHistory() {
           });
 
           if (futurePublicEvents.length === 0) {
-            setEvenements([]);
+            setevents([]);
             return;
           }
 
@@ -95,7 +95,7 @@ export function TimelineHistory() {
               return dateA.getTime() - dateB.getTime();
             });
 
-          setEvenements(timelineData);
+          setevents(timelineData);
         } else {
           setError("Erreur lors de la récupération des événements");
         }
@@ -107,7 +107,7 @@ export function TimelineHistory() {
       }
     };
 
-    fetchEvenements();
+    fetchevents();
   }, []);
 
 
@@ -115,7 +115,7 @@ export function TimelineHistory() {
     return <div className="text-red-500">{error}</div>;
   }
 
-  if (evenements.length === 0) {
+  if (events.length === 0) {
     return (
       <div className="text-center text-gray-500">Aucun événement à venir</div>
     );
@@ -123,7 +123,7 @@ export function TimelineHistory() {
 
   return (
     <div className="w-full ">
-      <Timeline data={evenements} />
+      <Timeline data={events} />
       {selectedEvent && (
         <EventDetailModal
           event={selectedEvent}

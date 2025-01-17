@@ -7,7 +7,7 @@ import { useLoading } from "@/contexts/LoadingContext";
 import { EventDetailModal } from "@/components/common/EventDetailModal";
 
 export default function ProgrammesPast() {
-  const [evenements, setEvenements] = useState<Event[]>([]);
+  const [events, setevents] = useState<Event[]>([]);
   const [error, setError] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,9 +16,9 @@ export default function ProgrammesPast() {
   useEffect(() => {
     const loadingId = registerLoadingComponent();
     
-    const fetchEvenements = async () => {
+    const fetchevents = async () => {
       try {
-        const response = await fetch("/api/evenements");
+        const response = await fetch("/api/events");
         if (response.ok) {
           const data = await response.json();
           
@@ -30,7 +30,7 @@ export default function ProgrammesPast() {
           });
 
           if (pastEvents.length === 0) {
-            setEvenements([]);
+            setevents([]);
             return;
           }
 
@@ -101,7 +101,7 @@ export default function ProgrammesPast() {
               return dateB.getTime() - dateA.getTime(); // Tri inversé pour avoir les plus récents en premier
             });
 
-          setEvenements(timelineData);
+          setevents(timelineData);
         } else {
           setError("Erreur lors de la récupération des événements");
         }
@@ -113,7 +113,7 @@ export default function ProgrammesPast() {
       }
     };
 
-    fetchEvenements();
+    fetchevents();
     
     return () => {
       componentLoaded(loadingId);
@@ -124,7 +124,7 @@ export default function ProgrammesPast() {
     return <div className="text-red-500">{error}</div>;
   }
 
-  if (evenements.length === 0) {
+  if (events.length === 0) {
     return (
       <div className="text-center text-gray-500">Aucun événement passé</div>
     );
@@ -145,7 +145,7 @@ export default function ProgrammesPast() {
       </div>
 
       <div className="container mx-auto px-4">
-        <Timeline data={evenements} />
+        <Timeline data={events} />
         {selectedEvent && (
           <EventDetailModal
             event={selectedEvent}

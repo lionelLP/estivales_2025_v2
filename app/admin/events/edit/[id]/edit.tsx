@@ -21,7 +21,7 @@ export default function EditEvent({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const response = await fetch(`/api/evenements/${params.id}`);
+        const response = await fetch(`/api/events/${params.id}`);
         if (response.ok) {
           const data = await response.json();
           const eventDate = new Date(data.event_date)
@@ -63,7 +63,7 @@ export default function EditEvent({ params }: { params: { id: string } }) {
       }
 
       // Mise à jour de l'événement
-      const response = await fetch(`/api/evenements/${params.id}`, {
+      const response = await fetch(`/api/events/${params.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -89,7 +89,7 @@ export default function EditEvent({ params }: { params: { id: string } }) {
           });
         }
 
-        router.push("/evenements");
+        router.push("/events");
       } else {
         const data = await response.json();
         setError(data.error || "Erreur lors de la mise à jour");
@@ -250,7 +250,7 @@ export default function EditEvent({ params }: { params: { id: string } }) {
           </button>
           <button
             type="button"
-            onClick={() => router.push("/evenements")}
+            onClick={() => router.push("/events")}
             className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
           >
             Annuler

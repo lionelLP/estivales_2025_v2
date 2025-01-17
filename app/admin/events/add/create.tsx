@@ -14,7 +14,7 @@ interface Suggestion {
   };
 }
 
-export default function CreerEvenement() {
+export default function CreateEvent() {
   const [currentUser] = useState({
     id: 1,
     firstName: "Admin",
@@ -59,7 +59,7 @@ export default function CreerEvenement() {
       }
 
       // Création de l'événement
-      const eventResponse = await fetch("/api/evenements", {
+      const eventResponse = await fetch("/api/events", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -88,7 +88,7 @@ export default function CreerEvenement() {
           });
         }
 
-        window.location.href = "/evenements";
+        window.location.href = "/events";
       }
     } catch (error) {
       console.error("Erreur:", error);

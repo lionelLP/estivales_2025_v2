@@ -5,19 +5,19 @@ import { Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export default function Evenements() {
-  const [evenements, setEvenements] = useState<Event[]>([]);
+export default function Events() {
+  const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
 
   useEffect(() => {
-    const fetchEvenements = async () => {
+    const fetchEvents = async () => {
       try {
-        const response = await fetch("/api/evenements");
+        const response = await fetch("/api/events");
         if (response.ok) {
           const data = await response.json();
-          setEvenements(data);
+          setEvents(data);
         } else {
           setError("Erreur lors de la récupération des événements");
         }
@@ -29,7 +29,7 @@ export default function Evenements() {
       }
     };
 
-    fetchEvenements();
+    fetchEvents();
   }, []);
 
   const handleDelete = async (id: number) => {
@@ -39,12 +39,12 @@ export default function Evenements() {
 
     setIsDeleting(id);
     try {
-      const response = await fetch(`/api/evenements/${id}`, {
+      const response = await fetch(`/api/events/${id}`, {
         method: "DELETE",
       });
 
       if (response.ok) {
-        setEvenements((prev) => prev.filter((event) => event.id !== id));
+        setEvents((prev) => prev.filter((event) => event.id !== id));
       } else {
         alert("Erreur lors de la suppression de l'événement");
       }
@@ -69,7 +69,7 @@ export default function Evenements() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Liste des événements</h1>
         <Link
-          href="/evenements/creer"
+          href="/events/creer"
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
         >
           Créer un événement
@@ -98,7 +98,7 @@ export default function Evenements() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
-            {evenements.map((event) => (
+            {events.map((event) => (
               <tr
                 key={event.id}
                 className="hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -147,7 +147,7 @@ export default function Evenements() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex items-center gap-2">
                     <Link
-                      href={`/evenements/${event.id}/edit`}
+                      href={`/events/${event.id}/edit`}
                       className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                     >
                       <Edit className="h-5 w-5" />
