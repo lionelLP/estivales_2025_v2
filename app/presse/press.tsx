@@ -83,19 +83,21 @@ export default function PressePage() {
       ),
       description: (
         <div className="flex flex-col h-full justify-between">
-          <div className="line-clamp-4 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300 mb-4">
+          <div className="line-clamp-2 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300 mb-4">
             {article.content}
           </div>
-          {article.content.length > (isLarge ? 150 : 100) && (
-            <Link
-              href={article.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline mt-auto"
-            >
-              Voir plus
-            </Link>
-          )}
+          <div className="flex justify-between items-center">
+            {article.content.length > (isLarge ? 150 : 100) && (
+              <Link
+                href={article.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline"
+              >
+                Voir plus
+              </Link>
+            )}
+          </div>
         </div>
       ),
       header: (
@@ -161,7 +163,7 @@ export default function PressePage() {
         </div>
       </div>
       <div>
-        <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[24rem]">
+        <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[23rem]">
           {items.map((item, i) => (
             <BentoGridItem key={i} {...item} />
           ))}

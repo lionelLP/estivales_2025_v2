@@ -84,29 +84,27 @@ export default function PressePage() {
     return {
       id: article.id,
       title: (
-        <div className="line-clamp-2 font-sans font-bold text-neutral-600 dark:text-neutral-200">
+        <div className="line-clamp-3 font-sans font-bold text-neutral-600 dark:text-neutral-200">
           {article.title}
         </div>
       ),
       description: (
-        <div className="relative">
-          <div className="line-clamp-2 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300">
+        <div className="flex flex-col h-full justify-between">
+          <div className="line-clamp-2 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300 mb-4">
             {article.content}
           </div>
-          <div className="flex justify-between items-center mt-2">
-            <div>
-              {article.content.length > (isLarge ? 150 : 100) && (
-                <Link
-                  href={article.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline inline-block"
-                >
-                  Voir plus
-                </Link>
-              )}
-            </div>
-            <div className="flex gap-2">
+          <div className="flex justify-between items-center">
+            {article.content.length > (isLarge ? 150 : 100) && (
+              <Link
+                href={article.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline"
+              >
+                Voir plus
+              </Link>
+            )}
+            <div className="flex gap-2 ml-auto">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -120,11 +118,7 @@ export default function PressePage() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (
-                    window.confirm(
-                      "Voulez-vous vraiment supprimer cet article ?"
-                    )
-                  ) {
+                  if (window.confirm("Voulez-vous vraiment supprimer cet article ?")) {
                     handleDeleteArticle(article.id);
                   }
                 }}
@@ -142,9 +136,9 @@ export default function PressePage() {
           href={article.link}
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full h-full"
+          className="block w-full"
         >
-          <div className="relative w-full h-40">
+          <div className="relative w-full h-44">
             <Image
               src={article.image}
               alt={article.title}
@@ -231,7 +225,7 @@ export default function PressePage() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[20rem]">
+        <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[24rem]">
           {items.map((item, i) => (
             <BentoGridItem key={i} {...item} />
           ))}
