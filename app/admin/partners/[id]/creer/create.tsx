@@ -1,6 +1,5 @@
 "use client";
 
-import { CircularImageCropper } from "@/components/common/circular-image-cropper";
 import { FileUpload } from "@/components/common/file-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,8 +17,6 @@ export default function CreatePartner() {
   const [banner, setBanner] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [showCropper, setShowCropper] = useState(false);
-  const [logoToProcess, setLogoToProcess] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,26 +68,6 @@ export default function CreatePartner() {
       ...prev,
       [name]: value,
     }));
-  };
-
-  const handleLogoSelect = (files: File[]) => {
-    if (files.length > 0) {
-      setLogoToProcess(files[0]);
-      setShowCropper(true);
-    }
-  };
-
-  const handleCroppedLogo = (croppedBlob: Blob) => {
-    const croppedFile = new File(
-      [croppedBlob],
-      logoToProcess?.name || "logo.png",
-      {
-        type: "image/png",
-      }
-    );
-    setLogo([croppedFile]);
-    setShowCropper(false);
-    setLogoToProcess(null);
   };
 
   return (
@@ -147,7 +124,7 @@ export default function CreatePartner() {
         <div className="space-y-4">
           <Label>Logo</Label>
           <FileUpload
-            onChange={handleLogoSelect}
+            onChange={(files) => setLogo(files)}
             maxFiles={1}
             accept="image/*"
             multiple={false}
@@ -155,16 +132,6 @@ export default function CreatePartner() {
           <p className="text-sm text-gray-500">
             Format recommandé : PNG ou JPG, taille maximale : 2MB
           </p>
-          {showCropper && logoToProcess && (
-            <CircularImageCropper
-              imageFile={logoToProcess}
-              onCropComplete={handleCroppedLogo}
-              onCancel={() => {
-                setShowCropper(false);
-                setLogoToProcess(null);
-              }}
-            />
-          )}
         </div>
 
         {/* Banner Upload */}
