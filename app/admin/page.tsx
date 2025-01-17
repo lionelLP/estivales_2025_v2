@@ -1,24 +1,41 @@
 "use client";
 
+import UnauthorizedPage from "@/app/unauthorized/page";
 import {
   FileText,
   Images,
   Newspaper,
   PartyPopper,
-  Users,
   UserPlus,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
-  const [currentUser] = useState({
-    id: 1,
-    firstName: "Admin",
-    lastName: "User",
-    userType: "1",
-  });
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch("/api/auth/me");
+        const data = await response.json();
+        if (response.ok) {
+          setCurrentUser(data);
+        }
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération de l'utilisateur:",
+          error
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   const adminLinks = [
     {
@@ -65,15 +82,11 @@ export default function AdminPage() {
     },
   ];
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+  if (isLoading) {
+    return <div>Chargement...</div>;
+  }
 
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (currentUser.userType !== "0") {
+  if (!currentUser || currentUser.userType !== 0) {
     return <UnauthorizedPage />;
   }
 
