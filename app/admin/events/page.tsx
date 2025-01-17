@@ -69,7 +69,7 @@ export default function Events() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Liste des événements</h1>
         <Link
-          href="/events/creer"
+          href="/admin/events/add"
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
         >
           Créer un événement
@@ -147,7 +147,7 @@ export default function Events() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex items-center gap-2">
                     <Link
-                      href={`/events/${event.id}/edit`}
+                      href={`/admin/events/edit/${event.id}`}
                       className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                     >
                       <Edit className="h-5 w-5" />

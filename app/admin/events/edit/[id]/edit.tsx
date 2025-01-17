@@ -1,5 +1,11 @@
 "use client";
-export default function EditEvent({ params }: { params: { id: string } }) {
+
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Event } from "@/lib/types/event";
+import React from "react";
+
+export default function EditEvent({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [formData, setFormData] = useState<Event>({
     title: "",
@@ -18,10 +24,25 @@ export default function EditEvent({ params }: { params: { id: string } }) {
   const [error, setError] = useState("");
   const [currentBrochurePath, setCurrentBrochurePath] = useState("");
 
+  // Unwrap params using React.use()
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
+
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolved = await params;
+      setResolvedParams(resolved);
+    };
+
+    resolveParams();
+  }, [params]);
+
+  const eventId = resolvedParams?.id;
+
   useEffect(() => {
     const fetchEvent = async () => {
+      if (!eventId) return; // Ensure eventId is available
       try {
-        const response = await fetch(`/api/events/${params.id}`);
+        const response = await fetch(`/api/events/${eventId}`);
         if (response.ok) {
           const data = await response.json();
           const eventDate = new Date(data.event_date)
@@ -40,12 +61,11 @@ export default function EditEvent({ params }: { params: { id: string } }) {
     };
 
     fetchEvent();
-  }, [params.id]);
+  }, [eventId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Gérer l'upload de la brochure si elle existe
       let brochurePath = currentBrochurePath;
       if (brochure.length > 0) {
         const formDataBrochure = new FormData();
@@ -62,8 +82,7 @@ export default function EditEvent({ params }: { params: { id: string } }) {
         }
       }
 
-      // Mise à jour de l'événement
-      const response = await fetch(`/api/events/${params.id}`, {
+      const response = await fetch(`/api/events/${eventId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -75,13 +94,12 @@ export default function EditEvent({ params }: { params: { id: string } }) {
       });
 
       if (response.ok) {
-        // Upload des nouvelles images si elles existent
         if (images.length > 0) {
           const imagesFormData = new FormData();
           images.forEach((file) => {
             imagesFormData.append("files", file);
           });
-          imagesFormData.append("eventId", params.id);
+          imagesFormData.append("eventId", eventId);
 
           await fetch("/api/upload/images", {
             method: "POST",
@@ -89,7 +107,7 @@ export default function EditEvent({ params }: { params: { id: string } }) {
           });
         }
 
-        router.push("/events");
+        router.push("/admin/events");
       } else {
         const data = await response.json();
         setError(data.error || "Erreur lors de la mise à jour");
@@ -250,7 +268,7 @@ export default function EditEvent({ params }: { params: { id: string } }) {
           </button>
           <button
             type="button"
-            onClick={() => router.push("/events")}
+            onClick={() => router.push("/admin/events")}
             className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
           >
             Annuler
