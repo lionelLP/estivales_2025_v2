@@ -23,8 +23,11 @@ export function useAuthentication() {
       const data = await response.json();
 
       if (response.ok) {
-        setUser(data.user);
-        router.push(data.user.userType === 0 ? "/admin" : "/");
+        setUser({
+          ...data.user,
+          userType: data.user.userType,
+        });
+        router.push(data.user.userType === 0 ? "/" : "/");
       } else {
         setError(data.message || "Erreur lors de la connexion");
       }
