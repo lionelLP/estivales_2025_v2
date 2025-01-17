@@ -11,9 +11,11 @@ import {
   LogOut,
   Newspaper,
   PartyPopper,
+  User,
   Users,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function AdminLayout({
@@ -236,6 +238,13 @@ const AdminMenu = ({
       transition={{ duration: 0.3 }}
       className="absolute bottom-full left-0 right-0 mb-8 bg-white dark:bg-dark-mode-2 rounded-lg shadow-lg p-2"
     >
+      <Link
+        href="/admin/profile"
+        className="flex items-center gap-2 p-2 hover:bg-neutral-100 dark:hover:bg-dark-mode-2 rounded w-full"
+      >
+        <User className="h-5 w-5" />
+        <span>Mon profil</span>
+      </Link>
       <Logout className="flex items-center gap-2 p-2 hover:bg-neutral-100 dark:hover:bg-dark-mode-2 rounded text-red-500 w-full">
         <LogOut className="h-5 w-5" />
         <span>Se déconnecter</span>
