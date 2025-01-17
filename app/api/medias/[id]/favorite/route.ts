@@ -1,4 +1,6 @@
+import { verifyToken } from "@/lib/auth/jwt";
 import pool from "@/lib/db/mysql";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -28,12 +30,24 @@ export async function GET() {
   }
 }
 
-export async function PUT(request: Request) {
-  const middlewareResponse = await apiMiddleware(request);
-  if (middlewareResponse.status !== 200) {
-    return middlewareResponse;
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  // Vérification de l'authentification directement ici
+  const cookieStore = cookies();
+  const token = cookieStore.get("token");
+
+  if (!token) {
+    return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
   }
+
   try {
+    const decoded = await verifyToken(token.value);
+    if (!decoded) {
+      return NextResponse.json({ message: "Token invalide" }, { status: 401 });
+    }
+
     const connection = await pool.getConnection();
     try {
       // Mettre à jour le statut favori
