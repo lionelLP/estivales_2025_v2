@@ -14,7 +14,7 @@ export async function GET(
         [parseInt(params.id)]
       );
 
-      if (!articles || !Array.isArray(articles) || articles.length === 0) {
+      if (!articles || articles.length === 0) {
         return NextResponse.json(
           { error: "Article non trouvé" },
           { status: 404 }
