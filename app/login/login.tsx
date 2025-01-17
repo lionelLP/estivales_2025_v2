@@ -9,7 +9,6 @@ import AnimatedCheckbox from "../../components/common/AnimatedCheckbox";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { useAuthentication } from "../../hooks/useAuthentication";
-import UnauthorizedPage from "../unauthorized/page";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -70,6 +69,7 @@ export default function LoginForm() {
             <Label htmlFor="password">Mot de passe</Label>
             <PasswordField
               onChange={handlePasswordChange}
+              showValidation={false}
               className="focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-neutral-400 dark:focus-visible:ring-neutral-600"
             />
           </LabelInputContainer>

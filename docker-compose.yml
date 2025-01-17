@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        - GITLAB_TOKEN=${GITLAB_TOKEN}
+    container_name: estivales_app
+    volumes:
+      - estivales_source:/app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=db
+      - DB_USER=estivales
+      - DB_PASSWORD=estivales_password
+      - DB_NAME=estivales_db
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8
+    container_name: estivales_db
+    command: --init-file /docker-entrypoint-initdb.d/init.sql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=estivales_db
+      - MYSQL_USER=estivales
+      - MYSQL_PASSWORD=estivales_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: estivales_phpmyadmin
+    environment:
+      - PMA_HOST=db
+      - PMA_USER=estivales
+      - PMA_PASSWORD=estivales_password
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+volumes:
+  estivales_source:
+  mysql_data:
