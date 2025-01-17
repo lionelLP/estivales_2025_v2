@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import pool from "@/lib/db/mysql";
+import { apiMiddleware } from "../middleware";
 
-export async function GET() {
+interface AboutContent {
+  html_content: string;
+}
+
+export async function GET(request: NextRequest) {
   try {
     const connection = await pool.getConnection();
     try {
@@ -18,9 +24,14 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const middlewareResponse = await apiMiddleware(request);
+  if (middlewareResponse.status !== 200) {
+    return middlewareResponse;
+  }
+
   try {
-    const { html_content } = await request.json();
+    const { html_content } = (await request.json()) as AboutContent;
     const connection = await pool.getConnection();
 
     try {

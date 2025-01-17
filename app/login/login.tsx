@@ -9,6 +9,7 @@ import AnimatedCheckbox from "../../components/common/AnimatedCheckbox";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { useAuthentication } from "../../hooks/useAuthentication";
+import UnauthorizedPage from "../unauthorized/page";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -100,8 +101,7 @@ export default function LoginForm() {
         </form>
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-
-        {/* Texte pour s'inscrire */}
+        {/* Texte pour s'inscrire
         <div className="mt-6 text-center flex flex-col gap-2">
           <div>
             <span className="text-neutral-600 dark:text-neutral-400">
@@ -113,8 +113,8 @@ export default function LoginForm() {
             >
               Inscrivez-vous ici
             </Link>
-          </div>
-
+          </div> */}
+        <div className="mt-6 text-center">
           <Link
             href="/forgot-password"
             className="text-sm text-red-brou hover:text-red-brou-2 dark:text-red-brou dark:hover:text-white"
