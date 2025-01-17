@@ -1,23 +1,30 @@
-import { query } from "@/lib/db";
+import pool from "@/lib/db/mysql";
 import { NextResponse } from "next/server";
+import * as mysql from 'mysql2/promise';
 
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const articles = await query("SELECT * FROM articles WHERE id = ?", [
-      parseInt(params.id),
-    ]);
-
-    if (!articles || articles.length === 0) {
-      return NextResponse.json(
-        { error: "Article non trouvé" },
-        { status: 404 }
+    const connection = await pool.getConnection();
+    try {
+      const [articles] = await connection.execute<mysql.RowDataPacket[]>(
+        "SELECT * FROM articles WHERE id = ?",
+        [parseInt(params.id)]
       );
-    }
 
-    return NextResponse.json(articles[0]);
+      if (!articles || !Array.isArray(articles) || articles.length === 0) {
+        return NextResponse.json(
+          { error: "Article non trouvé" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(articles[0]);
+    } finally {
+      connection.release();
+    }
   } catch (error) {
     console.error("Erreur lors de la récupération de l'article:", error);
     return NextResponse.json(

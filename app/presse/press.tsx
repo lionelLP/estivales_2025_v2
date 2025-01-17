@@ -77,13 +77,13 @@ export default function PressePage() {
 
     return {
       title: (
-        <div className="line-clamp-2 font-sans font-bold text-neutral-600 dark:text-neutral-200">
+        <div className="line-clamp-3 font-sans font-bold text-neutral-600 dark:text-neutral-200">
           {article.title}
         </div>
       ),
       description: (
-        <div className="relative">
-          <div className="line-clamp-2 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300">
+        <div className="flex flex-col h-full justify-between">
+          <div className="line-clamp-4 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300 mb-4">
             {article.content}
           </div>
           {article.content.length > (isLarge ? 150 : 100) && (
@@ -91,7 +91,7 @@ export default function PressePage() {
               href={article.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline inline-block"
+              className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline mt-auto"
             >
               Voir plus
             </Link>
@@ -103,9 +103,9 @@ export default function PressePage() {
           href={article.link}
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full h-full"
+          className="block w-full"
         >
-          <div className="relative w-full h-40">
+          <div className="relative w-full h-44">
             <Image
               src={article.image}
               alt={article.title}
@@ -161,7 +161,7 @@ export default function PressePage() {
         </div>
       </div>
       <div>
-        <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[20rem]">
+        <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[24rem]">
           {items.map((item, i) => (
             <BentoGridItem key={i} {...item} />
           ))}

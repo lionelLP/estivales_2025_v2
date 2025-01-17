@@ -8,8 +8,32 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+interface Article {
+  id: number;
+  title: string;
+  link: string;
+  content: string;
+  Creation_article: string;
+  image: string;
+  favicon?: string;
+  url?: string;
+  description?: string;
+  publishDate?: string;
+}
+
+interface BentoGridItemType {
+  title: JSX.Element;
+  description: JSX.Element;
+  header: JSX.Element;
+  className: string;
+  icon: JSX.Element;
+  link: string;
+  onClick: () => void;
+  id?: number;
+}
+
 export default function PressePage() {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<BentoGridItemType[]>([]);
   const { registerLoadingComponent, componentLoaded } = useLoading();
   const [showEditor, setShowEditor] = useState(false);
   const router = useRouter();
@@ -22,7 +46,7 @@ export default function PressePage() {
         const response = await fetch("/api/articles");
         if (response.ok) {
           const articles = await response.json();
-          const formattedItems = articles.map((article: any, index: number) =>
+          const formattedItems = articles.map((article: Article, index: number) =>
             formatArticleToItem(article, index)
           );
           setItems(formattedItems);
@@ -41,7 +65,7 @@ export default function PressePage() {
     };
   }, []);
 
-  const handleSaveArticle = async (article: any) => {
+  const handleSaveArticle = async (article: Article) => {
     try {
       console.log("Article à sauvegarder:", article); // Pour le debug
 
@@ -52,9 +76,9 @@ export default function PressePage() {
         },
         body: JSON.stringify({
           title: article.title,
-          link: article.url,
-          content: article.description,
-          Creation_article: article.publishDate,
+          link: article.url || article.link,
+          content: article.description || article.content,
+          Creation_article: article.publishDate || article.Creation_article,
           is_published: 1,
           user_id: 1,
           event_id: null,
@@ -74,13 +98,14 @@ export default function PressePage() {
 
       const newItem = formatArticleToItem(
         {
+          id: data.id,
           title: article.title,
-          link: article.url,
-          content: article.description,
-          Creation_article: article.publishDate,
+          link: article.url || article.link,
+          content: article.description || article.content,
+          Creation_article: article.publishDate || article.Creation_article,
           image: article.image,
           favicon: article.favicon,
-        },
+        } as Article,
         0
       );
 
@@ -91,7 +116,7 @@ export default function PressePage() {
     }
   };
 
-  const formatArticleToItem = (article: any, index: number) => {
+  const formatArticleToItem = (article: Article, index: number) => {
     const formattedDate = new Date(article.Creation_article).toLocaleDateString(
       "fr-FR",
       {
@@ -254,12 +279,6 @@ export default function PressePage() {
           </div>
         </div>
       </div>
-
-      {showEditor && (
-        <div className="container mx-auto px-4 py-8">
-          <ArticleEditor onSave={handleSaveArticle} />
-        </div>
-      )}
 
       <div className="container mx-auto px-4 py-8">
         <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[20rem]">
