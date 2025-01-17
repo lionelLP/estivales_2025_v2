@@ -6,7 +6,6 @@ import { CircleUser, LogOut, User, UserPlus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FaChevronDown } from "react-icons/fa";
 import { HoveredLink } from "../ui/navbar-menu";
 
 export default function MobileNavbar() {
@@ -147,34 +146,6 @@ export default function MobileNavbar() {
               <strong>Photos</strong>
             </HoveredLink>
           </div>
-
-          {/* Pratique */}
-          <div className="flex justify-between items-center">
-            <HoveredLink href="/pratique">
-              <strong>Pratique</strong>
-            </HoveredLink>
-            <motion.div
-              animate={{ rotate: openSubMenu === 1 ? 180 : 0 }}
-              transition={{ duration: 0.3 }}
-              className="cursor-pointer p-2"
-              onClick={() => toggleSubMenu(1)}
-            >
-              <FaChevronDown />
-            </motion.div>
-          </div>
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{
-              height: openSubMenu === 1 ? "auto" : 0,
-              opacity: openSubMenu === 1 ? 1 : 0,
-            }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden pl-4 space-y-3"
-          >
-            <HoveredLink href="/pratique/acces">Accès</HoveredLink>
-            <HoveredLink href="/pratique/billetterie">Billetterie</HoveredLink>
-            <HoveredLink href="/pratique/contact">Contact</HoveredLink>
-          </motion.div>
 
           {/* Vidéos */}
           <div className="flex justify-between items-center">
