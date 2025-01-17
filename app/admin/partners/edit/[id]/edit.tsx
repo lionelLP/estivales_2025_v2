@@ -77,7 +77,7 @@ export default function EditPartner({ params }: { params: { id: string } }) {
       });
 
       if (response.ok) {
-        router.push("/partenaires");
+        router.push("/partners");
         router.refresh();
       } else {
         const data = await response.json();
@@ -112,7 +112,7 @@ export default function EditPartner({ params }: { params: { id: string } }) {
       });
 
       if (response.ok) {
-        router.push("/partenaires");
+        router.push("/partners");
         router.refresh();
       } else {
         const data = await response.json();
