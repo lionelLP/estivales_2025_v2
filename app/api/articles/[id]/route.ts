@@ -38,30 +38,52 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const body = await request.json();
-    const { title, link, content, Creation_article, image, favicon } = body;
+    const connection = await pool.getConnection();
+    try {
+      const body = await request.json();
+      const { title, link, content, Creation_article, image, favicon, is_published, user_id, event_id } = body;
 
-    await query(
-      `UPDATE articles 
-       SET title = ?, 
-           link = ?, 
-           content = ?, 
-           Creation_article = ?, 
-           image = ?, 
-           favicon = ?
-       WHERE id = ?`,
-      [
-        title,
-        link,
-        content,
-        Creation_article,
-        image,
-        favicon,
-        parseInt(params.id),
-      ]
-    );
+      const formattedDate = Creation_article
+        ? new Date(Creation_article).toISOString().slice(0, 19).replace("T", " ")
+        : new Date().toISOString().slice(0, 19).replace("T", " ");
 
-    return NextResponse.json({ message: "Article mis à jour avec succès" });
+      const [result] = await connection.execute<mysql.ResultSetHeader>(
+        `UPDATE Article 
+         SET title = ?, 
+             link = ?, 
+             content = ?, 
+             Creation_article = ?, 
+             image = ?, 
+             favicon = ?,
+             is_published = ?,
+             user_id = ?,
+             event_id = ?
+         WHERE id = ?`,
+        [
+          title,
+          link,
+          content,
+          formattedDate,
+          image,
+          favicon,
+          is_published,
+          user_id,
+          event_id,
+          parseInt(params.id),
+        ]
+      );
+
+      if (result.affectedRows === 0) {
+        return NextResponse.json(
+          { error: "Article non trouvé" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({ message: "Article mis à jour avec succès" });
+    } finally {
+      connection.release();
+    }
   } catch (error) {
     console.error("Erreur lors de la mise à jour de l'article:", error);
     return NextResponse.json(

@@ -12,6 +12,12 @@ export default function EditNews({ params }: { params: Promise<{ id: string }> }
     title: "",
     link: "",
     content: "",
+    Creation_article: "",
+    image: "",
+    favicon: "",
+    is_published: 1,
+    user_id: 1,
+    event_id: null
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -27,6 +33,12 @@ export default function EditNews({ params }: { params: Promise<{ id: string }> }
             title: data.title,
             link: data.link,
             content: data.content,
+            Creation_article: data.Creation_article,
+            image: data.image,
+            favicon: data.favicon || "",
+            is_published: data.is_published || 1,
+            user_id: data.user_id || 1,
+            event_id: data.event_id || null
           });
         } else {
           setError("Article non trouvé");
@@ -59,7 +71,8 @@ export default function EditNews({ params }: { params: Promise<{ id: string }> }
         const data = await response.json();
         setError(data.error || "Erreur lors de la mise à jour");
       }
-    } catch {
+    } catch (error) {
+      console.error("Error details:", error);
       setError("Erreur lors de la mise à jour");
     } finally {
       setIsSaving(false);
