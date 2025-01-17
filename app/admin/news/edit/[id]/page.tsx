@@ -3,8 +3,10 @@
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { use } from "react";
 
-export default function EditNews({ params }: { params: { id: string } }) {
+export default function EditNews({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
   const router = useRouter();
   const [formData, setFormData] = useState({
     title: "",
@@ -21,7 +23,7 @@ export default function EditNews({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const response = await fetch(`/api/articles/${params.id}`);
+        const response = await fetch(`/api/articles/${resolvedParams.id}`);
         if (response.ok) {
           const data = await response.json();
           const creationDate = new Date(data.Creation_article)
@@ -42,13 +44,13 @@ export default function EditNews({ params }: { params: { id: string } }) {
     };
 
     fetchArticle();
-  }, [params.id]);
+  }, [resolvedParams.id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      const response = await fetch(`/api/articles/${params.id}`, {
+      const response = await fetch(`/api/articles/${resolvedParams.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

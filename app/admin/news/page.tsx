@@ -22,6 +22,7 @@ interface Article {
 }
 
 interface BentoGridItemType {
+  id: number;
   title: JSX.Element;
   description: JSX.Element;
   header: JSX.Element;
@@ -29,13 +30,11 @@ interface BentoGridItemType {
   icon: JSX.Element;
   link: string;
   onClick: () => void;
-  id?: number;
 }
 
 export default function PressePage() {
   const [items, setItems] = useState<BentoGridItemType[]>([]);
   const { registerLoadingComponent, componentLoaded } = useLoading();
-  const [showEditor, setShowEditor] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -65,57 +64,6 @@ export default function PressePage() {
     };
   }, []);
 
-  const handleSaveArticle = async (article: Article) => {
-    try {
-      console.log("Article à sauvegarder:", article); // Pour le debug
-
-      const response = await fetch("/api/articles", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: article.title,
-          link: article.url || article.link,
-          content: article.description || article.content,
-          Creation_article: article.publishDate || article.Creation_article,
-          is_published: 1,
-          user_id: 1,
-          event_id: null,
-          image: article.image,
-          favicon: article.favicon,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Erreur serveur:", errorData);
-        throw new Error(errorData.error || "Erreur lors de la sauvegarde");
-      }
-
-      const data = await response.json();
-      console.log("Réponse du serveur:", data);
-
-      const newItem = formatArticleToItem(
-        {
-          id: data.id,
-          title: article.title,
-          link: article.url || article.link,
-          content: article.description || article.content,
-          Creation_article: article.publishDate || article.Creation_article,
-          image: article.image,
-          favicon: article.favicon,
-        } as Article,
-        0
-      );
-
-      setItems([newItem, ...items]);
-      setShowEditor(false);
-    } catch (error) {
-      console.error("Erreur complète:", error);
-    }
-  };
-
   const formatArticleToItem = (article: Article, index: number) => {
     const formattedDate = new Date(article.Creation_article).toLocaleDateString(
       "fr-FR",
@@ -134,6 +82,7 @@ export default function PressePage() {
     const isLarge = isEvenRow ? isFirstInRow : !isFirstInRow;
 
     return {
+      id: article.id,
       title: (
         <div className="line-clamp-2 font-sans font-bold text-neutral-600 dark:text-neutral-200">
           {article.title}
@@ -243,17 +192,18 @@ export default function PressePage() {
         method: "DELETE",
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Erreur lors de la suppression");
+        throw new Error(data.error || "Erreur lors de la suppression");
       }
 
       setItems((prevItems) =>
-        prevItems.filter((item) => {
-          return item.id !== articleId;
-        })
+        prevItems.filter((item) => item.id !== articleId)
       );
     } catch (error) {
       console.error("Erreur lors de la suppression:", error);
+      alert(error instanceof Error ? error.message : "Erreur lors de la suppression");
     }
   };
 
