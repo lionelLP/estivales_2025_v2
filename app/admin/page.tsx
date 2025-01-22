@@ -86,7 +86,7 @@ export default function AdminPage() {
       href: "/admin/newsletter",
       icon: <Mail className="h-12 w-12" />,
       description: "Envoyer une newsletter aux abonnés",
-      color: "bg-indigo-500",
+      color: "bg-slate-500"
     },
   ];
 
