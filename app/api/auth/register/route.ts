@@ -3,9 +3,30 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { ResultSetHeader } from "mysql2";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { verifyToken } from "@/lib/auth/jwt";
 
 export async function POST(request: Request) {
+  // Vérification du rôle admin
+  const cookieStore = cookies();
+  const token = cookieStore.get("token");
+
+  if (!token) {
+    return NextResponse.json(
+      { error: "Non autorisé - Token manquant" },
+      { status: 401 }
+    );
+  }
+
   try {
+    const decoded = await verifyToken(token.value);
+    if (!decoded || decoded.userType !== 0) {
+      return NextResponse.json(
+        { error: "Non autorisé - Accès administrateur requis" },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const { email, password, name: username } = body;
 
@@ -32,49 +53,33 @@ export async function POST(request: Request) {
         );
       }
 
-      // Hasher le mot de passe
       const hashedPassword = await bcrypt.hash(password, 10);
+      const userType = body.userType || 1; // Permettre à l'admin de définir le type d'utilisateur
 
-      // Insérer le nouvel utilisateur
       const [result] = await connection.query<ResultSetHeader>(
         "INSERT INTO User (username, password, email, userType, description) VALUES (?, ?, ?, ?, ?)",
-        [username, hashedPassword, email, 1, null] // userType 1 pour utilisateur standard (0 pour admin)
+        [username, hashedPassword, email, userType, null]
       );
 
-      const token = jwt.sign(
-        { userId: result.insertId },
-        process.env.JWT_SECRET || "votre_secret",
-        { expiresIn: "7d" }
-      );
-
-      const user = {
-        id: result.insertId,
-        email,
-        username,
-      };
-
-      const response = NextResponse.json(
-        { success: true, user },
+      return NextResponse.json(
+        {
+          success: true,
+          user: {
+            id: result.insertId,
+            email,
+            username,
+            userType,
+          },
+        },
         { status: 201 }
       );
-
-      response.cookies.set({
-        name: "token",
-        value: token,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-      });
-
-      return response;
     } finally {
       connection.release();
     }
   } catch (error) {
     console.error("Erreur lors de l'inscription:", error);
     return NextResponse.json(
-      { message: "Erreur lors de l'inscription" },
+      { error: "Erreur lors de la création de l'utilisateur" },
       { status: 500 }
     );
   }
