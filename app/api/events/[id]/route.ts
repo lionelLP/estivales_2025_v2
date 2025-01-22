@@ -9,19 +9,25 @@ export async function GET(
     const connection = await pool.getConnection();
     try {
       const [rows] = await connection.execute(
-        "SELECT * FROM Event WHERE id = ?",
+        `SELECT id, title, subtitle, description, event_date, created_at, 
+         location, max_participants, is_public, user_id, brochure_path, booking_link 
+         FROM Event WHERE id = ?`,
         [params.id]
       );
 
       interface Event {
         id: number;
         title: string;
-        subtitle: string;
-        description: string;
+        subtitle: string | null;
+        description: string | null;
         event_date: Date;
-        location: string;
-        max_participants: number;
-        is_public: boolean;
+        created_at: Date;
+        location: string | null;
+        max_participants: number | null;
+        is_public: number;
+        user_id: number;
+        brochure_path: string | null;
+        booking_link: string | null;
       }
 
       const events = rows as Event[];
@@ -124,7 +130,9 @@ export async function DELETE(
 ) {
   try {
     // Suppression des images associées
-    await pool.execute("DELETE FROM event_media WHERE event_id = ?", [params.id]);
+    await pool.execute("DELETE FROM event_media WHERE event_id = ?", [
+      params.id,
+    ]);
 
     // Suppression de l'événement
     const [result] = await pool.execute("DELETE FROM events WHERE id = ?", [
