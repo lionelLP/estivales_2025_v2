@@ -30,6 +30,8 @@ export default function NewsletterPage() {
         HTMLAttributes: {
           class: "max-w-full h-auto",
         },
+        inline: true,
+        allowBase64: true,
       }),
       TextAlign.configure({
         types: ["heading", "paragraph"],
@@ -39,6 +41,10 @@ export default function NewsletterPage() {
       Color,
     ],
     content: "",
+    onUpdate: ({ editor }) => {
+      // Optional: Log the HTML content to see the base64 images
+      console.log(editor.getHTML());
+    },
   });
 
   const handleSend = async () => {
@@ -80,6 +86,31 @@ export default function NewsletterPage() {
     }
   };
 
+  const uploadImage = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Échec de l'upload");
+
+      const data = await response.json();
+      // Make sure we have an absolute URL for the email
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
+        (typeof window !== 'undefined' ? window.location.origin : '');
+      const absoluteUrl = `${baseUrl}${data.url}`;
+      
+      return absoluteUrl;
+    } catch (error) {
+      console.error("Erreur lors de l'upload:", error);
+      throw error;
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-12">
@@ -102,7 +133,7 @@ export default function NewsletterPage() {
         </div>
 
         <div className="mb-6 border rounded-lg">
-          <MenuBar editor={editor} />
+          <MenuBar editor={editor} onImageUpload={uploadImage} />
           <EditorContent editor={editor} className="min-h-[500px] p-4 prose max-w-none" />
         </div>
 

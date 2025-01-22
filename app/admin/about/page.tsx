@@ -125,7 +125,7 @@ export default function EditAbout() {
         Éditer la page À propos
       </h1>
       <div className="mb-6 border rounded-lg">
-        <MenuBar editor={editor} />
+        <MenuBar editor={editor} onImageUpload={uploadImage} />
         <EditorContent editor={editor} className="min-h-[500px] p-4 prose max-w-none" />
       </div>
       <div className="flex justify-end gap-4">

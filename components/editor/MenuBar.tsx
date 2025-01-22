@@ -1,29 +1,27 @@
 import { useCallback } from 'react';
 
-export const MenuBar = ({ editor }: { editor: any }) => {
+interface MenuBarProps {
+  editor: any;
+  onImageUpload?: (file: File) => Promise<string>;
+}
+
+export const MenuBar = ({ editor, onImageUpload }: MenuBarProps) => {
   const handleImageUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
 
       try {
-        const formData = new FormData();
-        formData.append("image", file);
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!response.ok) throw new Error("Échec de l'upload");
-
-        const data = await response.json();
-        editor.chain().focus().setImage({ src: data.url }).run();
+        if (onImageUpload) {
+          const imageUrl = await onImageUpload(file);
+          editor.chain().focus().setImage({ src: imageUrl }).run();
+        }
       } catch (error) {
         console.error("Erreur lors de l'upload de l'image:", error);
         alert("Erreur lors de l'upload de l'image");
       }
     },
-    [editor]
+    [editor, onImageUpload]
   );
 
   if (!editor) {

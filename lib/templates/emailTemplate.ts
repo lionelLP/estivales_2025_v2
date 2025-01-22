@@ -27,6 +27,14 @@ export function createEmailTemplate({
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        img {
+          max-width: 100% !important;
+          height: auto !important;
+          display: block !important;
+          margin: 10px auto !important;
+        }
+      </style>
     </head>
     <body style="margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #f3f4f6;">
       <table role="presentation" style="width: 100%; border: none; border-spacing: 0;">
