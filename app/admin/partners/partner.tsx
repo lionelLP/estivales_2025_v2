@@ -121,7 +121,7 @@ export default function Partenaires() {
             <div className="absolute top-4 right-4 z-20 flex gap-2">
               <button
                 onClick={() =>
-                  router.push(`/partenaires/${partenaire.id}/modifier`)
+                  router.push(`/admin/partners/edit/${partenaire.id}`)
                 }
                 className="bg-white/90 hover:bg-white p-2 rounded-full transition-colors"
               >

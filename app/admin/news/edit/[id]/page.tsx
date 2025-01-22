@@ -3,16 +3,21 @@
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { use } from "react";
 
-export default function EditNews({ params }: { params: { id: string } }) {
+export default function EditNews({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
   const router = useRouter();
   const [formData, setFormData] = useState({
     title: "",
     link: "",
     content: "",
+    Creation_article: "",
     image: "",
     favicon: "",
-    Creation_article: new Date().toISOString().slice(0, 16),
+    is_published: 1,
+    user_id: 1,
+    event_id: null
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -21,15 +26,19 @@ export default function EditNews({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const response = await fetch(`/api/articles/${params.id}`);
+        const response = await fetch(`/api/articles/${resolvedParams.id}`);
         if (response.ok) {
           const data = await response.json();
-          const creationDate = new Date(data.Creation_article)
-            .toISOString()
-            .slice(0, 16);
           setFormData({
-            ...data,
-            Creation_article: creationDate,
+            title: data.title,
+            link: data.link,
+            content: data.content,
+            Creation_article: data.Creation_article,
+            image: data.image,
+            favicon: data.favicon || "",
+            is_published: data.is_published || 1,
+            user_id: data.user_id || 1,
+            event_id: data.event_id || null
           });
         } else {
           setError("Article non trouvé");
@@ -42,13 +51,13 @@ export default function EditNews({ params }: { params: { id: string } }) {
     };
 
     fetchArticle();
-  }, [params.id]);
+  }, [resolvedParams.id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      const response = await fetch(`/api/articles/${params.id}`, {
+      const response = await fetch(`/api/articles/${resolvedParams.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -62,7 +71,8 @@ export default function EditNews({ params }: { params: { id: string } }) {
         const data = await response.json();
         setError(data.error || "Erreur lors de la mise à jour");
       }
-    } catch {
+    } catch (error) {
+      console.error("Error details:", error);
       setError("Erreur lors de la mise à jour");
     } finally {
       setIsSaving(false);
@@ -142,52 +152,6 @@ export default function EditNews({ params }: { params: { id: string } }) {
             onChange={handleChange}
             rows={4}
             className="w-full rounded-lg border p-2"
-          />
-        </div>
-
-        {/* Image URL */}
-        <div className="space-y-2">
-          <label htmlFor="image" className="block text-sm font-medium">
-            URL de l&apos;image
-          </label>
-          <Input
-            id="image"
-            name="image"
-            type="url"
-            value={formData.image}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Favicon URL */}
-        <div className="space-y-2">
-          <label htmlFor="favicon" className="block text-sm font-medium">
-            URL du favicon
-          </label>
-          <Input
-            id="favicon"
-            name="favicon"
-            type="url"
-            value={formData.favicon}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Date de création */}
-        <div className="space-y-2">
-          <label
-            htmlFor="Creation_article"
-            className="block text-sm font-medium"
-          >
-            Date de publication
-          </label>
-          <Input
-            id="Creation_article"
-            name="Creation_article"
-            type="datetime-local"
-            value={formData.Creation_article}
-            onChange={handleChange}
-            required
           />
         </div>
 

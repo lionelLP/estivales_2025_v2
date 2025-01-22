@@ -8,10 +8,33 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+interface Article {
+  id: number;
+  title: string;
+  link: string;
+  content: string;
+  Creation_article: string;
+  image: string;
+  favicon?: string;
+  url?: string;
+  description?: string;
+  publishDate?: string;
+}
+
+interface BentoGridItemType {
+  id: number;
+  title: JSX.Element;
+  description: JSX.Element;
+  header: JSX.Element;
+  className: string;
+  icon: JSX.Element;
+  link: string;
+  onClick: () => void;
+}
+
 export default function PressePage() {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<BentoGridItemType[]>([]);
   const { registerLoadingComponent, componentLoaded } = useLoading();
-  const [showEditor, setShowEditor] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -22,7 +45,7 @@ export default function PressePage() {
         const response = await fetch("/api/articles");
         if (response.ok) {
           const articles = await response.json();
-          const formattedItems = articles.map((article: any, index: number) =>
+          const formattedItems = articles.map((article: Article, index: number) =>
             formatArticleToItem(article, index)
           );
           setItems(formattedItems);
@@ -41,57 +64,7 @@ export default function PressePage() {
     };
   }, []);
 
-  const handleSaveArticle = async (article: any) => {
-    try {
-      console.log("Article à sauvegarder:", article); // Pour le debug
-
-      const response = await fetch("/api/articles", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: article.title,
-          link: article.url,
-          content: article.description,
-          Creation_article: article.publishDate,
-          is_published: 1,
-          user_id: 1,
-          event_id: null,
-          image: article.image,
-          favicon: article.favicon,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Erreur serveur:", errorData);
-        throw new Error(errorData.error || "Erreur lors de la sauvegarde");
-      }
-
-      const data = await response.json();
-      console.log("Réponse du serveur:", data);
-
-      const newItem = formatArticleToItem(
-        {
-          title: article.title,
-          link: article.url,
-          content: article.description,
-          Creation_article: article.publishDate,
-          image: article.image,
-          favicon: article.favicon,
-        },
-        0
-      );
-
-      setItems([newItem, ...items]);
-      setShowEditor(false);
-    } catch (error) {
-      console.error("Erreur complète:", error);
-    }
-  };
-
-  const formatArticleToItem = (article: any, index: number) => {
+  const formatArticleToItem = (article: Article, index: number) => {
     const formattedDate = new Date(article.Creation_article).toLocaleDateString(
       "fr-FR",
       {
@@ -109,30 +82,29 @@ export default function PressePage() {
     const isLarge = isEvenRow ? isFirstInRow : !isFirstInRow;
 
     return {
+      id: article.id,
       title: (
-        <div className="line-clamp-2 font-sans font-bold text-neutral-600 dark:text-neutral-200">
+        <div className="line-clamp-3 font-sans font-bold text-neutral-600 dark:text-neutral-200">
           {article.title}
         </div>
       ),
       description: (
-        <div className="relative">
-          <div className="line-clamp-2 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300">
+        <div className="flex flex-col h-full justify-between">
+          <div className="line-clamp-2 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300 mb-4">
             {article.content}
           </div>
-          <div className="flex justify-between items-center mt-2">
-            <div>
-              {article.content.length > (isLarge ? 150 : 100) && (
-                <Link
-                  href={article.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline inline-block"
-                >
-                  Voir plus
-                </Link>
-              )}
-            </div>
-            <div className="flex gap-2">
+          <div className="flex justify-between items-center">
+            {article.content.length > (isLarge ? 150 : 100) && (
+              <Link
+                href={article.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline"
+              >
+                Voir plus
+              </Link>
+            )}
+            <div className="flex gap-2 ml-auto">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -146,11 +118,7 @@ export default function PressePage() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (
-                    window.confirm(
-                      "Voulez-vous vraiment supprimer cet article ?"
-                    )
-                  ) {
+                  if (window.confirm("Voulez-vous vraiment supprimer cet article ?")) {
                     handleDeleteArticle(article.id);
                   }
                 }}
@@ -168,9 +136,9 @@ export default function PressePage() {
           href={article.link}
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full h-full"
+          className="block w-full"
         >
-          <div className="relative w-full h-40">
+          <div className="relative w-full h-44">
             <Image
               src={article.image}
               alt={article.title}
@@ -218,17 +186,18 @@ export default function PressePage() {
         method: "DELETE",
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Erreur lors de la suppression");
+        throw new Error(data.error || "Erreur lors de la suppression");
       }
 
       setItems((prevItems) =>
-        prevItems.filter((item) => {
-          return item.id !== articleId;
-        })
+        prevItems.filter((item) => item.id !== articleId)
       );
     } catch (error) {
       console.error("Erreur lors de la suppression:", error);
+      alert(error instanceof Error ? error.message : "Erreur lors de la suppression");
     }
   };
 
@@ -255,14 +224,8 @@ export default function PressePage() {
         </div>
       </div>
 
-      {showEditor && (
-        <div className="container mx-auto px-4 py-8">
-          <ArticleEditor onSave={handleSaveArticle} />
-        </div>
-      )}
-
       <div className="container mx-auto px-4 py-8">
-        <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[20rem]">
+        <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[24rem]">
           {items.map((item, i) => (
             <BentoGridItem key={i} {...item} />
           ))}

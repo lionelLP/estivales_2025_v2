@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { CircularImageCropper } from "@/components/common/circular-image-cropper";
 import { FileUpload } from "@/components/common/file-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -77,7 +76,7 @@ export default function EditPartner({ params }: { params: { id: string } }) {
       });
 
       if (response.ok) {
-        router.push("/partenaires");
+        router.push("/partners");
         router.refresh();
       } else {
         const data = await response.json();
@@ -112,7 +111,7 @@ export default function EditPartner({ params }: { params: { id: string } }) {
       });
 
       if (response.ok) {
-        router.push("/partenaires");
+        router.push("/partners");
         router.refresh();
       } else {
         const data = await response.json();
@@ -235,16 +234,6 @@ export default function EditPartner({ params }: { params: { id: string } }) {
           <p className="text-sm text-gray-500">
             Format recommandé : PNG ou JPG, taille maximale : 2MB
           </p>
-          {showCropper && logoToProcess && (
-            <CircularImageCropper
-              imageFile={logoToProcess}
-              onCropComplete={handleCroppedLogo}
-              onCancel={() => {
-                setShowCropper(false);
-                setLogoToProcess(null);
-              }}
-            />
-          )}
         </div>
 
         {/* Banner Upload */}

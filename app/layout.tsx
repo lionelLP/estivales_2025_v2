@@ -24,6 +24,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className={`${poppins.variable}`}>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          precedence="default"
+        />
+      </head>
       <body className={poppins.className}>
         <LoadingProvider>
           <AuthProvider>

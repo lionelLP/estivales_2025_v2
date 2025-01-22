@@ -12,7 +12,7 @@ export async function apiMiddleware(request: NextRequest) {
     "/api/about": ["GET"],
     "/api/medias": ["GET"],
     "/api/partenaires": ["GET"],
-    "/api/evenements": ["GET"],
+    "/api/events": ["GET"],
   };
 
   // Vérifier si la route est publique et si la méthode est autorisée

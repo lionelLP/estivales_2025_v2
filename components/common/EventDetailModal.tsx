@@ -30,7 +30,7 @@ export function EventDetailModal({
     const fetchImages = async () => {
       if (event.id) {
         try {
-          const response = await fetch(`/api/evenements/${event.id}/images`);
+          const response = await fetch(`/api/events/${event.id}/images`);
           if (response.ok) {
             const data = await response.json();
             setImages(data);
