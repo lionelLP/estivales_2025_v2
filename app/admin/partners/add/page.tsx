@@ -49,7 +49,7 @@ export default function CreatePartner() {
       });
 
       if (response.ok) {
-        router.push("/partenaires");
+        router.push("/admin/partners");
         router.refresh();
       } else {
         const data = await response.json();
