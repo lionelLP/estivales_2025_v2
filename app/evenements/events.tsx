@@ -43,7 +43,7 @@ export default function Evenements() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Liste des événements</h1>
         <Link
-          href="/evenements/creer"
+          href="/admin/events/add"
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
         >
           Créer un événement

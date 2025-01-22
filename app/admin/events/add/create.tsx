@@ -88,7 +88,7 @@ export default function CreerEvenement() {
           });
         }
 
-        window.location.href = "/evenements";
+        window.location.href = "/admin/events";
       }
     } catch (error) {
       console.error("Erreur:", error);

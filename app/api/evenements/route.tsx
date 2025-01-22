@@ -1,11 +1,36 @@
-import pool from "@/lib/db/mysql";
 import { NextResponse } from "next/server";
-import { notifySubscribersAboutNewEvent } from '@/lib/notifications/eventNotifications';
+import type { NextRequest } from "next/server";
+import { verifyToken } from "@/lib/auth/jwt";
+import { apiMiddleware } from "@/app/api/middleware";
+import pool from "@/lib/db/mysql";
+import { notifySubscribersAboutNewEvent } from "@/lib/notifications/eventNotifications";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const middlewareResponse = await apiMiddleware(request);
+  if (middlewareResponse.status !== 200) {
+    return middlewareResponse;
+  }
+
+  const token = request.cookies.get("token");
+  if (!token) {
+    return NextResponse.json(
+      { error: "Non autorisé - Token manquant" },
+      { status: 401 }
+    );
+  }
+
   try {
-    const body = await request.json();
+    const decoded = await verifyToken(token.value);
+    console.log("Token décodé:", decoded); // Pour le débogage
 
+    if (!decoded || decoded.userType !== 0) {
+      return NextResponse.json(
+        { error: "Non autorisé - Accès administrateur requis" },
+        { status: 403 }
+      );
+    }
+
+    const body = await request.json();
     const {
       title,
       subtitle,
@@ -25,7 +50,7 @@ export async function POST(request: Request) {
         `INSERT INTO Event (
           title, subtitle, description, event_date, location, 
           max_participants, is_public, booking_link, brochure_path, user_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           title,
           subtitle,
@@ -36,6 +61,7 @@ export async function POST(request: Request) {
           is_public,
           booking_link,
           brochure_path,
+          decoded.userId, // Utiliser l'ID de l'utilisateur connecté
         ]
       );
 
@@ -49,11 +75,11 @@ export async function POST(request: Request) {
             description,
             event_date,
             location,
-            booking_link
+            booking_link,
           });
-          console.log('Notifications sent successfully for event:', title);
+          console.log("Notifications sent successfully for event:", title);
         } catch (notifyError) {
-          console.error('Failed to send notifications:', notifyError);
+          console.error("Failed to send notifications:", notifyError);
         }
       }
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { verifyToken } from "@/lib/auth/jwt";
 
 export async function apiMiddleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
@@ -46,6 +46,7 @@ export async function apiMiddleware(request: NextRequest) {
     }
     return NextResponse.next();
   } catch (error) {
+    console.error("Erreur de vérification du token:", error);
     return NextResponse.json(
       { error: "Non autorisé - Token invalide" },
       { status: 401 }
