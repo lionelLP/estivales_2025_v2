@@ -1,14 +1,4 @@
-import { NextResponse } from 'next/server';
 import pool from '@/lib/db/mysql';
-import { sendEmail } from '@/lib/email';
-import crypto from 'crypto';
-
-function generateUnsubscribeToken(email: string): string {
-  return crypto
-    .createHash('sha256')
-    .update(email + process.env.JWT_SECRET)
-    .digest('hex');
-}
 
 export async function GET(
   request: Request,
