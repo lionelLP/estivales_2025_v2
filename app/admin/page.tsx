@@ -8,6 +8,7 @@ import {
   PartyPopper,
   UserPlus,
   Users,
+  Mail,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -79,6 +80,13 @@ export default function AdminPage() {
       icon: <UserPlus className="h-12 w-12" />,
       description: "Gérer les comptes utilisateurs",
       color: "bg-teal-500",
+    },
+    {
+      label: "Newsletter",
+      href: "/admin/newsletter",
+      icon: <Mail className="h-12 w-12" />,
+      description: "Envoyer une newsletter aux abonnés",
+      color: "bg-indigo-500",
     },
   ];
 
