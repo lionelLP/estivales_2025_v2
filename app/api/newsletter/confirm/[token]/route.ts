@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server';
 import pool from '@/lib/db/mysql';
 import { sendEmail } from '@/lib/email';
 import { createEmailTemplate } from '@/lib/templates/emailTemplate';
