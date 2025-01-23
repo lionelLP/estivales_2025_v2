@@ -3,9 +3,10 @@ import { useCallback } from 'react';
 interface MenuBarProps {
   editor: any;
   onImageUpload?: (file: File) => Promise<string>;
+  disableImage?: boolean;
 }
 
-export const MenuBar = ({ editor, onImageUpload }: MenuBarProps) => {
+export const MenuBar = ({ editor, onImageUpload, disableImage = false }: MenuBarProps) => {
   const handleImageUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
@@ -150,24 +151,26 @@ export const MenuBar = ({ editor, onImageUpload }: MenuBarProps) => {
           <i className="fas fa-link"></i>
         </button>
 
-        {/* Upload d'image */}
-        <div className="relative">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="hidden"
-            id="image-upload"
-          />
-          <label
-            htmlFor="image-upload"
-            className="p-2 rounded hover:bg-gray-100 cursor-pointer flex items-center gap-2"
-            title="Insérer une image"
-          >
-            <i className="fas fa-image"></i>
-            <span className="text-sm">Ajouter une image</span>
-          </label>
-        </div>
+        {/* Only show image upload if not disabled */}
+        {!disableImage && (
+          <div className="relative">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+              id="image-upload"
+            />
+            <label
+              htmlFor="image-upload"
+              className="p-2 rounded hover:bg-gray-100 cursor-pointer flex items-center gap-2"
+              title="Insérer une image"
+            >
+              <i className="fas fa-image"></i>
+              <span className="text-sm">Ajouter une image</span>
+            </label>
+          </div>
+        )}
       </div>
     </div>
   );

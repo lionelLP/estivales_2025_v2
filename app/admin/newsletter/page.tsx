@@ -132,9 +132,9 @@ export default function NewsletterPage() {
           />
         </div>
 
-        <div className="mb-6 border rounded-lg">
-          <MenuBar editor={editor} onImageUpload={uploadImage} />
-          <EditorContent editor={editor} className="min-h-[500px] p-4 prose max-w-none" />
+        <div className="mb-6 border rounded-lg shadow-sm">
+          <MenuBar editor={editor} disableImage={true} />
+          <EditorContent editor={editor} className="min-h-[600px] p-6 prose max-w-none" />
         </div>
 
         <div className="flex justify-end gap-4">
