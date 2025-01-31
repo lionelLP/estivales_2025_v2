@@ -135,9 +135,7 @@ export async function DELETE(
     ]);
 
     // Suppression de l'événement
-    const [result] = await pool.execute("DELETE FROM events WHERE id = ?", [
-      params.id,
-    ]);
+    await pool.execute("DELETE FROM events WHERE id = ?", [params.id]);
 
     return NextResponse.json({ message: "Événement supprimé avec succès" });
   } catch (error) {
