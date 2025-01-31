@@ -1,6 +1,5 @@
 "use client";
 import Logout from "@/components/common/Logout";
-import { PlaceholdersAndVanishInput } from "@/components/ui/placeholders-and-vanish-input";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { IconHome } from "@tabler/icons-react";
 import { motion } from "framer-motion";
@@ -81,6 +80,13 @@ export default function AdminLayout({
         <Mail className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
+    {
+      label: "Ajouter un utilisateur",
+      href: "/admin/users/add",
+      icon: (
+        <Users className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+    },
   ];
 
   const [open, setOpen] = useState(false);
@@ -95,23 +101,7 @@ export default function AdminLayout({
             <div className="mt-8 flex flex-col gap-2">
               {links.map((link, idx) => (
                 <div key={idx}>
-                  {link.searchBar ? (
-                    open ? (
-                      <div className="px-3 py-1 -mt-5">
-                        {" "}
-                        <PlaceholdersAndVanishInput
-                          placeholders={["Rechercher"]}
-                          onChange={() => {}}
-                          onSubmit={() => {}}
-                          className="h-8"
-                        />
-                      </div>
-                    ) : (
-                      <SidebarLink link={link} />
-                    )
-                  ) : (
-                    <SidebarLink link={link} />
-                  )}
+                  <SidebarLink link={link} />
                 </div>
               ))}
             </div>
@@ -185,7 +175,9 @@ const AdminProfile = ({
   showMenu: boolean;
   setShowMenu: (show: boolean) => void;
   currentUser: {
-    username: string;
+    id: number;
+    firstName: string;
+    lastName: string;
     userType: string;
   };
 }) => {
@@ -195,7 +187,7 @@ const AdminProfile = ({
         <div className="flex items-center gap-2">
           <Image
             src={`https://api.dicebear.com/6.x/miniavs/svg?seed=${encodeURIComponent(
-              `${currentUser.username?.toLowerCase()}`
+              `${currentUser.firstName?.toLowerCase()}`
             )}`}
             alt="Admin Avatar"
             width={40}
@@ -205,7 +197,7 @@ const AdminProfile = ({
           {open && (
             <div className="flex flex-col">
               <span className="font-medium text-sm">
-                {currentUser.username}
+                {currentUser.firstName} {currentUser.lastName}
               </span>
               <span className="text-xs text-neutral-500">
                 {currentUser.userType}
