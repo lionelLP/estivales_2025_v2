@@ -12,12 +12,8 @@ services:
       - estivales_source:/app
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=development
-      - DB_HOST=db
-      - DB_USER=estivales
-      - DB_PASSWORD=estivales_password
-      - DB_NAME=estivales_db
+    environment_file:
+      - .env.local
     depends_on:
       - db
 
