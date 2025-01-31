@@ -1,11 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { FileUpload } from "@/components/common/file-upload";
 import { Event } from "@/lib/types/event";
-import React from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
-export default function EditEvent({ params }: { params: Promise<{ id: string }> }) {
+export default function EditEvent({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const router = useRouter();
   const [formData, setFormData] = useState<Event>({
     title: "",
@@ -25,7 +29,9 @@ export default function EditEvent({ params }: { params: Promise<{ id: string }> 
   const [currentBrochurePath, setCurrentBrochurePath] = useState("");
 
   // Unwrap params using React.use()
-  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
+    null
+  );
 
   useEffect(() => {
     const resolveParams = async () => {
@@ -99,7 +105,7 @@ export default function EditEvent({ params }: { params: Promise<{ id: string }> 
           images.forEach((file) => {
             imagesFormData.append("files", file);
           });
-          imagesFormData.append("eventId", eventId);
+          imagesFormData.append("eventId", eventId || "");
 
           await fetch("/api/upload/images", {
             method: "POST",
@@ -257,6 +263,35 @@ export default function EditEvent({ params }: { params: Promise<{ id: string }> 
           <label htmlFor="is_public" className="text-sm font-medium">
             Événement public
           </label>
+        </div>
+
+        {/* Upload Brochure */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Brochure (PDF)</label>
+          <FileUpload
+            onChange={(files) => setBrochure(files)}
+            maxFiles={1}
+            accept=".pdf"
+            multiple={false}
+          />
+          {currentBrochurePath && (
+            <p className="text-sm text-gray-500">
+              Brochure actuelle : {currentBrochurePath}
+            </p>
+          )}
+        </div>
+
+        {/* Upload Images */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">
+            Images de l&apos;événement
+          </label>
+          <FileUpload
+            onChange={(files) => setImages(files)}
+            maxFiles={200}
+            accept="image/*"
+            multiple={true}
+          />
         </div>
 
         <div className="flex gap-4">
