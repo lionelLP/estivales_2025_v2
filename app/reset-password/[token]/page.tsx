@@ -1,26 +1,26 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import ShinyButton from '@/components/magicui/shiny-button';
-import DisableShinyButton from '@/components/common/DisableShinyButton';
-import PasswordField from '@/components/common/PasswordField';
-import { useRouter } from 'next/navigation';
+import DisableShinyButton from "@/components/common/DisableShinyButton";
+import PasswordField from "@/components/common/PasswordField";
+import ShinyButton from "@/components/magicui/shiny-button";
+import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function ResetPassword({
   params,
 }: {
   params: { token: string };
 }) {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
 
-  const isFormValid = password && confirmPassword && password === confirmPassword;
+  const isFormValid =
+    password && confirmPassword && password === confirmPassword;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,9 +29,9 @@ export default function ResetPassword({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: params.token, password }),
       });
 
@@ -42,10 +42,10 @@ export default function ResetPassword({
       if (response.ok) {
         // Redirect to login page after 2 seconds on success
         setTimeout(() => {
-          router.push('/login');
+          router.push("/login");
         }, 2000);
       }
-    } catch (error) {
+    } catch {
       setMessage("Une erreur est survenue");
       setIsSuccess(false);
     } finally {
@@ -80,22 +80,31 @@ export default function ResetPassword({
         </div>
 
         {message && (
-          <p className={`text-sm mb-4 text-center ${isSuccess ? 'text-green-600' : 'text-red-600'}`}>
+          <p
+            className={`text-sm mb-4 text-center ${
+              isSuccess ? "text-green-600" : "text-red-600"
+            }`}
+          >
             {message}
           </p>
         )}
 
         {isFormValid ? (
           <ShinyButton
-            text={isSubmitting ? "MISE À JOUR..." : "RÉINITIALISER LE MOT DE PASSE"}
+            text={
+              isSubmitting ? "MISE À JOUR..." : "RÉINITIALISER LE MOT DE PASSE"
+            }
             className="w-full"
             type="submit"
             disabled={isSubmitting}
           />
         ) : (
-          <DisableShinyButton text="RÉINITIALISER LE MOT DE PASSE" className="w-full" />
+          <DisableShinyButton
+            text="RÉINITIALISER LE MOT DE PASSE"
+            className="w-full"
+          />
         )}
       </form>
     </div>
   );
-} 
+}
