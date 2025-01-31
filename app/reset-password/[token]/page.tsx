@@ -10,7 +10,7 @@ import { useState } from "react";
 export default function ResetPassword({
   params,
 }: {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -29,10 +29,11 @@ export default function ResetPassword({
     setIsSubmitting(true);
 
     try {
+      const resolvedParams = await params;
       const response = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: params.token, password }),
+        body: JSON.stringify({ token: resolvedParams.token, password }),
       });
 
       const data = await response.json();

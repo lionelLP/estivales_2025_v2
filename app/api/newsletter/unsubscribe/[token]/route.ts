@@ -1,15 +1,21 @@
-import pool from '@/lib/db/mysql';
+import pool from "@/lib/db/mysql";
+import { RowDataPacket } from "mysql2";
+
+interface NewsletterSubscriber extends RowDataPacket {
+  email: string;
+}
 
 export async function GET(
   request: Request,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
+  const resolvedParams = await params;
   const connection = await pool.getConnection();
-  
+
   try {
-    const [subscribers] = await connection.execute(
-      'SELECT email FROM Newsletter WHERE SHA2(CONCAT(email, ?), 256) = ?',
-      [process.env.JWT_SECRET, params.token]
+    const [subscribers] = await connection.execute<NewsletterSubscriber[]>(
+      "SELECT email FROM Newsletter WHERE SHA2(CONCAT(email, ?), 256) = ?",
+      [process.env.JWT_SECRET, resolvedParams.token]
     );
 
     if (!Array.isArray(subscribers) || subscribers.length === 0) {
@@ -35,16 +41,13 @@ export async function GET(
         </html>`,
         {
           status: 400,
-          headers: { 'Content-Type': 'text/html' },
+          headers: { "Content-Type": "text/html" },
         }
       );
     }
 
     const email = subscribers[0].email;
-    await connection.execute(
-      'DELETE FROM Newsletter WHERE email = ?',
-      [email]
-    );
+    await connection.execute("DELETE FROM Newsletter WHERE email = ?", [email]);
 
     return new Response(
       `<!DOCTYPE html>
@@ -73,10 +76,10 @@ export async function GET(
       </body>
       </html>`,
       {
-        headers: { 'Content-Type': 'text/html' },
+        headers: { "Content-Type": "text/html" },
       }
     );
   } finally {
     connection.release();
   }
-} 
+}

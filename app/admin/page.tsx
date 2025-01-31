@@ -4,18 +4,22 @@ import UnauthorizedPage from "@/app/unauthorized/page";
 import {
   FileText,
   Images,
+  Mail,
   Newspaper,
   PartyPopper,
   UserPlus,
   Users,
-  Mail,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+interface User {
+  userType: number;
+}
+
 export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -86,7 +90,7 @@ export default function AdminPage() {
       href: "/admin/newsletter",
       icon: <Mail className="h-12 w-12" />,
       description: "Envoyer une newsletter aux abonnés",
-      color: "bg-slate-500"
+      color: "bg-slate-500",
     },
   ];
 

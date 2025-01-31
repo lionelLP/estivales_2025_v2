@@ -4,7 +4,11 @@ import { Event } from "@/lib/types/event";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-export default function EventPage({ params }: { params: { id: string } }) {
+export default function EventPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const [event, setEvent] = useState<Event | null>(null);
   const [images, setImages] = useState<{ id: number; url: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -13,8 +17,9 @@ export default function EventPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchEventData = async () => {
       try {
+        const resolvedParams = await params;
         // Récupération des détails de l'événement
-        const eventResponse = await fetch(`/api/events/${params.id}`);
+        const eventResponse = await fetch(`/api/events/${resolvedParams.id}`);
         if (!eventResponse.ok) {
           throw new Error("Erreur lors de la récupération de l'événement");
         }
@@ -22,7 +27,9 @@ export default function EventPage({ params }: { params: { id: string } }) {
         setEvent(eventData);
 
         // Récupération des images associées
-        const imagesResponse = await fetch(`/api/events/${params.id}/images`);
+        const imagesResponse = await fetch(
+          `/api/events/${resolvedParams.id}/images`
+        );
         if (imagesResponse.ok) {
           const imagesData = await imagesResponse.json();
           setImages(imagesData);
@@ -36,7 +43,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
     };
 
     fetchEventData();
-  }, [params.id]);
+  }, [params]);
 
   if (isLoading) {
     return (
@@ -87,10 +94,12 @@ export default function EventPage({ params }: { params: { id: string } }) {
 
             {/* Description */}
             {event.description && (
-              <div className="mb-8">
-                <h3 className="font-semibold mb-2">Description</h3>
-                <p className="whitespace-pre-wrap">{event.description}</p>
-              </div>
+              <>
+                <div className="mb-8">
+                  <h3 className="font-semibold mb-2">Description</h3>
+                  <p className="whitespace-pre-wrap">{event.description}</p>
+                </div>
+              </>
             )}
 
             {/* Informations complémentaires */}
