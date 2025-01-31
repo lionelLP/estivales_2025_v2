@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import * as cheerio from "cheerio";
+import { NextResponse } from "next/server";
 
 async function downloadImage(url: string): Promise<string> {
   try {
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     }
 
     // Récupérer la date de publication
-    let publishDate =
+    const publishDate =
       ogTags["article:published_time"] ||
       $('meta[property="article:published_time"]').attr("content") ||
       $('meta[name="date"]').attr("content") ||
