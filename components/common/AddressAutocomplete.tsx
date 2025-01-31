@@ -22,7 +22,6 @@ interface AddressAutocompleteProps {
 export function AddressAutocomplete({
   value,
   onChange,
-  onSelect,
   placeholder = "Entrez une adresse",
   className,
   required = false,
@@ -42,10 +41,20 @@ export function AddressAutocomplete({
         );
         const data = await response.json();
 
-        // Affichage des suggestions dans la console
+        interface Feature {
+          properties: {
+            label: string;
+            city: string;
+            postcode: string;
+          };
+          geometry: {
+            coordinates: number[];
+          };
+        }
+
         console.log(
           "Suggestions d'adresses:",
-          data.features.map((feature) => ({
+          data.features.map((feature: Feature) => ({
             adresse: feature.properties.label,
             ville: feature.properties.city,
             codePostal: feature.properties.postcode,
