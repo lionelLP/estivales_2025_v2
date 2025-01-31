@@ -44,7 +44,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   // Vérification de l'authentification directement ici
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("token");
 
   if (!token) {
