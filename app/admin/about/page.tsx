@@ -1,5 +1,6 @@
 "use client";
 
+import { MenuBar } from "@/components/editor/MenuBar";
 import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
 import Image from "@tiptap/extension-image";
@@ -16,7 +17,6 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { MenuBar } from "@/components/editor/MenuBar";
 
 // Keep the uploadImage function for image handling
 const uploadImage = async (file: File): Promise<string> => {
@@ -124,25 +124,36 @@ export default function EditAbout() {
       <h1 className="text-3xl font-bold text-center mb-12">
         Éditer la page À propos
       </h1>
-      <div className="mb-6 border rounded-lg">
-        <MenuBar editor={editor} onImageUpload={uploadImage} />
-        <EditorContent editor={editor} className="min-h-[500px] p-4 prose max-w-none" />
-      </div>
-      <div className="flex justify-end gap-4">
-        <button
-          onClick={() => router.push("/about")}
-          className="px-4 py-2 text-gray-600 hover:text-gray-800"
-        >
-          Annuler
-        </button>
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-        >
-          {isSaving ? "Enregistrement..." : "Enregistrer"}
-        </button>
-      </div>
+      {isLoading ? (
+        <div className="flex justify-center items-center min-h-[500px]">
+          <p>Chargement...</p>
+        </div>
+      ) : (
+        <>
+          <div className="mb-6 border rounded-lg">
+            <MenuBar editor={editor} onImageUpload={uploadImage} />
+            <EditorContent
+              editor={editor}
+              className="min-h-[500px] p-4 prose max-w-none"
+            />
+          </div>
+          <div className="flex justify-end gap-4">
+            <button
+              onClick={() => router.push("/about")}
+              className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            >
+              Annuler
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            >
+              {isSaving ? "Enregistrement..." : "Enregistrer"}
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

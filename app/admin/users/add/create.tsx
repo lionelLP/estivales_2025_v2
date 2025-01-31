@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import PasswordField from "@/components/common/PasswordField";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import PasswordField from "@/components/common/PasswordField";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function CreateUser() {
   const router = useRouter();
@@ -37,13 +37,13 @@ export default function CreateUser() {
       });
 
       if (response.ok) {
-        router.push("/admin/users");
+        router.push("/admin");
         router.refresh();
       } else {
         const data = await response.json();
         setError(data.message || "Une erreur est survenue");
       }
-    } catch (err) {
+    } catch {
       setError("Une erreur est survenue lors de la création de l'utilisateur");
     } finally {
       setIsSubmitting(false);
@@ -73,7 +73,7 @@ export default function CreateUser() {
 
         {/* Nom d'utilisateur */}
         <div className="space-y-2">
-          <Label htmlFor="username">Nom d'utilisateur</Label>
+          <Label htmlFor="username">Nom d&apos;utilisateur</Label>
           <Input
             id="username"
             name="username"
@@ -109,7 +109,7 @@ export default function CreateUser() {
 
         {/* Type d'utilisateur */}
         <div className="space-y-2">
-          <Label htmlFor="userType">Type d'utilisateur</Label>
+          <Label htmlFor="userType">Type d&apos;utilisateur</Label>
           <select
             id="userType"
             name="userType"

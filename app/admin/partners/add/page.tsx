@@ -8,12 +8,6 @@ import { useState } from "react";
 
 export default function CreatePartner() {
   const router = useRouter();
-  const [currentUser] = useState({
-    id: 1,
-    firstName: "Admin",
-    lastName: "User",
-    userType: "Administrateur",
-  });
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -55,7 +49,7 @@ export default function CreatePartner() {
         const data = await response.json();
         setError(data.message || "Une erreur est survenue");
       }
-    } catch (err) {
+    } catch {
       setError("Une erreur est survenue lors de la création du partenaire");
     } finally {
       setIsSubmitting(false);

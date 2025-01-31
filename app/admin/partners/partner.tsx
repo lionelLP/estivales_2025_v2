@@ -1,5 +1,4 @@
 "use client";
-import { useLoading } from "@/contexts/LoadingContext";
 import { Partner } from "@/lib/types/partner";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -15,11 +14,9 @@ export default function Partenaires() {
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<number>>(
     new Set()
   );
-  const { registerLoadingComponent, componentLoaded } = useLoading();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadingId = registerLoadingComponent();
-
     const fetchPartenaires = async () => {
       try {
         const response = await fetch("/api/partenaires");
@@ -28,21 +25,20 @@ export default function Partenaires() {
           setPartenaires(data);
         } else {
           const errorData = await response.json();
-          setError("Erreur lors de la récupération des partenaires");
+          setError(
+            errorData.message ||
+              "Erreur lors de la récupération des partenaires"
+          );
         }
       } catch (error) {
         console.error("Fetch error:", error);
         setError("Erreur lors de la récupération des partenaires");
       } finally {
-        componentLoaded(loadingId);
+        setIsLoading(false);
       }
     };
 
     fetchPartenaires();
-
-    return () => {
-      componentLoaded(loadingId);
-    };
   }, []);
 
   // Debug logs for render state
@@ -88,6 +84,14 @@ export default function Partenaires() {
       return newSet;
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">Chargement...</div>
+      </div>
+    );
+  }
 
   if (error) {
     return (

@@ -3,6 +3,15 @@ import pool from "@/lib/db/mysql";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+interface Media {
+  id: number;
+  url: string;
+  title: string;
+  type: string;
+  is_favorite: boolean;
+  uploaded_at: Date;
+}
+
 export async function GET() {
   try {
     const connection = await pool.getConnection();
@@ -15,7 +24,7 @@ export async function GET() {
       );
 
       // Transformer les URLs relatives en URLs absolues si nécessaire
-      const medias = (rows as any[]).map((media) => ({
+      const medias = (rows as Media[]).map((media) => ({
         ...media,
         url: media.url.startsWith("http") ? media.url : media.url,
       }));
@@ -35,7 +44,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   // Vérification de l'authentification directement ici
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("token");
 
   if (!token) {
@@ -66,7 +75,7 @@ export async function PUT(
 
       return NextResponse.json({
         success: true,
-        is_favorite: (rows as any[])[0]?.is_favorite,
+        is_favorite: (rows as Media[])[0]?.is_favorite,
       });
     } finally {
       connection.release();

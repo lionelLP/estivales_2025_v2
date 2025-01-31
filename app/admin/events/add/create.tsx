@@ -15,13 +15,6 @@ interface Suggestion {
 }
 
 export default function CreateEvent() {
-  const [currentUser] = useState({
-    id: 1,
-    firstName: "Admin",
-    lastName: "User",
-    userType: "Administrateur",
-  });
-
   const [formData, setFormData] = useState({
     title: "",
     subtitle: "",
@@ -315,7 +308,7 @@ export default function CreateEvent() {
             accept="image/*"
             multiple={true}
           />
-          <p className="text-sm text-gray-500">Jusqu'à 200 images</p>
+          <p className="text-sm text-gray-500">Jusqu&apos;à 200 images</p>
         </div>
 
         <button

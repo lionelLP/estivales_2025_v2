@@ -1,16 +1,16 @@
 "use client";
 
-import { useEditor, EditorContent } from "@tiptap/react";
+import { MenuBar } from "@/components/editor/MenuBar";
+import Color from "@tiptap/extension-color";
+import Image from "@tiptap/extension-image";
+import Link from "@tiptap/extension-link";
+import TextAlign from "@tiptap/extension-text-align";
+import TextStyle from "@tiptap/extension-text-style";
+import Underline from "@tiptap/extension-underline";
+import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { MenuBar } from "@/components/editor/MenuBar";
-import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image";
-import TextAlign from "@tiptap/extension-text-align";
-import Underline from "@tiptap/extension-underline";
-import TextStyle from "@tiptap/extension-text-style";
-import Color from "@tiptap/extension-color";
 
 export default function NewsletterPage() {
   const [isSending, setIsSending] = useState(false);
@@ -86,31 +86,6 @@ export default function NewsletterPage() {
     }
   };
 
-  const uploadImage = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error("Échec de l'upload");
-
-      const data = await response.json();
-      // Make sure we have an absolute URL for the email
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
-        (typeof window !== 'undefined' ? window.location.origin : '');
-      const absoluteUrl = `${baseUrl}${data.url}`;
-      
-      return absoluteUrl;
-    } catch (error) {
-      console.error("Erreur lors de l'upload:", error);
-      throw error;
-    }
-  };
-
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-12">
@@ -134,7 +109,10 @@ export default function NewsletterPage() {
 
         <div className="mb-6 border rounded-lg shadow-sm">
           <MenuBar editor={editor} disableImage={true} />
-          <EditorContent editor={editor} className="min-h-[600px] p-6 prose max-w-none" />
+          <EditorContent
+            editor={editor}
+            className="min-h-[600px] p-6 prose max-w-none"
+          />
         </div>
 
         <div className="flex justify-end gap-4">

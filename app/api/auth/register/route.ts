@@ -1,14 +1,13 @@
+import { verifyToken } from "@/lib/auth/jwt";
 import pool from "@/lib/db";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { ResultSetHeader } from "mysql2";
-import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { verifyToken } from "@/lib/auth/jwt";
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   // Vérification du rôle admin
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("token");
 
   if (!token) {

@@ -1,18 +1,19 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import pool from "@/lib/db/mysql";
-import { apiMiddleware } from "../middleware";
 import { verifyToken } from "@/lib/auth/jwt";
+import pool from "@/lib/db/mysql";
+import { RowDataPacket } from "mysql2/promise";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { apiMiddleware } from "../middleware";
 
-interface AboutContent {
+interface AboutContent extends RowDataPacket {
   html_content: string;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const connection = await pool.getConnection();
     try {
-      const [rows] = await connection.execute(
+      const [rows] = await connection.execute<AboutContent[]>(
         "SELECT * FROM AboutContent ORDER BY updated_at DESC LIMIT 1"
       );
       return NextResponse.json(rows[0] || { html_content: "" });
