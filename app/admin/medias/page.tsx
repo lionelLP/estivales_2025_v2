@@ -15,12 +15,6 @@ interface Media {
 export default function MediasPage() {
   const [medias, setMedias] = useState<Media[]>([]);
   const [filter, setFilter] = useState<"all" | "favorites">("all");
-  const [currentUser] = useState({
-    id: 1,
-    firstName: "Admin",
-    lastName: "User",
-    userType: "Administrateur",
-  });
 
   useEffect(() => {
     const fetchMedias = async () => {
