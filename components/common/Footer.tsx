@@ -2,7 +2,12 @@
 
 import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
+
+interface SubmitStatus {
+  type: "success" | "error";
+  message: string;
+}
 
 export default function Footer() {
   const addressForMaps = encodeURIComponent(
@@ -11,9 +16,9 @@ export default function Footer() {
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${addressForMaps}`;
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus | null>(null);
 
-  const handleNewsletterSubmit = async (e) => {
+  const handleNewsletterSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
@@ -26,16 +31,23 @@ export default function Footer() {
       });
       const data = await response.json();
       if (data.success) {
-        setSubmitStatus({ 
-          type: "success", 
-          message: "Un email de confirmation vous a été envoyé. Veuillez vérifier votre boîte de réception." 
+        setSubmitStatus({
+          type: "success",
+          message:
+            "Un email de confirmation vous a été envoyé. Veuillez vérifier votre boîte de réception.",
         });
         setEmail("");
       } else {
-        setSubmitStatus({ type: "error", message: "Erreur lors de l'inscription" });
+        setSubmitStatus({
+          type: "error",
+          message: "Erreur lors de l'inscription",
+        });
       }
-    } catch (error) {
-      setSubmitStatus({ type: "error", message: "Erreur lors de l'inscription" });
+    } catch {
+      setSubmitStatus({
+        type: "error",
+        message: "Erreur lors de l'inscription",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -148,7 +160,13 @@ export default function Footer() {
                 {isSubmitting ? "Inscription..." : "S'abonner"}
               </button>
               {submitStatus && (
-                <p className={`text-sm ${submitStatus.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                <p
+                  className={`text-sm ${
+                    submitStatus.type === "success"
+                      ? "text-green-400"
+                      : "text-red-400"
+                  }`}
+                >
                   {submitStatus.message}
                 </p>
               )}

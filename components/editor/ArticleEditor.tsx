@@ -1,6 +1,5 @@
-import { useState } from "react";
-import { Newspaper } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 interface ArticleMetadata {
   title: string;
@@ -35,14 +34,14 @@ export default function ArticleEditor({ onSave }: ArticleEditorProps) {
       });
 
       if (!response.ok) {
-        throw new Error("Impossible d'extraire les métadonnées");
+        throw new Error("Impossible d&apos;extraire les métadonnées");
       }
 
       const data = await response.json();
       console.log("ArticleMetadata après extraction:", data);
       setMetadata(data);
-    } catch (err) {
-      setError("Erreur lors de l'extraction des métadonnées");
+    } catch {
+      setError("Erreur lors de l&apos;extraction des métadonnées");
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +59,7 @@ export default function ArticleEditor({ onSave }: ArticleEditorProps) {
       <div className="space-y-6">
         <div>
           <label htmlFor="url" className="block text-sm font-medium mb-2">
-            URL de l'article
+            URL de l&apos;article
           </label>
           <div className="flex gap-2">
             <input

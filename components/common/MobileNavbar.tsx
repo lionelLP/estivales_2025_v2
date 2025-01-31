@@ -10,19 +10,13 @@ import { HoveredLink } from "../ui/navbar-menu";
 
 export default function MobileNavbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [openSubMenu, setOpenSubMenu] = useState<number | null>(null);
   const { user } = useAuth();
   const { logout } = useAuthentication();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  const toggleSubMenu = (index: number | null) => {
-    setOpenSubMenu(openSubMenu === index ? null : index);
-  };
-
   const handleLinkClick = () => {
     setIsOpen(false);
-    setOpenSubMenu(null);
   };
 
   useEffect(() => {
