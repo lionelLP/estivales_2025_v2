@@ -5,9 +5,13 @@ import { Event } from "@/lib/types/event";
 import { useEffect, useState } from "react";
 import { EventDetailModal } from "./EventDetailModal";
 
+interface TimelineEntry {
+  title: string;
+  content: React.ReactNode;
+}
+
 export function TimelineHistory() {
-  const [events, setevents] = useState<Event[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [events, setevents] = useState<TimelineEntry[]>([]);
   const [error, setError] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -59,7 +63,7 @@ export function TimelineHistory() {
               content: (
                 <div>
                   <div className="mb-8">
-                    {events.map((event: Event) => (
+                    {(events as Event[]).map((event: Event) => (
                       <div key={event.id} className="mb-4">
                         <h3 className="text-neutral-800 dark:text-neutral-200 text-sm font-semibold">
                           {event.title}
@@ -88,10 +92,10 @@ export function TimelineHistory() {
               // Find the first event from each group to compare dates
               const eventsA = eventsByDate[a.title];
               const eventsB = eventsByDate[b.title];
-              
+
               const dateA = new Date(eventsA[0].event_date);
               const dateB = new Date(eventsB[0].event_date);
-              
+
               return dateA.getTime() - dateB.getTime();
             });
 
@@ -102,14 +106,11 @@ export function TimelineHistory() {
       } catch (err) {
         console.error("Erreur lors de la récupération des événements:", err);
         setError("Erreur lors de la récupération des événements");
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchevents();
   }, []);
-
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
