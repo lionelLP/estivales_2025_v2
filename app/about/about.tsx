@@ -31,7 +31,15 @@ export default function About() {
         <h1 className="text-3xl font-bold text-center">À propos</h1>
       </div>
       <div className="prose prose-lg max-w-none">
-        {content ? parse(content) : <p>Aucun contenu disponible</p>}
+        {isLoading ? (
+          <div className="flex justify-center items-center min-h-[200px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : content ? (
+          parse(content)
+        ) : (
+          <p className="text-center text-gray-500">Aucun contenu disponible</p>
+        )}
       </div>
     </div>
   );

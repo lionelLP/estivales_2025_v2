@@ -193,7 +193,7 @@ const AdminProfile = ({
     <div className="relative">
       <div className="flex items-center justify-between -ml-[7px] bg-neutral-100 dark:bg-dark-mode-2 rounded-lg cursor-pointer">
         <div className="flex items-center gap-2">
-          <img
+          <Image
             src={`https://api.dicebear.com/6.x/miniavs/svg?seed=${encodeURIComponent(
               `${currentUser.username?.toLowerCase()}`
             )}`}
