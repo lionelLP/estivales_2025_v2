@@ -37,9 +37,10 @@ export default function PressePage() {
       try {
         const response = await fetch("/api/articles");
         if (response.ok) {
-          const articles = await response.json() as Article[];
-          const formattedItems = articles.map((article: Article, index: number) =>
-            formatArticleToItem(article, index)
+          const articles = (await response.json()) as Article[];
+          const formattedItems = articles.map(
+            (article: Article, index: number) =>
+              formatArticleToItem(article, index)
           );
           setItems(formattedItems);
         }
@@ -55,8 +56,7 @@ export default function PressePage() {
     return () => {
       componentLoaded(loadingId);
     };
-  }, []);
-
+  }, [componentLoaded, registerLoadingComponent]);
 
   const formatArticleToItem = (article: Article, index: number) => {
     const formattedDate = new Date(article.Creation_article).toLocaleDateString(
