@@ -1,17 +1,25 @@
-import pool from '@/lib/db/mysql';
-import { sendEmail } from '@/lib/email';
-import { createEmailTemplate } from '@/lib/templates/emailTemplate';
+import pool from "@/lib/db/mysql";
+import { sendEmail } from "@/lib/email";
+import { createEmailTemplate } from "@/lib/templates/emailTemplate";
+import { RowDataPacket } from "mysql2";
+
+interface PendingNewsletter extends RowDataPacket {
+  email: string;
+  confirmation_token: string;
+  expires_at: Date;
+}
 
 export async function GET(
   request: Request,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
+  const resolvedParams = await params;
   const connection = await pool.getConnection();
-  
+
   try {
-    const [pending] = await connection.execute(
-      'SELECT * FROM NewsletterPending WHERE confirmation_token = ? AND expires_at > NOW()',
-      [params.token]
+    const [pending] = await connection.execute<PendingNewsletter[]>(
+      "SELECT * FROM NewsletterPending WHERE confirmation_token = ? AND expires_at > NOW()",
+      [resolvedParams.token]
     );
 
     if (!Array.isArray(pending) || pending.length === 0) {
@@ -44,7 +52,7 @@ export async function GET(
         `,
         {
           status: 400,
-          headers: { 'Content-Type': 'text/html' },
+          headers: { "Content-Type": "text/html" },
         }
       );
     }
@@ -54,29 +62,29 @@ export async function GET(
 
     try {
       await connection.execute(
-        'INSERT INTO Newsletter (email, subscribed_at) VALUES (?, NOW())',
+        "INSERT INTO Newsletter (email, subscribed_at) VALUES (?, NOW())",
         [pendingSubscription.email]
       );
 
       await connection.execute(
-        'DELETE FROM NewsletterPending WHERE confirmation_token = ?',
-        [params.token]
+        "DELETE FROM NewsletterPending WHERE confirmation_token = ?",
+        [resolvedParams.token]
       );
 
       await connection.commit();
 
       await sendEmail(
         pendingSubscription.email,
-        'Bienvenue dans notre newsletter !',
+        "Bienvenue dans notre newsletter !",
         createEmailTemplate({
-          title: 'Bienvenue dans notre newsletter !',
+          title: "Bienvenue dans notre newsletter !",
           content: `
             <p>Votre inscription à la newsletter des Estivales de Brou a été confirmée avec succès.</p>
             <p>Vous recevrez désormais nos actualités et informations importantes directement dans votre boîte mail.</p>
             <p>Merci de votre confiance !</p>
           `,
           email: pendingSubscription.email,
-          isNewsletter: true
+          isNewsletter: true,
         })
       );
 
@@ -121,7 +129,7 @@ export async function GET(
         </html>
         `,
         {
-          headers: { 'Content-Type': 'text/html' },
+          headers: { "Content-Type": "text/html" },
         }
       );
     } catch (error) {
@@ -131,4 +139,4 @@ export async function GET(
   } finally {
     connection.release();
   }
-} 
+}

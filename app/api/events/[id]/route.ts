@@ -3,16 +3,17 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     const connection = await pool.getConnection();
     try {
       const [rows] = await connection.execute(
         `SELECT id, title, subtitle, description, event_date, created_at, 
          location, max_participants, is_public, user_id, brochure_path, booking_link 
          FROM Event WHERE id = ?`,
-        [params.id]
+        [resolvedParams.id]
       );
 
       interface Event {
@@ -56,9 +57,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     const body = await request.json();
     const {
       title,
@@ -96,7 +98,7 @@ export async function PUT(
           is_public,
           booking_link,
           brochure_path,
-          params.id,
+          resolvedParams.id,
         ]
       );
 
@@ -126,16 +128,17 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     // Suppression des images associées
     await pool.execute("DELETE FROM event_media WHERE event_id = ?", [
-      params.id,
+      resolvedParams.id,
     ]);
 
     // Suppression de l'événement
-    await pool.execute("DELETE FROM events WHERE id = ?", [params.id]);
+    await pool.execute("DELETE FROM events WHERE id = ?", [resolvedParams.id]);
 
     return NextResponse.json({ message: "Événement supprimé avec succès" });
   } catch (error) {

@@ -41,8 +41,9 @@ export async function GET() {
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const resolvedParams = await params;
   // Vérification de l'authentification directement ici
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
@@ -64,13 +65,13 @@ export async function PUT(
         `UPDATE Media 
          SET is_favorite = NOT is_favorite 
          WHERE id = ?`,
-        [params.id]
+        [resolvedParams.id]
       );
 
       // Récupérer le nouveau statut
       const [rows] = await connection.execute(
         `SELECT is_favorite FROM Media WHERE id = ?`,
-        [params.id]
+        [resolvedParams.id]
       );
 
       return NextResponse.json({

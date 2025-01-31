@@ -1,17 +1,18 @@
 import pool from "@/lib/db/mysql";
+import * as mysql from "mysql2/promise";
 import { NextResponse } from "next/server";
-import * as mysql from 'mysql2/promise';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     const connection = await pool.getConnection();
     try {
       const [articles] = await connection.execute<mysql.RowDataPacket[]>(
         "SELECT * FROM Article WHERE id = ?",
-        [parseInt(params.id)]
+        [parseInt(resolvedParams.id)]
       );
 
       if (!articles || articles.length === 0) {
@@ -35,16 +36,31 @@ export async function GET(
 }
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
+
     const connection = await pool.getConnection();
     try {
       const body = await request.json();
-      const { title, link, content, Creation_article, image, favicon, is_published, user_id, event_id } = body;
+      const {
+        title,
+        link,
+        content,
+        Creation_article,
+        image,
+        favicon,
+        is_published,
+        user_id,
+        event_id,
+      } = body;
 
       const formattedDate = Creation_article
-        ? new Date(Creation_article).toISOString().slice(0, 19).replace("T", " ")
+        ? new Date(Creation_article)
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ")
         : new Date().toISOString().slice(0, 19).replace("T", " ");
 
       const [result] = await connection.execute<mysql.ResultSetHeader>(
@@ -69,7 +85,7 @@ export async function PUT(
           is_published,
           user_id,
           event_id,
-          parseInt(params.id),
+          parseInt(resolvedParams.id),
         ]
       );
 
@@ -95,15 +111,16 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     const connection = await pool.getConnection();
     try {
       // Check if article exists first
       const [article] = await connection.execute(
         "SELECT id FROM Article WHERE id = ?",
-        [parseInt(params.id)]
+        [parseInt(resolvedParams.id)]
       );
 
       if (!article || (article as mysql.RowDataPacket[]).length === 0) {
@@ -117,7 +134,7 @@ export async function DELETE(
       // Proceed with deletion
       const [result] = await connection.execute(
         "DELETE FROM Article WHERE id = ?",
-        [parseInt(params.id)]
+        [parseInt(resolvedParams.id)]
       );
 
       if ((result as mysql.ResultSetHeader).affectedRows === 0) {
