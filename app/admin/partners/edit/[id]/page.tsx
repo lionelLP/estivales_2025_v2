@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import EditPartner from "./edit";
 
 export const metadata: Metadata = {
   title: "Modifier un Partenaire | Estivales de Brou",
@@ -10,4 +11,11 @@ export const metadata: Metadata = {
   },
 };
 
-export { default } from "./edit";
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function Page({ params }: PageProps) {
+  const resolvedParams = await params;
+  return <EditPartner params={resolvedParams} />;
+}

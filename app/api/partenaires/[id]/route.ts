@@ -7,12 +7,12 @@ import path from "path";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const connection = await pool.getConnection();
     try {
-      const id = await Promise.resolve(params.id);
+      const { id } = await context.params;
       const [rows] = await connection.execute(
         "SELECT * FROM Partenaire WHERE id = ?",
         [id]
@@ -40,10 +40,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   // Vérification de l'authentification
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("token");
 
   if (!token) {
@@ -57,7 +57,7 @@ export async function PUT(
     }
 
     const formData = await request.formData();
-    const id = await Promise.resolve(params.id);
+    const { id } = await context.params;
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const website_url = formData.get("website_url") as string;
@@ -126,15 +126,16 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   const connection = await pool.getConnection();
 
   try {
+    const { id } = await context.params;
     // First, get the current files to delete them
     const [existingPartners] = await connection.execute(
       "SELECT logo_url, banner_url FROM Partenaire WHERE id = ?",
-      [params.id]
+      [id]
     );
 
     interface Partner {
@@ -167,9 +168,7 @@ export async function DELETE(
     }
 
     // Delete from database
-    await connection.execute("DELETE FROM Partenaire WHERE id = ?", [
-      params.id,
-    ]);
+    await connection.execute("DELETE FROM Partenaire WHERE id = ?", [id]);
     connection.release();
     return NextResponse.json({ success: true });
   } catch (error) {

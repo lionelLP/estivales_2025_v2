@@ -9,7 +9,13 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function EditPartner({ params }: { params: { id: string } }) {
+interface EditPartnerProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function EditPartner({ params }: EditPartnerProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
