@@ -1,20 +1,39 @@
-import pool from '@/lib/db/mysql';
-import { sendEmail } from '@/lib/email';
-import { createEventNotificationEmail } from '@/lib/templates/eventEmailTemplate';
+import pool from "@/lib/db/mysql";
+import { sendEmail } from "@/lib/email";
+import { createEventNotificationEmail } from "@/lib/templates/eventEmailTemplate";
+import { RowDataPacket } from "mysql2/promise";
 
-export async function notifySubscribersAboutNewEvent(event: any) {
-  console.log('Starting notification process for event:', event.title);
+interface Event {
+  title: string;
+  subtitle?: string;
+  description: string;
+  event_date: string;
+  location: string;
+  booking_link?: string;
+  id: number;
+}
+
+interface NewsletterSubscriber extends RowDataPacket {
+  email: string;
+}
+
+export async function notifySubscribersAboutNewEvent(event: Event) {
+  console.log("Starting notification process for event:", event.title);
   const connection = await pool.getConnection();
-  
+
   try {
     // Get all active newsletter subscribers
-    const [subscribers] = await connection.execute(
-      'SELECT email FROM Newsletter'
+    const [subscribers] = await connection.execute<NewsletterSubscriber[]>(
+      "SELECT email FROM Newsletter"
     );
-    console.log(`Found ${Array.isArray(subscribers) ? subscribers.length : 0} active subscribers`);
+    console.log(
+      `Found ${
+        Array.isArray(subscribers) ? subscribers.length : 0
+      } active subscribers`
+    );
 
     if (!Array.isArray(subscribers) || subscribers.length === 0) {
-      console.log('No active subscribers found, skipping notifications');
+      console.log("No active subscribers found, skipping notifications");
       return;
     }
 
@@ -26,20 +45,21 @@ export async function notifySubscribersAboutNewEvent(event: any) {
         `Nouvel événement aux Estivales ! : ${event.title}`,
         createEventNotificationEmail(event, subscriber.email),
         true
-      ).then(result => {
+      ).then((result) => {
         console.log(`Email result for ${subscriber.email}:`, result);
         return result;
       });
     });
 
     const results = await Promise.all(emailPromises);
-    const successCount = results.filter(r => r.success).length;
-    console.log(`Notification summary: ${successCount}/${subscribers.length} emails sent successfully`);
-    
+    const successCount = results.filter((r) => r.success).length;
+    console.log(
+      `Notification summary: ${successCount}/${subscribers.length} emails sent successfully`
+    );
   } catch (error) {
-    console.error('Error in notifySubscribersAboutNewEvent:', error);
+    console.error("Error in notifySubscribersAboutNewEvent:", error);
     throw error;
   } finally {
     connection.release();
   }
-} 
+}
