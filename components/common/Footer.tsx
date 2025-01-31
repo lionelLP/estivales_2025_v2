@@ -26,16 +26,23 @@ export default function Footer() {
       });
       const data = await response.json();
       if (data.success) {
-        setSubmitStatus({ 
-          type: "success", 
-          message: "Un email de confirmation vous a été envoyé. Veuillez vérifier votre boîte de réception." 
+        setSubmitStatus({
+          type: "success",
+          message:
+            "Un email de confirmation vous a été envoyé. Veuillez vérifier votre boîte de réception.",
         });
         setEmail("");
       } else {
-        setSubmitStatus({ type: "error", message: "Erreur lors de l'inscription" });
+        setSubmitStatus({
+          type: "error",
+          message: "Erreur lors de l'inscription",
+        });
       }
     } catch (error) {
-      setSubmitStatus({ type: "error", message: "Erreur lors de l'inscription" });
+      setSubmitStatus({
+        type: "error",
+        message: "Erreur lors de l'inscription",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -61,7 +68,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/programme/passes"
+                  href="programmes/past"
                   className="hover:text-white/80 transition"
                 >
                   Événements précédents
@@ -69,7 +76,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/programme/futur"
+                  href="/programmes/to-come"
                   className="hover:text-white/80 transition"
                 >
                   Programmes à venir
@@ -148,7 +155,13 @@ export default function Footer() {
                 {isSubmitting ? "Inscription..." : "S'abonner"}
               </button>
               {submitStatus && (
-                <p className={`text-sm ${submitStatus.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                <p
+                  className={`text-sm ${
+                    submitStatus.type === "success"
+                      ? "text-green-400"
+                      : "text-red-400"
+                  }`}
+                >
                   {submitStatus.message}
                 </p>
               )}
