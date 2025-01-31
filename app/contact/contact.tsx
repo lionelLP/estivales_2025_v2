@@ -48,12 +48,21 @@ export default function Contact() {
 
       if (response.ok) {
         setSubmitStatus("success");
-        setFormData({ name: "", email: "", subject: "", message: "" });
+        setFormData({
+          name: "",
+          email: "",
+          address: "",
+          city: "",
+          postcode: "",
+          coordinates: { lat: 0, lng: 0 },
+          subject: "",
+          message: "",
+        });
         setAttachments([]);
       } else {
         setSubmitStatus("error");
       }
-    } catch (error) {
+    } catch {
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
