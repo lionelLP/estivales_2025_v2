@@ -6,10 +6,11 @@ export default function UnauthorizedPage() {
           Accès non autorisé
         </h1>
         <p className="text-gray-600 mb-4">
-          Vous n'avez pas les permissions nécessaires pour accéder à cette page.
+          Vous n&apos;avez pas les permissions nécessaires pour accéder à cette
+          page.
         </p>
         <a href="/" className="text-blue-600 hover:text-blue-800 underline">
-          Retour à l'accueil
+          Retour à l&apos;accueil
         </a>
       </div>
     </div>
