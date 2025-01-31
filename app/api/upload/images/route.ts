@@ -1,9 +1,11 @@
-import { writeFile } from "fs/promises";
-import { NextResponse } from "next/server";
-import path from "path";
 import pool from "@/lib/db/mysql";
+import { writeFile } from "fs/promises";
+import { ResultSetHeader } from "mysql2";
+import { NextRequest, NextResponse } from "next/server";
+import path from "path";
 import { apiMiddleware } from "../../middleware";
-export async function POST(request: Request) {
+
+export async function POST(request: NextRequest) {
   const middlewareResponse = await apiMiddleware(request);
   if (middlewareResponse.status !== 200) {
     return middlewareResponse;
@@ -45,7 +47,7 @@ export async function POST(request: Request) {
           [relativePath, file.type, file.name, file.size]
         );
 
-        const mediaId = (mediaResult as any).insertId;
+        const mediaId = (mediaResult as ResultSetHeader).insertId;
 
         // Créer la relation dans Event_Media
         if (eventId) {
