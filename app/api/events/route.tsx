@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { verifyToken } from "@/lib/auth/jwt";
 import { apiMiddleware } from "@/app/api/middleware";
+import { verifyToken } from "@/lib/auth/jwt";
 import pool from "@/lib/db/mysql";
 import { notifySubscribersAboutNewEvent } from "@/lib/notifications/eventNotifications";
+import { ResultSetHeader } from "mysql2";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const middlewareResponse = await apiMiddleware(request);
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
     const connection = await pool.getConnection();
 
     try {
-      const [result] = await connection.execute(
+      const [result] = await connection.execute<ResultSetHeader>(
         `INSERT INTO Event (
           title, subtitle, description, event_date, location, 
           max_participants, is_public, booking_link, brochure_path, user_id

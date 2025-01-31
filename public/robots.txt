@@ -1,0 +1,12 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /login
+Disallow: /api
+
+# Host
+Host: https://estivales-brou.vercel.app
+
+# Sitemaps
+Sitemap: https://estivales-brou.vercel.app/sitemap.xml

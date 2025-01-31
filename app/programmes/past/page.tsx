@@ -1,13 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Timeline } from "@/components/ui/timeline";
-import { Event } from "@/lib/types/event";
-import { useLoading } from "@/contexts/LoadingContext";
 import { EventDetailModal } from "@/components/common/EventDetailModal";
+import { Timeline } from "@/components/ui/timeline";
+import { useLoading } from "@/contexts/LoadingContext";
+import { Event } from "@/lib/types/event";
+import { useEffect, useState } from "react";
+
+interface TimelineEntry {
+  title: string;
+  content: React.ReactNode;
+}
 
 export default function ProgrammesPast() {
-  const [events, setevents] = useState<Event[]>([]);
+  const [events, setevents] = useState<TimelineEntry[]>([]);
   const [error, setError] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,13 +20,13 @@ export default function ProgrammesPast() {
 
   useEffect(() => {
     const loadingId = registerLoadingComponent();
-    
+
     const fetchevents = async () => {
       try {
         const response = await fetch("/api/events");
         if (response.ok) {
           const data = await response.json();
-          
+
           // Filtrer les événements passés
           const now = new Date();
           const pastEvents = data.filter((event: Event) => {
@@ -55,13 +60,15 @@ export default function ProgrammesPast() {
           );
 
           // Transformer en format Timeline
-          const timelineData = Object.entries(eventsByDate)
-            .map(([date, events]) => ({
+          const timelineData: TimelineEntry[] = Object.entries<Event[]>(
+            eventsByDate
+          )
+            .map(([date, dateEvents]) => ({
               title: date,
               content: (
                 <div>
                   <div className="mb-8">
-                    {events.map((event: Event) => (
+                    {dateEvents.map((event: Event) => (
                       <div key={event.id} className="mb-4">
                         <h3 className="text-neutral-800 dark:text-neutral-200 text-sm font-semibold">
                           {event.title}
@@ -72,10 +79,13 @@ export default function ProgrammesPast() {
                           </p>
                         )}
                         <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
-                          {new Date(event.event_date).toLocaleTimeString("fr-FR", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {new Date(event.event_date).toLocaleTimeString(
+                            "fr-FR",
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
                         </p>
                         <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
                           {event.location}
@@ -114,10 +124,7 @@ export default function ProgrammesPast() {
     };
 
     fetchevents();
-    
-    return () => {
-      componentLoaded(loadingId);
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (error) {
@@ -159,4 +166,4 @@ export default function ProgrammesPast() {
       </div>
     </div>
   );
-} 
+}

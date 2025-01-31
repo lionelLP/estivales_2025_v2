@@ -48,7 +48,7 @@ export default function Partenaires() {
     return () => {
       componentLoaded(loadingId);
     };
-  }, []);
+  }, [componentLoaded, registerLoadingComponent]);
 
   const toggleDescription = (id: number, e: React.MouseEvent) => {
     e.preventDefault();

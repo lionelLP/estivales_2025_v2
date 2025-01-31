@@ -5,11 +5,9 @@ import { Partner } from "@/lib/types/partner";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Partenaires() {
-  const router = useRouter();
   const [partenaires, setPartenaires] = useState<Partner[]>([]);
   const [error, setError] = useState("");
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<number>>(
@@ -27,7 +25,6 @@ export default function Partenaires() {
           const data = await response.json();
           setPartenaires(data);
         } else {
-          const errorData = await response.json();
           setError("Erreur lors de la récupération des partenaires");
         }
       } catch (error) {
@@ -43,7 +40,7 @@ export default function Partenaires() {
     return () => {
       componentLoaded(loadingId);
     };
-  }, []);
+  }, [componentLoaded, registerLoadingComponent]);
 
   // Debug logs for render state
   console.log("Current state:", {

@@ -73,7 +73,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/programme/passes"
+                  href="programmes/past"
                   className="hover:text-white/80 transition"
                 >
                   Événements précédents
@@ -81,7 +81,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/programme/futur"
+                  href="/programmes/to-come"
                   className="hover:text-white/80 transition"
                 >
                   Programmes à venir

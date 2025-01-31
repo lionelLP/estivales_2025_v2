@@ -16,7 +16,7 @@ export default function MentionsLegales() {
               Bourg-en-Bresse, située à :
             </p>
             <address className="not-italic">
-              Place de l'Hôtel de Ville
+              Place de l&apos;Hôtel de Ville
               <br />
               BP 90419
               <br />
@@ -36,10 +36,10 @@ export default function MentionsLegales() {
               3. Propriété intellectuelle
             </h2>
             <p>
-              L'ensemble du contenu de ce site (textes, images, vidéos, etc.)
-              est protégé par le droit d'auteur. Toute reproduction ou
-              représentation, intégrale ou partielle, par quelque procédé que ce
-              soit, est strictement interdite sans autorisation préalable.
+              L&apos;ensemble du contenu de ce site (textes, images, vidéos,
+              etc.) est protégé par le droit d&apos;auteur. Toute reproduction
+              ou représentation, intégrale ou partielle, par quelque procédé que
+              ce soit, est strictement interdite sans autorisation préalable.
             </p>
           </section>
 
@@ -49,10 +49,10 @@ export default function MentionsLegales() {
             </h2>
             <p>
               Conformément au Règlement Général sur la Protection des Données
-              (RGPD), vous disposez d'un droit d'accès, de rectification et de
-              suppression des données vous concernant. Pour exercer ces droits
-              ou pour toute question, vous pouvez nous contacter via le
-              formulaire de contact.
+              (RGPD), vous disposez d&apos;un droit d&apos;accès, de
+              rectification et de suppression des données vous concernant. Pour
+              exercer ces droits ou pour toute question, vous pouvez nous
+              contacter via le formulaire de contact.
             </p>
           </section>
 
@@ -69,9 +69,9 @@ export default function MentionsLegales() {
             <h2 className="text-2xl font-semibold mb-4">6. Liens externes</h2>
             <p>
               Le site peut contenir des liens vers des sites externes. La Ville
-              de Bourg-en-Bresse n'est pas responsable du contenu de ces sites
-              et ne peut être tenue responsable des dommages résultant de leur
-              utilisation.
+              de Bourg-en-Bresse n&apos;est pas responsable du contenu de ces
+              sites et ne peut être tenue responsable des dommages résultant de
+              leur utilisation.
             </p>
           </section>
 
@@ -79,7 +79,7 @@ export default function MentionsLegales() {
             <h2 className="text-2xl font-semibold mb-4">7. Contact</h2>
             <p>
               Pour toute question concernant ces mentions légales, vous pouvez
-              nous contacter à l'adresse suivante :
+              nous contacter à l&apos;adresse suivante :
             </p>
             <p>Email : contact@estivales-brou.fr</p>
           </section>
