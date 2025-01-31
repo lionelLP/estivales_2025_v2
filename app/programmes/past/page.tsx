@@ -124,10 +124,7 @@ export default function ProgrammesPast() {
     };
 
     fetchevents();
-
-    return () => {
-      componentLoaded(loadingId);
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (error) {
