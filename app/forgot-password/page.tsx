@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import ShinyButton from '@/components/magicui/shiny-button';
-import DisableShinyButton from '@/components/common/DisableShinyButton';
+import DisableShinyButton from "@/components/common/DisableShinyButton";
+import ShinyButton from "@/components/magicui/shiny-button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -17,9 +17,9 @@ export default function ForgotPassword() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
 
@@ -27,9 +27,9 @@ export default function ForgotPassword() {
       setMessage(data.message);
       setIsSuccess(response.ok);
       if (response.ok) {
-        setEmail('');
+        setEmail("");
       }
-    } catch (error) {
+    } catch {
       setMessage("Une erreur est survenue");
       setIsSuccess(false);
     } finally {
@@ -60,7 +60,11 @@ export default function ForgotPassword() {
         </div>
 
         {message && (
-          <p className={`text-sm mb-4 text-center ${isSuccess ? 'text-green-600' : 'text-red-600'}`}>
+          <p
+            className={`text-sm mb-4 text-center ${
+              isSuccess ? "text-green-600" : "text-red-600"
+            }`}
+          >
             {message}
           </p>
         )}
@@ -78,4 +82,4 @@ export default function ForgotPassword() {
       </form>
     </div>
   );
-} 
+}
