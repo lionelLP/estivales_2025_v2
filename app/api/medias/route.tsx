@@ -1,16 +1,7 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 import pool from "@/lib/db/mysql";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { apiMiddleware } from "../middleware";
-
-interface Media {
-  id: number;
-  url: string;
-  title: string;
-  type: string;
-  is_published?: number;
-  uploaded_at?: string;
-}
 
 export async function GET(request: NextRequest) {
   try {
