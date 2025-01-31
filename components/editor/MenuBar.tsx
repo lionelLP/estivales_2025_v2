@@ -1,19 +1,26 @@
-import { useCallback } from 'react';
+import { Editor } from "@tiptap/react";
+import { useCallback } from "react";
+
+type Level = 1 | 2 | 3;
 
 interface MenuBarProps {
-  editor: any;
+  editor: Editor | null;
   onImageUpload?: (file: File) => Promise<string>;
   disableImage?: boolean;
 }
 
-export const MenuBar = ({ editor, onImageUpload, disableImage = false }: MenuBarProps) => {
+export const MenuBar = ({
+  editor,
+  onImageUpload,
+  disableImage = false,
+}: MenuBarProps) => {
   const handleImageUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
 
       try {
-        if (onImageUpload) {
+        if (onImageUpload && editor) {
           const imageUrl = await onImageUpload(file);
           editor.chain().focus().setImage({ src: imageUrl }).run();
         }
@@ -35,21 +42,27 @@ export const MenuBar = ({ editor, onImageUpload, disableImage = false }: MenuBar
         {/* Styles de texte */}
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-2 rounded ${editor.isActive("bold") ? "bg-gray-200" : ""}`}
+          className={`p-2 rounded ${
+            editor.isActive("bold") ? "bg-gray-200" : ""
+          }`}
           title="Gras"
         >
           <i className="fas fa-bold"></i>
         </button>
         <button
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-2 rounded ${editor.isActive("italic") ? "bg-gray-200" : ""}`}
+          className={`p-2 rounded ${
+            editor.isActive("italic") ? "bg-gray-200" : ""
+          }`}
           title="Italique"
         >
           <i className="fas fa-italic"></i>
         </button>
         <button
           onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className={`p-2 rounded ${editor.isActive("underline") ? "bg-gray-200" : ""}`}
+          className={`p-2 rounded ${
+            editor.isActive("underline") ? "bg-gray-200" : ""
+          }`}
           title="Souligné"
         >
           <i className="fas fa-underline"></i>
@@ -60,10 +73,10 @@ export const MenuBar = ({ editor, onImageUpload, disableImage = false }: MenuBar
         {/* Titres */}
         <select
           onChange={(e) => {
-            const level = parseInt(e.target.value);
-            level
+            const level = parseInt(e.target.value) as Level;
+            void (level
               ? editor.chain().focus().toggleHeading({ level }).run()
-              : editor.chain().focus().setParagraph().run();
+              : editor.chain().focus().setParagraph().run());
           }}
           className="p-2 rounded border"
           value={
@@ -87,21 +100,27 @@ export const MenuBar = ({ editor, onImageUpload, disableImage = false }: MenuBar
         {/* Alignement */}
         <button
           onClick={() => editor.chain().focus().setTextAlign("left").run()}
-          className={`p-2 rounded ${editor.isActive({ textAlign: "left" }) ? "bg-gray-200" : ""}`}
+          className={`p-2 rounded ${
+            editor.isActive({ textAlign: "left" }) ? "bg-gray-200" : ""
+          }`}
           title="Aligner à gauche"
         >
           <i className="fas fa-align-left"></i>
         </button>
         <button
           onClick={() => editor.chain().focus().setTextAlign("center").run()}
-          className={`p-2 rounded ${editor.isActive({ textAlign: "center" }) ? "bg-gray-200" : ""}`}
+          className={`p-2 rounded ${
+            editor.isActive({ textAlign: "center" }) ? "bg-gray-200" : ""
+          }`}
           title="Centrer"
         >
           <i className="fas fa-align-center"></i>
         </button>
         <button
           onClick={() => editor.chain().focus().setTextAlign("right").run()}
-          className={`p-2 rounded ${editor.isActive({ textAlign: "right" }) ? "bg-gray-200" : ""}`}
+          className={`p-2 rounded ${
+            editor.isActive({ textAlign: "right" }) ? "bg-gray-200" : ""
+          }`}
           title="Aligner à droite"
         >
           <i className="fas fa-align-right"></i>
@@ -112,14 +131,18 @@ export const MenuBar = ({ editor, onImageUpload, disableImage = false }: MenuBar
         {/* Listes */}
         <button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`p-2 rounded ${editor.isActive("bulletList") ? "bg-gray-200" : ""}`}
+          className={`p-2 rounded ${
+            editor.isActive("bulletList") ? "bg-gray-200" : ""
+          }`}
           title="Liste à puces"
         >
           <i className="fas fa-list-ul"></i>
         </button>
         <button
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`p-2 rounded ${editor.isActive("orderedList") ? "bg-gray-200" : ""}`}
+          className={`p-2 rounded ${
+            editor.isActive("orderedList") ? "bg-gray-200" : ""
+          }`}
           title="Liste numérotée"
         >
           <i className="fas fa-list-ol"></i>
@@ -130,7 +153,13 @@ export const MenuBar = ({ editor, onImageUpload, disableImage = false }: MenuBar
         {/* Couleurs */}
         <input
           type="color"
-          onInput={(e) => editor.chain().focus().setColor(e.target.value).run()}
+          onInput={(e) =>
+            editor
+              .chain()
+              .focus()
+              .setColor((e.target as HTMLInputElement).value)
+              .run()
+          }
           className="w-8 h-8 p-1 rounded"
           title="Couleur du texte"
         />
@@ -145,7 +174,9 @@ export const MenuBar = ({ editor, onImageUpload, disableImage = false }: MenuBar
               editor.chain().focus().setLink({ href: url }).run();
             }
           }}
-          className={`p-2 rounded ${editor.isActive("link") ? "bg-gray-200" : ""}`}
+          className={`p-2 rounded ${
+            editor.isActive("link") ? "bg-gray-200" : ""
+          }`}
           title="Insérer un lien"
         >
           <i className="fas fa-link"></i>
@@ -174,4 +205,4 @@ export const MenuBar = ({ editor, onImageUpload, disableImage = false }: MenuBar
       </div>
     </div>
   );
-}; 
+};
