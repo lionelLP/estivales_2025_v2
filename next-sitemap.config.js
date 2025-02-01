@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: "https://estivales-brou.vercel.app",
+  siteUrl: process.env.NEXT_PUBLIC_BASE_URL,
   generateRobotsTxt: true,
   exclude: ["/admin/*", "/login", "/api/*"],
   robotsTxtOptions: {

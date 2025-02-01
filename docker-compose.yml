@@ -5,14 +5,12 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
-      args:
-        - GITLAB_TOKEN=${GITLAB_TOKEN}
     container_name: estivales_app
     volumes:
-      - estivales_source:/app
+      - .:/app
     ports:
       - "3000:3000"
-    environment_file:
+    env_file:
       - .env.local
     depends_on:
       - db
