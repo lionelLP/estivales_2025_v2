@@ -23,7 +23,8 @@ else
     git clone https://iutbg-gitlab.iutbourg.univ-lyon1.fr/sae-but31/2024-25-web/estivales-brou.git .
     npm install
 fi
-npm run dev
+npm run sitemap
+npm run build
 EOF
 
 # Rendre le script exécutable
