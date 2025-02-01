@@ -25,7 +25,6 @@ else
 fi
 npm run sitemap
 npm run build
-npm run start
 EOF
 
 # Rendre le script exécutable
