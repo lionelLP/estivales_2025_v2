@@ -1,15 +1,15 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { motion, type AnimationProps } from "framer-motion";
+import { motion } from "framer-motion";
 
 const animationProps = {
-  initial: { "--x": "100%" } as React.CSSProperties,
-  animate: { "--x": "-100%" } as React.CSSProperties,
+  initial: { "--x": "100%" },
+  animate: { "--x": "-100%" },
   whileTap: { scale: 0.95 },
   transition: {
     repeat: Infinity,
-    repeatType: "loop",
+    repeatType: "loop" as const,
     repeatDelay: 1,
     type: "spring",
     stiffness: 20,
@@ -22,7 +22,7 @@ const animationProps = {
       mass: 0.5,
     },
   },
-} as AnimationProps;
+};
 
 interface ShinyButtonProps {
   text: string;
