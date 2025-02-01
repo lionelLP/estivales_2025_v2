@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 import { verifyToken } from "@/lib/auth/jwt";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 export async function apiMiddleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
@@ -16,7 +16,12 @@ export async function apiMiddleware(request: NextRequest) {
   };
 
   // Vérifier si la route est publique et si la méthode est autorisée
-  if (publicReadRoutes[path] && publicReadRoutes[path].includes(method)) {
+  if (
+    publicReadRoutes[path as keyof typeof publicReadRoutes] &&
+    publicReadRoutes[path as keyof typeof publicReadRoutes].includes(
+      method as string
+    )
+  ) {
     const newRequest = new Request(request.url, {
       method: request.method,
       headers: new Headers({

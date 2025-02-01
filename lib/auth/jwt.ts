@@ -16,7 +16,7 @@ export async function verifyToken(token: string): Promise<DecodedToken | null> {
 
     console.log("Token verification result:", payload);
 
-    return payload as DecodedToken;
+    return payload as unknown as DecodedToken;
   } catch (error) {
     console.error("Token verification error:", error);
     return null;

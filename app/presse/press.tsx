@@ -52,7 +52,7 @@ export default function PressePage() {
     };
 
     fetchArticles();
-  }, []);
+  }, [componentLoaded, registerLoadingComponent]);
 
   const formatArticleToItem = (article: Article, index: number) => {
     const formattedDate = new Date(article.Creation_article).toLocaleDateString(

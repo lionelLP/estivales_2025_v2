@@ -1,10 +1,19 @@
-import pool from "@/lib/db/mysql";
-import { NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
-import { NextRequest } from "next/server";
-import path from "path";
-import { verifyToken } from "@/lib/auth/jwt";
 import { apiMiddleware } from "@/app/api/middleware";
+import { verifyToken } from "@/lib/auth/jwt";
+import pool from "@/lib/db/mysql";
+import { writeFile } from "fs/promises";
+import { NextRequest, NextResponse } from "next/server";
+import path from "path";
+
+interface SQLError extends Error {
+  code?: string;
+  sqlState?: string;
+}
+
+interface ConnectionError extends Error {
+  code?: string;
+  name: string;
+}
 
 export async function GET() {
   try {
@@ -22,15 +31,16 @@ export async function GET() {
       );
       return NextResponse.json(rows);
     } catch (error) {
+      const err = error as SQLError;
       console.error("SQL Error details:", {
-        message: error.message,
-        code: error.code,
-        state: error.sqlState,
+        message: err.message,
+        code: err.code,
+        state: err.sqlState,
       });
       return NextResponse.json(
         {
           error: "Erreur lors de la récupération des partenaires",
-          details: error.message,
+          details: err.message,
         },
         { status: 500 }
       );
@@ -39,13 +49,14 @@ export async function GET() {
       connection.release();
     }
   } catch (error) {
+    const err = error as ConnectionError;
     console.error("Connection Error details:", {
-      message: error.message,
-      code: error.code,
-      name: error.name,
+      message: err.message,
+      code: err.code,
+      name: err.name,
     });
     return NextResponse.json(
-      { error: "Erreur serveur", details: error.message },
+      { error: "Erreur serveur", details: err.message },
       { status: 500 }
     );
   }

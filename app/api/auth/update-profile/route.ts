@@ -1,8 +1,13 @@
 import { verifyToken } from "@/lib/auth/jwt";
 import pool from "@/lib/db/mysql";
 import bcrypt from "bcryptjs";
+import { RowDataPacket } from "mysql2";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+
+interface UserRow extends RowDataPacket {
+  password: string;
+}
 
 export async function PUT(request: Request) {
   try {
@@ -50,7 +55,7 @@ export async function PUT(request: Request) {
         }
 
         // Vérifier l'ancien mot de passe
-        const [users] = await connection.query(
+        const [users] = await connection.query<UserRow[]>(
           "SELECT password FROM User WHERE id = ?",
           [decoded.userId]
         );

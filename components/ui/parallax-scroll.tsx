@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
+import { useRef, useState } from "react";
 
 interface Media {
   id: number;
@@ -51,7 +51,7 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
     return match && match[2].length === 11 ? match[2] : null;
   };
 
-  const rows = [[], [], []];
+  const rows: Media[][] = [[], [], []];
   media.forEach((item, idx) => {
     rows[idx % 3].push(item);
   });
