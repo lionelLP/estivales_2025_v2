@@ -3,6 +3,7 @@ import * as jose from "jose";
 interface DecodedToken {
   userId: number;
   userType: number;
+  email: string;
   exp: number;
 }
 
