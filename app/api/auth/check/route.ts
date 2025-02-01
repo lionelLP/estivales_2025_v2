@@ -2,6 +2,12 @@ import { verifyToken } from "@/lib/auth/jwt";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+interface DecodedToken {
+  userId: number;
+  email: string;
+  userType: number;
+}
+
 export async function GET() {
   try {
     const cookieStore = await cookies();
@@ -12,11 +18,13 @@ export async function GET() {
     }
 
     // Vérifier le token
-    const decoded = await verifyToken(token.value);
+    const decodedToken = await verifyToken(token.value);
 
-    if (!decoded) {
+    if (!decodedToken || !("email" in decodedToken)) {
       return NextResponse.json({ message: "Token invalide" }, { status: 401 });
     }
+
+    const decoded = decodedToken as DecodedToken;
 
     return NextResponse.json({
       id: decoded.userId,
