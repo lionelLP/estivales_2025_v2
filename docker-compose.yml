@@ -8,13 +8,12 @@ services:
       args:
         - GITLAB_TOKEN=${GITLAB_TOKEN}
     env_file:
-      - .env.local
+      - .env
     container_name: estivales_app
     volumes:
       - estivales_source:/app
     ports:
       - "3000:3000"
-
     depends_on:
       - db
 
