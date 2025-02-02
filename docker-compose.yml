@@ -21,11 +21,8 @@ services:
     image: mysql:8
     container_name: estivales_db
     command: --init-file /docker-entrypoint-initdb.d/init.sql
-    environment:
-      - MYSQL_ROOT_PASSWORD=root_password
-      - MYSQL_DATABASE=estivales_db
-      - MYSQL_USER=estivales
-      - MYSQL_PASSWORD=estivales_password
+    env_file:
+      - .env
     ports:
       - "3306:3306"
     volumes:
@@ -35,10 +32,8 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: estivales_phpmyadmin
-    environment:
-      - PMA_HOST=db
-      - PMA_USER=estivales
-      - PMA_PASSWORD=estivales_password
+    env_file:
+      - .env
     ports:
       - "8080:80"
     depends_on:
