@@ -1,5 +1,6 @@
 "use client";
 
+import { ImageViewer } from "@/components/common/ImageViewer";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import { useRef, useState } from "react";
@@ -87,8 +88,8 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
                       }
                     }}
                   >
-                    <div className="h-[200px] md:h-[350px] w-full md:w-[250px] relative">
-                      {isYoutubeUrl(item.url) ? (
+                    {isYoutubeUrl(item.url) ? (
+                      <div className="h-[200px] md:h-[350px] w-full md:w-[250px] relative">
                         <div className="relative w-full h-full bg-black flex items-center justify-center">
                           <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center">
                             <svg
@@ -100,15 +101,22 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
                             </svg>
                           </div>
                         </div>
-                      ) : (
-                        <Image
-                          src={item.url}
-                          alt={item.alt_text || item.title}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <ImageViewer
+                        src={item.url}
+                        alt={item.alt_text || item.title}
+                      >
+                        <div className="h-[200px] md:h-[350px] w-full md:w-[250px] relative">
+                          <Image
+                            src={item.url}
+                            alt={item.alt_text || item.title}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+                      </ImageViewer>
+                    )}
                   </div>
                 ))}
               </motion.div>
