@@ -11,14 +11,14 @@ interface MediaRow extends RowDataPacket {
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const middlewareResponse = await apiMiddleware(request);
   if (middlewareResponse.status !== 200) {
     return middlewareResponse;
   }
 
-  const mediaId = params.id;
+  const mediaId = (await params).id;
   const connection = await pool.getConnection();
 
   try {
