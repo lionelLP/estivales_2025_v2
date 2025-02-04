@@ -1,41 +1,39 @@
 import { writeFile } from "fs/promises";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
-import { convertToWebP, isImage } from "@/lib/imageTransformer";
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const file = formData.get("image") as File;
+    const file = formData.get("file") as File;
+    const image = formData.get("image") as File;
 
-    if (!file) {
+    if (!file && !image) {
       return NextResponse.json(
         { error: "Aucun fichier fourni" },
         { status: 400 }
       );
     }
 
-    // Verify that the uploaded file is a supported image format
-    if (!isImage(file.name)) {
-      return NextResponse.json(
-        { error: "Format de fichier non supporté" },
-        { status: 400 }
-      );
+    if (file) {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const filename = Date.now() + "-" + file.name.replaceAll(" ", "_");
+      const uploadDir = path.join(process.cwd(), "public/uploads/brochures");
+      await writeFile(path.join(uploadDir, filename), buffer);
+      return NextResponse.json({
+        path: `/uploads/brochures/${filename}`,
+      });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const originalName = file.name.replace(/\.[^/.]+$/, "").replace(/\s+/g, "_");
-    const filename = `${Date.now()}_${originalName}.webp`;
-
-    // Convert the image to WebP using the central transformer
-    const webpBuffer = await convertToWebP(buffer);
-
-    const uploadDir = path.join(process.cwd(), "public/uploads");
-    await writeFile(path.join(uploadDir, filename), webpBuffer);
-
-    return NextResponse.json({
-      url: `/uploads/${filename}`,
-    });
+    if (image) {
+      const buffer = Buffer.from(await image.arrayBuffer());
+      const filename = Date.now() + "-" + image.name.replaceAll(" ", "_");
+      const uploadDir = path.join(process.cwd(), "public/uploads/images");
+      await writeFile(path.join(uploadDir, filename), buffer);
+      return NextResponse.json({
+        url: `/uploads/images/${filename}`,
+      });
+    }
   } catch (error) {
     console.error("Erreur lors de l'upload:", error);
     return NextResponse.json(

@@ -1,6 +1,7 @@
 "use client";
 
-import { Heart } from "lucide-react";
+import { ImageViewer } from "@/components/common/ImageViewer";
+import { Heart, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -52,6 +53,27 @@ export default function MediasPage() {
     }
   };
 
+  const deleteMedia = async (mediaId: number) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce média ?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/medias/${mediaId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setMedias(medias.filter((media) => media.id !== mediaId));
+      } else {
+        alert("Erreur lors de la suppression du média");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression du média:", error);
+      alert("Erreur lors de la suppression du média");
+    }
+  };
+
   const filteredMedias =
     filter === "all" ? medias : medias.filter((media) => media.is_favorite);
 
@@ -88,26 +110,42 @@ export default function MediasPage() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredMedias.map((media) => (
           <div key={media.id} className="relative group">
-            <div className="aspect-square relative rounded-lg overflow-hidden">
-              <Image
-                src={media.url}
-                alt={media.title}
-                fill
-                className="object-cover transition-transform group-hover:scale-110"
-              />
-              <button
-                onClick={() => toggleFavorite(media.id)}
-                className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white transition-all"
-              >
-                <Heart
-                  className={`w-5 h-5 ${
-                    media.is_favorite
-                      ? "fill-pink-500 text-pink-500"
-                      : "text-gray-600"
-                  }`}
+            <ImageViewer src={media.url} alt={media.title}>
+              <div className="aspect-square relative rounded-lg overflow-hidden cursor-pointer">
+                <Image
+                  src={media.url}
+                  alt={media.title}
+                  fill
+                  className="object-cover transition-transform group-hover:scale-110"
                 />
-              </button>
-            </div>
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(media.id);
+                    }}
+                    className="p-2 rounded-full bg-white/80 hover:bg-white transition-all"
+                  >
+                    <Heart
+                      className={`w-5 h-5 ${
+                        media.is_favorite
+                          ? "fill-pink-500 text-pink-500"
+                          : "text-gray-600"
+                      }`}
+                    />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteMedia(media.id);
+                    }}
+                    className="p-2 rounded-full bg-white/80 hover:bg-white transition-all"
+                  >
+                    <Trash2 className="w-5 h-5 text-red-500" />
+                  </button>
+                </div>
+              </div>
+            </ImageViewer>
             <p className="mt-2 text-sm text-center truncate">{media.title}</p>
           </div>
         ))}

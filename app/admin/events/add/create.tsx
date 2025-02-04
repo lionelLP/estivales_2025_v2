@@ -99,10 +99,11 @@ export default function CreateEvent() {
           )}&limit=5`
         );
         const data = await response.json();
-        setSuggestions(data.features);
+        setSuggestions(data.features || []);
         setShowSuggestions(true);
       } catch (error) {
         console.error("Erreur lors de la recherche d'adresse:", error);
+        setSuggestions([]);
       }
     } else {
       setSuggestions([]);
