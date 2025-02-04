@@ -10,6 +10,7 @@ import { HoveredLink } from "../ui/navbar-menu";
 
 export default function MobileNavbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isProgramOpen, setIsProgramOpen] = useState(false);
   const { user } = useAuth();
   const { logout } = useAuthentication();
 
@@ -127,36 +128,75 @@ export default function MobileNavbar() {
             )}
           </div>
 
-          {/* Programme */}
-          <div className="flex justify-between items-center">
-            <HoveredLink href="/programme" onClick={handleLinkClick}>
-              <strong>Programme de l&apos;année</strong>
-            </HoveredLink>
+          {/* Programme avec sous-menu */}
+          <div className="flex flex-col">
+            <div
+              className="flex justify-between items-center cursor-pointer"
+              onClick={() => setIsProgramOpen(!isProgramOpen)}
+            >
+              <span className="font-bold">Programmes</span>
+              <motion.svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                animate={{ rotate: isProgramOpen ? 180 : 0 }}
+                className="text-black dark:text-white"
+              >
+                <path
+                  d="M6 9l6 6 6-6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </motion.svg>
+            </div>
+
+            <motion.div
+              initial={{ height: 0 }}
+              animate={{ height: isProgramOpen ? "auto" : 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden ml-4"
+            >
+              <div className="flex flex-col space-y-2 py-2">
+                <HoveredLink
+                  href="/programmes/to-come"
+                  onClick={handleLinkClick}
+                >
+                  À venir
+                </HoveredLink>
+                <HoveredLink href="/programmes/past" onClick={handleLinkClick}>
+                  Programmes passés
+                </HoveredLink>
+              </div>
+            </motion.div>
           </div>
 
           {/* Photos */}
           <div className="flex justify-between items-center">
-            <HoveredLink href="/photos" onClick={handleLinkClick}>
-              <strong>Photos</strong>
+            <HoveredLink href="/media" onClick={handleLinkClick}>
+              <strong>Medias</strong>
             </HoveredLink>
           </div>
 
           {/* Vidéos */}
           <div className="flex justify-between items-center">
-            <HoveredLink href="/videos" onClick={handleLinkClick}>
-              <strong>Vidéos</strong>
+            <HoveredLink href="/presse" onClick={handleLinkClick}>
+              <strong>Presse</strong>
             </HoveredLink>
           </div>
 
           {/* Revues de Presse */}
           <div className="flex justify-between items-center">
-            <HoveredLink href="/presse" onClick={handleLinkClick}>
-              <strong>Revues de Presse</strong>
+            <HoveredLink href="/about" onClick={handleLinkClick}>
+              <strong>À propos</strong>
             </HoveredLink>
           </div>
 
           <div className="flex justify-between items-center">
-            <HoveredLink href="/partenaires" onClick={handleLinkClick}>
+            <HoveredLink href="/partners" onClick={handleLinkClick}>
               <strong>Partenaires</strong>
             </HoveredLink>
           </div>

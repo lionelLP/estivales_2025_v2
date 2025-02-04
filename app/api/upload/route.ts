@@ -5,26 +5,35 @@ import path from "path";
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const file = formData.get("image") as File;
+    const file = formData.get("file") as File;
+    const image = formData.get("image") as File;
 
-    if (!file) {
+    if (!file && !image) {
       return NextResponse.json(
         { error: "Aucun fichier fourni" },
         { status: 400 }
       );
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const filename = Date.now() + "-" + file.name.replaceAll(" ", "_");
+    if (file) {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const filename = Date.now() + "-" + file.name.replaceAll(" ", "_");
+      const uploadDir = path.join(process.cwd(), "public/uploads/brochures");
+      await writeFile(path.join(uploadDir, filename), buffer);
+      return NextResponse.json({
+        path: `/uploads/brochures/${filename}`,
+      });
+    }
 
-    // Assurez-vous que ce dossier existe et est accessible en écriture
-    const uploadDir = path.join(process.cwd(), "public/uploads");
-    await writeFile(path.join(uploadDir, filename), buffer);
-
-    // Retourne l'URL de l'image uploadée
-    return NextResponse.json({
-      url: `/uploads/${filename}`,
-    });
+    if (image) {
+      const buffer = Buffer.from(await image.arrayBuffer());
+      const filename = Date.now() + "-" + image.name.replaceAll(" ", "_");
+      const uploadDir = path.join(process.cwd(), "public/uploads/images");
+      await writeFile(path.join(uploadDir, filename), buffer);
+      return NextResponse.json({
+        url: `/uploads/images/${filename}`,
+      });
+    }
   } catch (error) {
     console.error("Erreur lors de l'upload:", error);
     return NextResponse.json(

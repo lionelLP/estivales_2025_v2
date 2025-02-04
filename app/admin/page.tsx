@@ -82,7 +82,7 @@ export default function AdminPage() {
       label: "Utilisateurs",
       href: "/admin/users/add",
       icon: <UserPlus className="h-12 w-12" />,
-      description: "Gérer les comptes utilisateurs",
+      description: "Ajouter un utilisateur",
       color: "bg-teal-500",
     },
     {
