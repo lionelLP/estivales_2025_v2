@@ -46,7 +46,13 @@ export default function EditAbout() {
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        paragraph: {
+          HTMLAttributes: {
+            class: 'mb-4',
+          },
+        },
+      }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -76,6 +82,23 @@ export default function EditAbout() {
       TableCell,
     ],
     content: "",
+    editorProps: {
+      handleKeyDown: (view, event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+          view.dispatch(view.state.tr.replaceSelectionWith(
+            view.state.schema.nodes.paragraph.create()
+          ));
+          return true;
+        }
+        if (event.key === 'Enter' && event.shiftKey) {
+          view.dispatch(view.state.tr.replaceSelectionWith(
+            view.state.schema.nodes.hardBreak.create()
+          ));
+          return true;
+        }
+        return false;
+      },
+    },
   });
 
   useEffect(() => {

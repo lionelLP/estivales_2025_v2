@@ -1,6 +1,7 @@
 import { writeFile } from "fs/promises";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
+import { convertToWebP, isImage } from "@/lib/imageTransformer";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,14 +15,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Verify that the uploaded file is a supported image format
+    if (!isImage(file.name)) {
+      return NextResponse.json(
+        { error: "Format de fichier non supporté" },
+        { status: 400 }
+      );
+    }
+
     const buffer = Buffer.from(await file.arrayBuffer());
-    const filename = Date.now() + "-" + file.name.replaceAll(" ", "_");
+    const originalName = file.name.replace(/\.[^/.]+$/, "").replace(/\s+/g, "_");
+    const filename = `${Date.now()}_${originalName}.webp`;
 
-    // Assurez-vous que ce dossier existe et est accessible en écriture
+    // Convert the image to WebP using the central transformer
+    const webpBuffer = await convertToWebP(buffer);
+
     const uploadDir = path.join(process.cwd(), "public/uploads");
-    await writeFile(path.join(uploadDir, filename), buffer);
+    await writeFile(path.join(uploadDir, filename), webpBuffer);
 
-    // Retourne l'URL de l'image uploadée
     return NextResponse.json({
       url: `/uploads/${filename}`,
     });

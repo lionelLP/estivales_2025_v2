@@ -3,6 +3,7 @@ import { writeFile } from "fs/promises";
 import { ResultSetHeader } from "mysql2";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
+import { convertToWebP } from "@/lib/imageTransformer";
 import { apiMiddleware } from "../../middleware";
 
 export async function POST(request: NextRequest) {
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
     try {
       for (const file of files) {
         const buffer = Buffer.from(await file.arrayBuffer());
-        const filename = `${Date.now()}_${file.name}`;
+        const filename = `${Date.now()}_${file.name.replace(/\s+/g, "_")}.webp`;
         const filepath = path.join(
           process.cwd(),
           "public",
@@ -39,7 +40,10 @@ export async function POST(request: NextRequest) {
         );
         const relativePath = `/uploads/events/${filename}`;
 
-        await writeFile(filepath, buffer);
+        // Convert the image to WebP
+        const webpBuffer = await convertToWebP(buffer);
+
+        await writeFile(filepath, webpBuffer);
 
         // Insérer dans la table Media
         const [mediaResult] = await connection.execute(
