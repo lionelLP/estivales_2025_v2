@@ -61,7 +61,7 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
     <>
       <div
         ref={containerRef}
-        className="h-[150vh] md:h-[300vh] flex items-start justify-center overflow-hidden"
+        className="h-[130vh] md:h-[205vh] flex items-start justify-center overflow-hidden"
       >
         <div className="sticky top-0 flex h-screen items-center justify-center">
           <div className="pt-[200px] md:pt-[600px]">
