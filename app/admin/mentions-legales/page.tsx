@@ -18,7 +18,6 @@ import StarterKit from "@tiptap/starter-kit";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-// Keep the uploadImage function for image handling
 const uploadImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("image", file);
@@ -39,20 +38,14 @@ const uploadImage = async (file: File): Promise<string> => {
   }
 };
 
-export default function EditAbout() {
+export default function EditLegal() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        paragraph: {
-          HTMLAttributes: {
-            class: 'mb-4',
-          },
-        },
-      }),
+      StarterKit,
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -82,29 +75,12 @@ export default function EditAbout() {
       TableCell,
     ],
     content: "",
-    editorProps: {
-      handleKeyDown: (view, event) => {
-        if (event.key === 'Enter' && !event.shiftKey) {
-          view.dispatch(view.state.tr.replaceSelectionWith(
-            view.state.schema.nodes.paragraph.create()
-          ));
-          return true;
-        }
-        if (event.key === 'Enter' && event.shiftKey) {
-          view.dispatch(view.state.tr.replaceSelectionWith(
-            view.state.schema.nodes.hardBreak.create()
-          ));
-          return true;
-        }
-        return false;
-      },
-    },
   });
 
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const response = await fetch("/api/about");
+        const response = await fetch("/api/legal");
         if (response.ok) {
           const data = await response.json();
           editor?.commands.setContent(data.html_content || "");
@@ -122,18 +98,22 @@ export default function EditAbout() {
   }, [editor]);
 
   const handleSave = async () => {
+    if (!editor?.getHTML()) return;
+
     setIsSaving(true);
     try {
-      const response = await fetch("/api/about", {
+      const response = await fetch("/api/legal", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ html_content: editor?.getHTML() }),
+        body: JSON.stringify({ html_content: editor.getHTML() }),
       });
 
       if (response.ok) {
-        router.push("/about");
+        router.push("/mentions-legales");
+      } else {
+        console.error("Erreur lors de la sauvegarde");
       }
     } catch (error) {
       console.error("Erreur lors de la sauvegarde:", error);
@@ -145,7 +125,7 @@ export default function EditAbout() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-12">
-        Éditer la page À propos
+        Éditer les mentions légales
       </h1>
       {isLoading ? (
         <div className="flex justify-center items-center min-h-[500px]">
@@ -162,7 +142,7 @@ export default function EditAbout() {
           </div>
           <div className="flex justify-end gap-4">
             <button
-              onClick={() => router.push("/about")}
+              onClick={() => router.push("/mentions-legales")}
               className="px-4 py-2 text-gray-600 hover:text-gray-800"
             >
               Annuler

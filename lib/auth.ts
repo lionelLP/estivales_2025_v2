@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import type { NextAuthOptions } from "next-auth";
 
 export async function verifyToken(token: string) {
   try {
@@ -8,3 +9,9 @@ export async function verifyToken(token: string) {
     return null;
   }
 }
+
+export const authOptions: NextAuthOptions = {
+  // ... configuration de next-auth ...
+  providers: [],
+  // Ajoutez ici votre configuration d'authentification
+};

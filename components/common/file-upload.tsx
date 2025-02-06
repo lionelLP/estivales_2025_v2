@@ -70,17 +70,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleFileChange = (newFiles: File[]) => {
-    if (!multiple && newFiles.length > 0) {
-      const updatedFiles = [newFiles[0]];
-      setFiles(updatedFiles);
-      onChange(updatedFiles);
-      return;
-    }
-
-    const updatedFiles = [...files, ...newFiles].slice(0, maxFiles);
-    setFiles(updatedFiles);
-    onChange(updatedFiles);
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    onChange(files);
   };
 
   const handleRemoveFile = (index: number) => {
@@ -97,10 +89,15 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     fileInputRef.current?.click();
   };
 
+  const handleDrop = (acceptedFiles: File[]) => {
+    setFiles(acceptedFiles);
+    onChange(acceptedFiles);
+  };
+
   const { getRootProps, isDragActive } = useDropzone({
     multiple,
     noClick: true,
-    onDrop: handleFileChange,
+    onDrop: handleDrop,
     accept: accept ? { [accept]: [] } : undefined,
     onDropRejected: (error) => {
       console.log(error);
@@ -120,7 +117,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           type="file"
           multiple={multiple}
           accept={accept}
-          onChange={(e) => handleFileChange(Array.from(e.target.files || []))}
+          onChange={handleFileChange}
           className="hidden"
         />
         <div className="">

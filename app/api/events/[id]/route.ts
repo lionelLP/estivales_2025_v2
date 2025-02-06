@@ -133,12 +133,12 @@ export async function DELETE(
   try {
     const resolvedParams = await params;
     // Suppression des images associées
-    await pool.execute("DELETE FROM event_media WHERE event_id = ?", [
+    await pool.execute("DELETE FROM Event_Media WHERE event_id = ?", [
       resolvedParams.id,
     ]);
 
     // Suppression de l'événement
-    await pool.execute("DELETE FROM events WHERE id = ?", [resolvedParams.id]);
+    await pool.execute("DELETE FROM Event WHERE id = ?", [resolvedParams.id]);
 
     return NextResponse.json({ message: "Événement supprimé avec succès" });
   } catch (error) {
