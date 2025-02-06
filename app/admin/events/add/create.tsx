@@ -2,6 +2,7 @@
 import { FileUpload } from "@/components/common/file-upload";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Suggestion {
   properties: {
@@ -29,30 +30,33 @@ export default function CreateEvent() {
   const [images, setImages] = useState<File[]>([]);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       // Upload de la brochure si elle existe
       let brochurePath = null;
       if (brochure.length > 0) {
-        const formData = new FormData();
-        formData.append("file", brochure[0]);
+        const formDataBrochure = new FormData();
+        formDataBrochure.append("file", brochure[0]);
 
         const uploadResponse = await fetch("/api/upload", {
           method: "POST",
-          body: formData,
+          body: formDataBrochure,
         });
 
-        if (uploadResponse.ok) {
-          const { path } = await uploadResponse.json();
-          brochurePath = path;
+        if (!uploadResponse.ok) {
+          throw new Error("Erreur lors de l'upload de la brochure");
         }
+
+        const { path } = await uploadResponse.json();
+        brochurePath = path;
       }
 
-      // Création de l'événement
-      const eventResponse = await fetch("/api/events", {
+      // Création de l'événement avec le chemin de la brochure
+      const response = await fetch("/api/events", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -63,28 +67,14 @@ export default function CreateEvent() {
         }),
       });
 
-      if (eventResponse.ok) {
-        const eventData = await eventResponse.json();
-        const eventId = eventData.result.insertId;
-
-        // Upload des images si elles existent
-        if (images.length > 0) {
-          const imagesFormData = new FormData();
-          images.forEach((file) => {
-            imagesFormData.append("files", file);
-          });
-          imagesFormData.append("eventId", eventId);
-
-          await fetch("/api/upload/images", {
-            method: "POST",
-            body: imagesFormData,
-          });
-        }
-
-        window.location.href = "/admin/events";
+      if (!response.ok) {
+        throw new Error("Erreur lors de la création de l'événement");
       }
+
+      router.push("/admin/events");
     } catch (error) {
       console.error("Erreur:", error);
+      setError("Erreur lors de la création de l'événement");
     }
   };
 

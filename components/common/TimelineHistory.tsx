@@ -80,7 +80,7 @@ export function TimelineHistory() {
                           }}
                           className="inline-block mt-2 px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-medium hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
                         >
-                          Voir le détaille
+                          Voir le détail
                         </button>
                       </div>
                     ))}

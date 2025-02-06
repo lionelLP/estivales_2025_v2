@@ -1,6 +1,7 @@
 import { writeFile, access, mkdir } from "fs/promises";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
+import fs from "fs/promises";
 
 export async function POST(request: NextRequest) {
   try {
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
-    console.error("Erreur lors de l'upload:", error);
+    console.error("Erreur upload:", error);
     return NextResponse.json(
       { error: "Erreur lors de l'upload" },
       { status: 500 }
