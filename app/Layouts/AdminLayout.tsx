@@ -35,17 +35,23 @@ export default function AdminLayout({
     {
       label: "Tableau de bord",
       href: "/admin",
-      icon: <LayoutDashboard className="h-5 w-5" />,
+      icon: (
+        <LayoutDashboard className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
     },
     {
       label: "Partenaires",
       href: "/admin/partners",
-      icon: <Users className="h-5 w-5" />,
+      icon: (
+        <Users className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
     },
     {
       label: "À propos",
       href: "/admin/about",
-      icon: <FileText className="h-5 w-5" />,
+      icon: (
+        <FileText className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
     },
     {
       label: "Événements",
@@ -85,7 +91,9 @@ export default function AdminLayout({
     {
       label: "Mentions légales",
       href: "/admin/mentions-legales",
-      icon: <Scale className="h-5 w-5" />,
+      icon: (
+        <Scale className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
     },
   ];
 
