@@ -1,6 +1,6 @@
 "use client";
 
-import UnauthorizedPage from "@/app/unauthorized/page";
+import UnauthorizedPage from "@/app/unauthorized/unauthorized";
 import {
   FileText,
   Images,

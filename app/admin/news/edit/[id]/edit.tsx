@@ -1,17 +1,16 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Accès refusé | Estivales de Brou",
+  title: "Créer un Événement | Estivales de Brou",
   description:
-    "Vous n'avez pas les permissions nécessaires pour accéder à cette page",
+    "Interface d'administration pour la création d'un nouvel événement des Estivales de Brou",
   robots: {
     index: false,
     follow: false,
   },
   openGraph: {
-    title: "Accès refusé | Estivales de Brou",
-    description:
-      "Vous n'avez pas les permissions nécessaires pour accéder à cette page",
+    title: "Créer un Événement | Estivales de Brou",
+    description: "Création d'un nouvel événement pour les Estivales de Brou",
     images: [
       {
         url: "/homepage/banner/estivale2.jpg",
@@ -23,4 +22,4 @@ export const metadata: Metadata = {
   },
 };
 
-export { default } from "./unauthorized";
+export { default } from "./create";
