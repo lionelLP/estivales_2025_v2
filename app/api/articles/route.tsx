@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import pool from "@/lib/db/mysql";
-import { apiMiddleware } from "../middleware";
+import { apiMiddleware } from "@/app/api/middleware";
+import { verifyToken } from "@/lib/auth/jwt";
 
 interface Article {
   title: string;
@@ -64,7 +65,23 @@ export async function POST(request: NextRequest) {
     return middlewareResponse;
   }
 
+  const token = request.cookies.get("token");
+  if (!token) {
+    return NextResponse.json(
+      { error: "Non autorisé - Token manquant" },
+      { status: 401 }
+    );
+  }
+
   try {
+    const decoded = await verifyToken(token.value);
+    if (!decoded || decoded.userType !== 0) {
+      return NextResponse.json(
+        { error: "Non autorisé - Accès administrateur requis" },
+        { status: 403 }
+      );
+    }
+
     const body = (await request.json()) as Article;
     const connection = await pool.getConnection();
 
@@ -87,7 +104,7 @@ export async function POST(request: NextRequest) {
           body.content,
           formattedDate,
           body.is_published || 1,
-          body.user_id || 1,
+          decoded.userId,
           body.event_id || null,
           body.image || null,
           body.favicon || null,

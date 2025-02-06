@@ -133,11 +133,14 @@ export default function EventPage({
               {event.brochure_path && (
                 <a
                   href={event.brochure_path}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  download={`brochure-${event.title}.pdf`}
                   className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = event.brochure_path;
+                  }}
                 >
-                  Voir la brochure
+                  Télécharger la brochure
                 </a>
               )}
             </div>
