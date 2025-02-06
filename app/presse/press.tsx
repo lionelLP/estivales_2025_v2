@@ -38,9 +38,8 @@ export default function PressePage() {
         const response = await fetch("/api/articles");
         if (response.ok) {
           const articles = (await response.json()) as Article[];
-          const formattedItems = articles.map(
-            (article: Article, index: number) =>
-              formatArticleToItem(article, index)
+          const formattedItems = articles.map((article, index) =>
+            formatArticleToItem(article, index)
           );
           setItems(formattedItems);
         }
@@ -52,7 +51,9 @@ export default function PressePage() {
     };
 
     fetchArticles();
-  }, [componentLoaded, registerLoadingComponent]);
+    // Run this effect only once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const formatArticleToItem = (article: Article, index: number) => {
     const formattedDate = new Date(article.Creation_article).toLocaleDateString(
@@ -103,14 +104,20 @@ export default function PressePage() {
           rel="noopener noreferrer"
           className="block w-full"
         >
-          <div className="relative w-full h-44">
-            <Image
-              src={article.image}
-              alt={article.title}
-              fill
-              className="object-cover rounded-lg"
-            />
-          </div>
+          {article.image ? (
+            <div className="relative w-full h-44">
+              <Image
+                src={article.image}
+                alt={article.title}
+                fill
+                className="object-cover rounded-lg"
+              />
+            </div>
+          ) : (
+            <div className="relative w-full h-44 bg-gray-200 flex items-center justify-center">
+              <span className="text-gray-500">Aucune image disponible</span>
+            </div>
+          )}
         </Link>
       ),
       className: `${
