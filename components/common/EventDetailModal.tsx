@@ -53,9 +53,9 @@ export function EventDetailModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-3xl w-full p-6 relative">
-        <div className="flex flex-col items-center relative">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-3xl w-full p-6 relative my-8">
+        <div className="flex flex-col items-center relative max-h-[80vh] overflow-y-auto">
           <div className="absolute left-0 flex items-center gap-1 text-gray-300">
             <Armchair className="w-5 h-5" />
             <span>{event.max_participants}</span>
