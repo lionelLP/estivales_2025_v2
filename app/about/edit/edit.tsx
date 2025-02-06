@@ -11,6 +11,7 @@ const ReactQuill = dynamic(() => import("react-quill"), {
 
 import "react-quill/dist/quill.snow.css";
 
+// Updated toolbar configuration with indent controls for lists.
 const modules = {
   toolbar: [
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
@@ -23,6 +24,25 @@ const modules = {
     ["code-block"],
   ],
 };
+
+// Allowed formats for ReactQuill, including list and indent options.
+const formats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "blockquote",
+  "list",
+  "bullet",
+  "indent",
+  "align",
+  "link",
+  "image",
+  "color",
+  "background",
+  "code-block",
+];
 
 export default function EditAbout() {
   const [content, setContent] = useState("");
@@ -84,6 +104,7 @@ export default function EditAbout() {
           value={content}
           onChange={setContent}
           modules={modules}
+          formats={formats}
           className="h-[500px] mb-12"
         />
       </div>

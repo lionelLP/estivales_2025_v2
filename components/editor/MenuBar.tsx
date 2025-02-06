@@ -73,10 +73,12 @@ export const MenuBar = ({
         {/* Titres */}
         <select
           onChange={(e) => {
-            const level = parseInt(e.target.value) as Level;
-            void (level
-              ? editor.chain().focus().toggleHeading({ level }).run()
-              : editor.chain().focus().setParagraph().run());
+            const value = parseInt(e.target.value);
+            if (value === 0) {
+              editor.chain().focus().setParagraph().run();
+            } else {
+              editor.chain().focus().toggleHeading({ level: value as Level }).run();
+            }
           }}
           className="p-2 rounded border"
           value={

@@ -89,10 +89,15 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     fileInputRef.current?.click();
   };
 
+  const handleDrop = (acceptedFiles: File[]) => {
+    setFiles(acceptedFiles);
+    onChange(acceptedFiles);
+  };
+
   const { getRootProps, isDragActive } = useDropzone({
     multiple,
     noClick: true,
-    onDrop: handleFileChange,
+    onDrop: handleDrop,
     accept: accept ? { [accept]: [] } : undefined,
     onDropRejected: (error) => {
       console.log(error);
