@@ -98,6 +98,8 @@ export default function EditLegal() {
   }, [editor]);
 
   const handleSave = async () => {
+    if (!editor?.getHTML()) return;
+
     setIsSaving(true);
     try {
       const response = await fetch("/api/legal", {
@@ -105,11 +107,13 @@ export default function EditLegal() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ html_content: editor?.getHTML() }),
+        body: JSON.stringify({ html_content: editor.getHTML() }),
       });
 
       if (response.ok) {
         router.push("/mentions-legales");
+      } else {
+        console.error("Erreur lors de la sauvegarde");
       }
     } catch (error) {
       console.error("Erreur lors de la sauvegarde:", error);
