@@ -1,8 +1,6 @@
 import { Editor } from "@tiptap/react";
 import { useCallback } from "react";
 
-type Level = 1 | 2 | 3;
-
 interface MenuBarProps {
   editor: Editor | null;
   onImageUpload?: (file: File) => Promise<string>;
@@ -70,35 +68,6 @@ export const MenuBar = ({
 
         <div className="w-px h-6 bg-gray-300 mx-2"></div>
 
-        {/* Titres */}
-        <select
-          onChange={(e) => {
-            const value = parseInt(e.target.value);
-            if (value === 0) {
-              editor.chain().focus().setParagraph().run();
-            } else {
-              editor.chain().focus().toggleHeading({ level: value as Level }).run();
-            }
-          }}
-          className="p-2 rounded border"
-          value={
-            editor.isActive("heading", { level: 1 })
-              ? "1"
-              : editor.isActive("heading", { level: 2 })
-              ? "2"
-              : editor.isActive("heading", { level: 3 })
-              ? "3"
-              : "0"
-          }
-        >
-          <option value="0">Paragraphe</option>
-          <option value="1">Titre 1</option>
-          <option value="2">Titre 2</option>
-          <option value="3">Titre 3</option>
-        </select>
-
-        <div className="w-px h-6 bg-gray-300 mx-2"></div>
-
         {/* Alignement */}
         <button
           onClick={() => editor.chain().focus().setTextAlign("left").run()}
@@ -130,28 +99,6 @@ export const MenuBar = ({
       </div>
 
       <div className="flex flex-wrap gap-2 w-full">
-        {/* Listes */}
-        <button
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`p-2 rounded ${
-            editor.isActive("bulletList") ? "bg-gray-200" : ""
-          }`}
-          title="Liste à puces"
-        >
-          <i className="fas fa-list-ul"></i>
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`p-2 rounded ${
-            editor.isActive("orderedList") ? "bg-gray-200" : ""
-          }`}
-          title="Liste numérotée"
-        >
-          <i className="fas fa-list-ol"></i>
-        </button>
-
-        <div className="w-px h-6 bg-gray-300 mx-2"></div>
-
         {/* Couleurs */}
         <input
           type="color"
