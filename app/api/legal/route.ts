@@ -3,13 +3,17 @@ import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
+interface LegalContent {
+  html_content: string;
+}
+
 export async function GET() {
   try {
-    const [content] = await db.execute(
+    const [rows] = (await db.execute(
       "SELECT html_content FROM LegalContent ORDER BY created_at DESC LIMIT 1"
-    );
+    )) as [LegalContent[], unknown];
 
-    return NextResponse.json(content[0] || { html_content: "" });
+    return NextResponse.json(rows[0] || { html_content: "" });
   } catch (error) {
     console.error("Erreur lors de la récupération du contenu:", error);
     return NextResponse.json(
