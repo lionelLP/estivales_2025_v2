@@ -1,16 +1,17 @@
 "use client";
 import Logout from "@/components/common/Logout";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
-import { IconHome } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import {
   ChevronDown,
   FileText,
   Images,
+  LayoutDashboard,
   LogOut,
   Mail,
   Newspaper,
   PartyPopper,
+  Scale,
   User,
   Users,
 } from "lucide-react";
@@ -34,23 +35,17 @@ export default function AdminLayout({
     {
       label: "Tableau de bord",
       href: "/admin",
-      icon: (
-        <IconHome className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
+      icon: <LayoutDashboard className="h-5 w-5" />,
     },
     {
       label: "Partenaires",
       href: "/admin/partners",
-      icon: (
-        <Users className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
+      icon: <Users className="h-5 w-5" />,
     },
     {
-      label: "A propos",
+      label: "À propos",
       href: "/admin/about",
-      icon: (
-        <FileText className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-      ),
+      icon: <FileText className="h-5 w-5" />,
     },
     {
       label: "Événements",
@@ -86,6 +81,11 @@ export default function AdminLayout({
       icon: (
         <Users className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
+    },
+    {
+      label: "Mentions légales",
+      href: "/admin/mentions-legales",
+      icon: <Scale className="h-5 w-5" />,
     },
   ];
 

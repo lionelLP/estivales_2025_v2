@@ -7,6 +7,7 @@ import {
   Mail,
   Newspaper,
   PartyPopper,
+  Scale,
   UserPlus,
   Users,
 } from "lucide-react";
@@ -56,6 +57,13 @@ export default function AdminPage() {
       icon: <FileText className="h-12 w-12" />,
       description: "Modifier la page À propos",
       color: "bg-green-500",
+    },
+    {
+      label: "Mentions légales",
+      href: "/admin/mentions-legales",
+      icon: <Scale className="h-12 w-12" />,
+      description: "Modifier les mentions légales",
+      color: "bg-yellow-500",
     },
     {
       label: "Événements",
