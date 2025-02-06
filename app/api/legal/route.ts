@@ -1,7 +1,7 @@
-import { authOptions } from "@/lib/auth";
+import { verifyToken } from "@/lib/auth/jwt";
 import { db } from "@/lib/db";
-import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { apiMiddleware } from "../middleware";
 
 interface LegalContent {
   html_content: string;
@@ -23,11 +23,27 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const middlewareResponse = await apiMiddleware(request);
+  if (middlewareResponse.status !== 200) {
+    return middlewareResponse;
+  }
+
+  const token = request.cookies.get("token");
+  if (!token) {
+    return NextResponse.json(
+      { error: "Non autorisé - Token manquant" },
+      { status: 401 }
+    );
+  }
+
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    const decoded = await verifyToken(token.value);
+    if (!decoded || decoded.userType !== 0) {
+      return NextResponse.json(
+        { error: "Non autorisé - Accès administrateur requis" },
+        { status: 403 }
+      );
     }
 
     const { html_content } = await request.json();
