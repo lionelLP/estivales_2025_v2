@@ -51,7 +51,7 @@ export default function MediaPage() {
           Galerie Média
         </h1>
         <div className="flex justify-center items-center">
-          <div className="w-full">
+          <div className="w-full ">
             <ParallaxScroll media={media} />
           </div>
         </div>

@@ -64,63 +64,65 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
         className="h-[150vh] md:h-[300vh] flex items-start justify-center overflow-hidden"
       >
         <div className="sticky top-0 flex h-screen items-center justify-center">
-          <div className="grid grid-cols-3 gap-4 px-4 max-w-7xl mx-auto">
-            {rows.map((row, rowIndex) => (
-              <motion.div
-                key={rowIndex}
-                style={{
-                  y:
-                    rowIndex === 1
-                      ? translateSecond
-                      : rowIndex === 2
-                      ? translateThird
-                      : translateFirst,
-                }}
-                className="flex flex-col gap-4"
-              >
-                {row.map((item) => (
-                  <div
-                    key={item.id}
-                    className="group relative rounded-lg overflow-hidden cursor-pointer"
-                    onClick={() => {
-                      if (isYoutubeUrl(item.url)) {
-                        setSelectedVideo(item.url);
-                      }
-                    }}
-                  >
-                    {isYoutubeUrl(item.url) ? (
-                      <div className="h-[200px] md:h-[350px] w-full md:w-[250px] relative">
-                        <div className="relative w-full h-full bg-black flex items-center justify-center">
-                          <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center">
-                            <svg
-                              className="w-6 h-6 md:w-8 md:h-8 text-white"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path d="M8 5v14l11-7z" />
-                            </svg>
+          <div className="pt-[200px] md:pt-[600px]">
+            <div className="grid grid-cols-3 gap-4 px-4 max-w-7xl mx-auto">
+              {rows.map((row, rowIndex) => (
+                <motion.div
+                  key={rowIndex}
+                  style={{
+                    y:
+                      rowIndex === 1
+                        ? translateSecond
+                        : rowIndex === 2
+                        ? translateThird
+                        : translateFirst,
+                  }}
+                  className="flex flex-col gap-4"
+                >
+                  {row.map((item) => (
+                    <div
+                      key={item.id}
+                      className="group relative rounded-lg overflow-hidden cursor-pointer"
+                      onClick={() => {
+                        if (isYoutubeUrl(item.url)) {
+                          setSelectedVideo(item.url);
+                        }
+                      }}
+                    >
+                      {isYoutubeUrl(item.url) ? (
+                        <div className="h-[200px] md:h-[350px] w-full md:w-[250px] relative">
+                          <div className="relative w-full h-full bg-black flex items-center justify-center">
+                            <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center">
+                              <svg
+                                className="w-6 h-6 md:w-8 md:h-8 text-white"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path d="M8 5v14l11-7z" />
+                              </svg>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ) : (
-                      <ImageViewer
-                        src={item.url}
-                        alt={item.alt_text || item.title}
-                      >
-                        <div className="h-[200px] md:h-[350px] w-full md:w-[250px] relative">
-                          <Image
-                            src={item.url}
-                            alt={item.alt_text || item.title}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                      </ImageViewer>
-                    )}
-                  </div>
-                ))}
-              </motion.div>
-            ))}
+                      ) : (
+                        <ImageViewer
+                          src={item.url}
+                          alt={item.alt_text || item.title}
+                        >
+                          <div className="h-[200px] md:h-[350px] w-full md:w-[250px] relative">
+                            <Image
+                              src={item.url}
+                              alt={item.alt_text || item.title}
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          </div>
+                        </ImageViewer>
+                      )}
+                    </div>
+                  ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
