@@ -1,9 +1,16 @@
 import { verifyToken } from "@/lib/auth/jwt";
 import pool from "@/lib/db/mysql";
 import { unlink, writeFile } from "fs/promises";
+import { RowDataPacket } from "mysql2";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import path from "path";
+
+interface PartenaireRow extends RowDataPacket {
+  id: number;
+  logo_url: string | null;
+  banner_url: string | null;
+}
 
 export async function GET(
   request: Request,
@@ -38,31 +45,48 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: Request,
-  context: { params: Promise<{ id: string }> }
-) {
-  // Vérification de l'authentification
+// Fonction utilitaire pour vérifier l'authentification admin
+async function checkAdminAuth() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
 
   if (!token) {
-    return NextResponse.json({ message: "Non autorisé" }, { status: 401 });
+    return false;
+  }
+
+  const decoded = await verifyToken(token.value);
+  return decoded && decoded.userType === 0; // 0 = ADMIN
+}
+
+export async function PUT(
+  request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  // Vérification admin
+  if (!(await checkAdminAuth())) {
+    return NextResponse.json(
+      { error: "Non autorisé - Accès administrateur requis" },
+      { status: 403 }
+    );
   }
 
   try {
-    const decoded = await verifyToken(token.value);
-    if (!decoded) {
-      return NextResponse.json({ message: "Token invalide" }, { status: 401 });
-    }
-
     const formData = await request.formData();
     const { id } = await context.params;
+
+    // Validation des données
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const website_url = formData.get("website_url") as string;
     const logo = formData.get("logo") as File | null;
     const banner = formData.get("banner") as File | null;
+
+    if (!name || !description || !website_url) {
+      return NextResponse.json(
+        { error: "Les champs name, description et website_url sont requis" },
+        { status: 400 }
+      );
+    }
 
     const connection = await pool.getConnection();
     try {
@@ -118,7 +142,7 @@ export async function PUT(
   } catch (error) {
     console.error("Error updating partner:", error);
     return NextResponse.json(
-      { error: "Error updating partner" },
+      { error: "Erreur lors de la mise à jour du partenaire" },
       { status: 500 }
     );
   }
@@ -128,26 +152,29 @@ export async function DELETE(
   request: Request,
   context: { params: Promise<{ id: string }> }
 ) {
+  // Vérification admin
+  if (!(await checkAdminAuth())) {
+    return NextResponse.json(
+      { error: "Non autorisé - Accès administrateur requis" },
+      { status: 403 }
+    );
+  }
+
   const connection = await pool.getConnection();
 
   try {
     const { id } = await context.params;
-    // First, get the current files to delete them
-    const [existingPartners] = await connection.execute(
+
+    // Vérification que le partenaire existe
+    const [existingPartners] = await connection.execute<PartenaireRow[]>(
       "SELECT logo_url, banner_url FROM Partenaire WHERE id = ?",
       [id]
     );
 
-    interface Partner {
-      logo_url: string | null;
-      banner_url: string | null;
-    }
-
-    const existingPartner = (existingPartners as Partner[])[0];
-    if (!existingPartner) {
+    if (!existingPartners || existingPartners.length === 0) {
       connection.release();
       return NextResponse.json(
-        { message: "Partenaire non trouvé" },
+        { error: "Partenaire non trouvé" },
         { status: 404 }
       );
     }
@@ -156,6 +183,7 @@ export async function DELETE(
     const uploadsDir = path.join(process.cwd(), "public");
 
     try {
+      const existingPartner = existingPartners[0];
       if (existingPartner.logo_url) {
         await unlink(path.join(uploadsDir, existingPartner.logo_url));
       }
@@ -175,7 +203,7 @@ export async function DELETE(
     console.error("Error deleting partner:", error);
     connection.release();
     return NextResponse.json(
-      { message: "Erreur lors de la suppression du partenaire" },
+      { error: "Erreur lors de la suppression du partenaire" },
       { status: 500 }
     );
   }
