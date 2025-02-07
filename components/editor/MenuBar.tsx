@@ -13,7 +13,7 @@ export const MenuBar = ({
   disableImage = false,
 }: MenuBarProps) => {
   // Define an active class for all selected buttons
-  const activeClass = "bg-zinc-600";
+  const activeClass = "dark:bg-zinc-600 bg-zinc-200";
 
   const handleImageUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
