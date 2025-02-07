@@ -166,6 +166,7 @@ export function EventDetailModal({
                 fill
                 className="object-contain"
                 priority
+                unoptimized
               />
               <button
                 onClick={() => setSelectedImage(null)}

@@ -3,7 +3,7 @@ import { writeFile } from "fs/promises";
 import { ResultSetHeader } from "mysql2";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
-import { convertToWebP } from "@/lib/imageTransformer";
+import { convertToWebP, isImage } from "@/lib/imageTransformer";
 import { apiMiddleware } from "../../middleware";
 
 export async function POST(request: NextRequest) {
@@ -30,7 +30,12 @@ export async function POST(request: NextRequest) {
     try {
       for (const file of files) {
         const buffer = Buffer.from(await file.arrayBuffer());
-        const filename = `${Date.now()}_${file.name.replace(/\s+/g, "_")}.webp`;
+        if (!isImage(file.name)) {
+          throw new Error(`Invalid image format for file: ${file.name}`);
+        }
+        const originalName = path.parse(file.name).name;
+        const sanitizedOriginalName = originalName.replace(/[^a-zA-Z0-9-_]/g, "_");
+        const filename = `${Date.now()}_${sanitizedOriginalName}.webp`;
         const filepath = path.join(
           process.cwd(),
           "public",
@@ -41,19 +46,25 @@ export async function POST(request: NextRequest) {
         const relativePath = `/uploads/events/${filename}`;
 
         // Convert the image to WebP
+        try {
+          console.log('Starting WebP conversion for file:', file.name);
+          const webpBuffer = await convertToWebP(buffer);
+          console.log('WebP conversion successful. Buffer size:', webpBuffer.length);
+        } catch (convError) {
+          console.error('Conversion failed for', file.name, convError);
+          throw new Error(`Failed to convert ${file.name} to WebP`);
+        }
         const webpBuffer = await convertToWebP(buffer);
-
         await writeFile(filepath, webpBuffer);
 
-        // Insérer dans la table Media
+        // Insert into the Media table
         const [mediaResult] = await connection.execute(
           `INSERT INTO Media (url, type, title, size) VALUES (?, ?, ?, ?)`,
-          [relativePath, file.type, file.name, file.size]
+          [relativePath, 'image/webp', file.name, webpBuffer.length]
         );
-
         const mediaId = (mediaResult as ResultSetHeader).insertId;
 
-        // Créer la relation dans Event_Media
+        // Create the relationship in Event_Media
         if (eventId) {
           await connection.execute(
             `INSERT INTO Event_Media (event_id, media_id) VALUES (?, ?)`,

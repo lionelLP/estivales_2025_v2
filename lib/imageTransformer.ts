@@ -2,13 +2,16 @@ import sharp from 'sharp';
 
 export async function convertToWebP(buffer: Buffer): Promise<Buffer> {
   try {
-    return await sharp(buffer)
-      .rotate() // Auto-rotate based on EXIF data
-      .webp({ quality: 80 }) // Adjust quality as needed (0-100)
+    console.log('Processing image with Sharp. Input buffer size:', buffer.length);
+    const result = await sharp(buffer)
+      .rotate()
+      .webp({ quality: 70 })
       .toBuffer();
-  } catch (error) {
-    console.error('Error converting image to WebP:', error);
-    throw error;
+    console.log('Sharp processing successful. Output buffer size:', result.length);
+    return result;
+  } catch (error: unknown) {
+    console.error('Sharp processing error:', error instanceof Error ? error.message : 'Unknown error', error instanceof Error ? error.stack : '');
+    throw new Error('Failed to process image: ' + (error instanceof Error ? error.message : 'Unknown error'));
   }
 }
 
