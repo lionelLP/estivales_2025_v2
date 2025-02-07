@@ -164,7 +164,7 @@ export default function Contact() {
                 onChange={handleChange}
                 required
                 rows={6}
-                className="w-full rounded-lg border p-3 bg-white dark:bg-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500 transition"
+                className="w-full rounded-lg border p-3 bg-white dark:bg-neutral-800 shadow-sm focus:ring-2 focus:ring-blue-500 transition"
               />
             </div>
 
