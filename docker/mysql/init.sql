@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `User` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-INSERT INTO `User` (`username`, `password`, `email`, `userType`) VALUES ('admin', '$2y$10$CtKRUG6SycVbsKkob.4cOuSdRzrStM2cIqD9yAm0yaygv3bUbWsOm', 'admin@admin.com', 0);
+INSERT INTO `User` (`username`, `password`, `email`, `userType`) VALUES ('admin', '$2y$10$L9oxsKt62MUggllDPh6FDe1w2cLIrNTGkpw0Pj4byGix94rsKN2UC', 'admin@admin.com', 0);
 
 
 CREATE TABLE IF NOT EXISTS `AboutContent` (
