@@ -1,6 +1,5 @@
 "use client";
 
-import { AddressAutocomplete } from "@/components/common/AddressAutocomplete";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -138,30 +137,6 @@ export default function Contact() {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">Adresse</label>
-              <AddressAutocomplete
-                value={formData.address}
-                onChange={(value) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    address: value,
-                  }))
-                }
-                onSelect={(address) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    address: address.label,
-                    city: address.city,
-                    postcode: address.postcode,
-                    coordinates: address.coordinates,
-                  }))
-                }
-                placeholder="Entrez votre adresse"
                 required
               />
             </div>
