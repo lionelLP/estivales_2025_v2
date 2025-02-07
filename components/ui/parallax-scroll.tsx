@@ -63,8 +63,7 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
         ref={containerRef}
         className="h-[130vh] md:h-[205vh] flex items-start justify-center overflow-hidden"
       >
-        <div className="sticky top-0 flex h-screen items-center justify-center">
-          <div className="pt-[200px] md:pt-[600px]">
+        <div className="sticky top-0 flex h-screen items-start justify-center">
             <div className="grid grid-cols-3 gap-4 px-4 max-w-7xl mx-auto">
               {rows.map((row, rowIndex) => (
                 <motion.div
@@ -122,7 +121,6 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
                   ))}
                 </motion.div>
               ))}
-            </div>
           </div>
         </div>
       </div>
