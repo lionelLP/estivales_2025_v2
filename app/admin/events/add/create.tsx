@@ -221,6 +221,7 @@ export default function CreateEvent() {
                 formData.location.length > 2 && setShowSuggestions(true)
               }
               placeholder="Entrez une adresse"
+              className="w-full rounded-lg border p-2 bg-white dark:bg-neutral-950 shadow-sm focus:ring-2 focus:ring-blue-500 transition"
             />
 
             {showSuggestions && suggestions.length > 0 && (
