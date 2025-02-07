@@ -154,33 +154,85 @@ git clone https://iutbg-gitlab.iutbourg.univ-lyon1.fr/sae-but31/2024-25-web/esti
 
 2. Configuration des variables d'environnement :
 
-```3:4:README.md
-Dans le projet, modifier le fichier .env.example avec les bonnes informations.
-Renommer le fichier .env.exemple en .env
+```bash
+# Copier le fichier d'exemple
+cp .env.example .env
 ```
 
-Decriptif des variables d'environnement :
+Voici le contenu complet du fichier `.env` à configurer :
 
+```bash
+# Configuration GitLab
+GITLAB_TOKEN=     # Votre token d'accès GitLab
+
+# Configuration de la base de données
+DB_HOST=db        # Nom du service dans docker-compose
+DB_USER=          # Votre nom d'utilisateur MySQL
+DB_PASSWORD=      # Votre mot de passe MySQL
+DB_NAME=          # Nom de votre base de données
+
+# Configuration phpMyAdmin
+MYSQL_ROOT_PASSWORD=  # Mot de passe root MySQL
+MYSQL_DATABASE=       # Même nom que DB_NAME
+MYSQL_USER=          # Même nom que DB_USER
+MYSQL_PASSWORD=      # Même mot de passe que DB_PASSWORD
+PMA_HOST=db          # Même valeur que DB_HOST
+PMA_USER=            # Même nom que DB_USER
+PMA_PASSWORD=        # Même mot de passe que DB_PASSWORD
+
+# Configuration SMTP pour l'envoi d'emails
+SMTP_HOST=        # Exemple : smtp.gmail.com
+SMTP_PORT=        # Exemple : 587 pour TLS
+SMTP_SECURE=      # true pour SSL, false pour TLS
+SMTP_USER=        # Votre adresse email
+SMTP_PASSWORD=    # Votre mot de passe SMTP
+SMTP_FROM=        # Adresse d'envoi des emails
+CONTACT_EMAIL=    # Adresse de réception des formulaires de contact
+
+# Configuration du site
+NEXT_PUBLIC_BASE_URL=  # URL complète de votre site (https://votre-domaine.com)
+
+# Sécurité
+JWT_SECRET=       # Chaîne aléatoire pour sécuriser les tokens
 ```
-GITLAB_TOKEN= # Token du git du projet
 
-DB_HOST= # Emplacement de la base de données
-DB_USER= # Nom d'utilisateur de la base de données
-DB_PASSWORD= # Mot de passe de la base de données
-DB_NAME= # Nom de la base de données
-SMTP_HOST= # Emplacement du serveur SMTP
-SMTP_PORT= # Port du serveur SMTP
-SMTP_SECURE= # Si le serveur SMTP utilise un protocole sécurisé
-SMTP_USER= # Nom d'utilisateur du serveur SMTP
-SMTP_PASSWORD= # Mot de passe du serveur SMTP
-SMTP_FROM= # Adresse email de l'expéditeur
-NEXT_PUBLIC_BASE_URL= # URL de l'application
-JWT_SECRET= # Clé secrète pour le token JWT (générer une clé secrète avec openssl)
+### Guide de configuration
+
+#### 1. Base de données
+
+La base de données est configurée via Docker. Assurez-vous que les variables DB*\* et MYSQL*\* correspondent entre elles. Le `DB_HOST` doit être `db` car c'est le nom du service dans le docker-compose.
+
+#### 2. Serveur SMTP
+
+Pour configurer l'envoi d'emails, vous avez plusieurs options :
+
+**Avec Gmail :**
+
+1. Activez l'authentification à deux facteurs sur votre compte Google
+2. Générez un "mot de passe d'application" dans les paramètres de sécurité
+3. Utilisez ce mot de passe comme `SMTP_PASSWORD`
+4. Configurez les variables :
+   - SMTP_HOST=smtp.gmail.com
+   - SMTP_PORT=587
+   - SMTP_SECURE=false
+
+Autres services disponibles : SendGrid, Amazon SES, etc.
+
+#### 3. URL du site
+
+Le `NEXT_PUBLIC_BASE_URL` doit être l'URL complète de votre site, incluant le protocole https://. Par exemple : https://estivales-brou.fr
+
+#### 4. Sécurité
+
+Pour générer une chaîne aléatoire sécurisée pour `JWT_SECRET`, utilisez la commande :
+
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 
 3. Lancement avec Docker :
 
-```
+```bash
 docker compose up -d
 ```
 
