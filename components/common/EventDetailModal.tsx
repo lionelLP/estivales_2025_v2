@@ -133,7 +133,7 @@ export function EventDetailModal({
                 href={event.brochure_path}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 text-center py-3 px-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
+                className="flex items-center justify-center gap-2 text-center py-3 px-4 bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 rounded-lg transition"
               >
                 <Download className="w-5 h-5" />
                 <span>Télécharger la brochure</span>
