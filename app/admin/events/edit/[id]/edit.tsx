@@ -304,7 +304,7 @@ export default function EditEvent({
           <button
             type="button"
             onClick={() => router.push("/admin/events")}
-            className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
+            className="flex-1 bg-gray-200 text-neutral-900 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
           >
             Annuler
           </button>

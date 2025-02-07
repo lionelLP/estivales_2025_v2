@@ -85,7 +85,7 @@ export default function Events() {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-gray-800 shadow-md rounded-lg">
+        <table className="min-w-full bg-white dark:bg-neutral-900 shadow-md rounded-lg">
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">

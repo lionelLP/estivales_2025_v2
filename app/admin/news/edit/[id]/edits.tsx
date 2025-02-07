@@ -159,7 +159,7 @@ export default function EditNews({ params }: { params: Promise<{ id: string }> }
           <button
             type="button"
             onClick={() => router.push("/admin/news")}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            className="px-4 py-2 text-gray-600 hover:text-neutral-900"
           >
             Annuler
           </button>

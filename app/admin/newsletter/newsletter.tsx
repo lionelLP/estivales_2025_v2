@@ -118,7 +118,7 @@ export default function NewsletterPage() {
         <div className="flex justify-end gap-4">
           <button
             onClick={() => router.push("/admin")}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            className="px-4 py-2 text-gray-600 hover:text-neutral-900"
           >
             Annuler
           </button>
