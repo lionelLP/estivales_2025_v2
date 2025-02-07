@@ -96,7 +96,7 @@ export default function Contact() {
       >
         <h1 className="text-3xl font-bold text-center mb-12">Contactez-nous</h1>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8">
+        <div className="bg-white dark:bg-neutral-900 rounded-lg shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-8">
             {submitStatus === "error" && (
               <div className="bg-red-50 text-red-500 p-4 rounded-lg">

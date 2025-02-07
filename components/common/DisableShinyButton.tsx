@@ -16,7 +16,7 @@ const ShinyButton = ({
     <motion.button
       whileTap={{ scale: 0.95 }}
       className={cn(
-        "relative rounded-lg px-6 py-2 font-medium backdrop-blur-xl transition-[box-shadow] duration-300 ease-in-out hover:shadow bg-gray-200 text-gray-800 overflow-hidden cursor-not-allowed",
+        "relative rounded-lg px-6 py-2 font-medium backdrop-blur-xl transition-[box-shadow] duration-300 ease-in-out hover:shadow bg-gray-200 text-neutral-900 overflow-hidden cursor-not-allowed",
         className
       )}
     >

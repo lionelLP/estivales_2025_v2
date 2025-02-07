@@ -26,7 +26,7 @@ export function ImageViewer({ src, alt, children }: ImageViewerProps) {
         <div className="fixed inset-0 flex items-center justify-center">
           <div className="relative w-auto h-auto max-w-[90vw] max-h-[90vh]">
             <DialogPrimitive.Close className="absolute -right-4 -top-4 p-2 rounded-full bg-white shadow-lg hover:bg-gray-200 transition-all z-50">
-              <X className="w-6 h-6 text-gray-800" />
+              <X className="w-6 h-6 text-neutral-900" />
             </DialogPrimitive.Close>
             <Image
               src={src}
