@@ -1,12 +1,3 @@
-# Déploiement
-
-Dans le dossier docker, modifier le fichier .env.local avec les bonnes informations.
-Renommer le fichier .env.local en .env
-
-```bash
-docker compose up -d
-```
-
 ## Utilisation
 
 Survoler l'icone de l'utilisateur en haut à droite de l'écran. Puis cliquer sur "Se connecter".
@@ -94,6 +85,12 @@ Dans la page medias vous pouvez voir tous les medias qui on été ajouter via de
 Dans la sections vous pouvez envoyer une newsletter à tous les utilisateurs qui ce sont inscrit à la newsletter.
 
 Pour rappelle une newsletter est egalement envoyé par mail à chaque nouvelle création d'évènement.
+
+#### Mentions légales
+
+![alt text](README/image-20.png)
+
+Dans la section "Mentions légales" vous pouvez écrire vos mentions légales et les afficher sur la page d'accueil.
 
 ### Interface utilisateur
 
