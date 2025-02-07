@@ -1,5 +1,24 @@
+import { verifyToken } from "@/lib/auth/jwt";
 import pool from "@/lib/db/mysql";
+import { RowDataPacket } from "mysql2";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+
+interface EventRow extends RowDataPacket {
+  user_id: number;
+}
+
+// Middleware de vérification d'authentification
+async function checkAuth() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token");
+
+  if (!token) {
+    return null;
+  }
+
+  return await verifyToken(token.value);
+}
 
 export async function GET(
   request: Request,
@@ -59,6 +78,30 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Vérification de l'authentification
+  const user = await checkAuth();
+  if (!user) {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  // Vérification des permissions (ADMIN ou propriétaire de l'événement)
+  if (user.userType !== 0) {
+    const resolvedParams = await params;
+    const connection = await pool.getConnection();
+    const [event] = await connection.execute<EventRow[]>(
+      "SELECT user_id FROM Event WHERE id = ?",
+      [resolvedParams.id]
+    );
+    connection.release();
+
+    if (!event || event[0]?.user_id !== user.userId) {
+      return NextResponse.json(
+        { error: "Permission refusée" },
+        { status: 403 }
+      );
+    }
+  }
+
   try {
     const resolvedParams = await params;
     const body = await request.json();
@@ -130,6 +173,17 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Vérification de l'authentification
+  const user = await checkAuth();
+  if (!user) {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  // Seuls les ADMIN peuvent supprimer des événements
+  if (user.userType !== 0) {
+    return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  }
+
   try {
     const resolvedParams = await params;
     // Suppression des images associées
