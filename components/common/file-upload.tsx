@@ -54,25 +54,26 @@ interface FileUploadProps {
   onChange: (files: File[]) => void;
   maxFiles?: number;
   initialFiles?: File[];
+  id: string;
   accept?: string;
-  multiple?: boolean;
 }
 
 export const FileUpload: React.FC<FileUploadProps> = ({
   onChange,
   maxFiles = 3,
   initialFiles = [],
+  id,
   accept,
-  multiple = true,
 }) => {
   const [files, setFiles] = useState<File[]>(initialFiles);
   const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    onChange(files);
+  const handleFileChange = (newFiles: File[]) => {
+    const updatedFiles = [...files, ...newFiles].slice(0, maxFiles);
+    setFiles(updatedFiles);
+    if (onChange) onChange(updatedFiles);
   };
 
   const handleRemoveFile = (index: number) => {
@@ -80,25 +81,19 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     setTimeout(() => {
       const updatedFiles = files.filter((_, idx) => idx !== index);
       setFiles(updatedFiles);
-      onChange(updatedFiles);
+      if (onChange) onChange(updatedFiles);
       setDeletingIndex(null);
-    }, 200); // Réduit le délai à 200ms pour correspondre à la durée de l'animation
+    }, 200);
   };
 
   const handleClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleDrop = (acceptedFiles: File[]) => {
-    setFiles(acceptedFiles);
-    onChange(acceptedFiles);
-  };
-
   const { getRootProps, isDragActive } = useDropzone({
-    multiple,
+    multiple: true,
     noClick: true,
-    onDrop: handleDrop,
-    accept: accept ? { [accept]: [] } : undefined,
+    onDrop: handleFileChange,
     onDropRejected: (error) => {
       console.log(error);
     },
@@ -113,18 +108,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       >
         <input
           ref={fileInputRef}
-          id="file-upload-handle"
+          id={`file-upload-handle-${id}`}
           type="file"
-          multiple={multiple}
+          multiple
           accept={accept}
-          onChange={handleFileChange}
+          onChange={(e) => handleFileChange(Array.from(e.target.files || []))}
           className="hidden"
         />
         <div className="">
           <div className="relative w-full mt-10 max-w-xl mx-auto">
             {files.length < maxFiles && (
               <motion.div
-                layoutId="file-upload"
+                layoutId={`file-upload-${id}`}
                 variants={mainVariant}
                 transition={{
                   type: "spring",
@@ -162,14 +157,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               {files.map((file, idx) => {
                 return (
                   <motion.div
-                    key={`file-${idx}`}
+                    key={`file-${id}-${idx}`}
                     className="flex items-center gap-2 mt-4"
                     variants={fileCardVariant}
                     initial="initial"
                     exit="exit"
                   >
                     <motion.div
-                      layoutId={`file-upload-${idx}`}
+                      layoutId={`file-upload-${id}-${idx}`}
                       className={cn(
                         "relative overflow-hidden z-40 bg-white dark:bg-neutral-900 flex flex-col items-start justify-start md:h-24 p-4 w-full rounded-md",
                         "shadow-sm"

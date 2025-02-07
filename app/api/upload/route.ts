@@ -1,7 +1,6 @@
-import { writeFile, access, mkdir } from "fs/promises";
+import { access, mkdir, writeFile } from "fs/promises";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
-import fs from "fs/promises";
 
 export async function POST(request: NextRequest) {
   try {
