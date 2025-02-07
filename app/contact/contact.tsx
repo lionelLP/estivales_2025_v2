@@ -35,6 +35,9 @@ export default function Contact() {
     formDataToSend.append("firstname", formData.firstname);
     formDataToSend.append("name", formData.name);
     formDataToSend.append("email", formData.email);
+    formDataToSend.append("address", formData.address);
+    formDataToSend.append("city", formData.city);
+    formDataToSend.append("postcode", formData.postcode);
     formDataToSend.append("subject", formData.subject);
     formDataToSend.append("message", formData.message);
 
@@ -48,24 +51,26 @@ export default function Contact() {
         body: formDataToSend,
       });
 
-      if (response.ok) {
-        setSubmitStatus("success");
-        setFormData({
-          firstname: "",
-          name: "",
-          email: "",
-          address: "",
-          city: "",
-          postcode: "",
-          coordinates: { lat: 0, lng: 0 },
-          subject: "",
-          message: "",
-        });
-        setAttachments([]);
-      } else {
-        setSubmitStatus("error");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Une erreur est survenue");
       }
-    } catch {
+
+      setSubmitStatus("success");
+      setFormData({
+        firstname: "",
+        name: "",
+        email: "",
+        address: "",
+        city: "",
+        postcode: "",
+        coordinates: { lat: 0, lng: 0 },
+        subject: "",
+        message: "",
+      });
+      setAttachments([]);
+    } catch (error) {
+      console.error("Erreur lors de l'envoi:", error);
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
