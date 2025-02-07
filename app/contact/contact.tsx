@@ -7,6 +7,7 @@ import { useState } from "react";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
+    firstname: "",
     name: "",
     email: "",
     address: "",
@@ -31,6 +32,7 @@ export default function Contact() {
     setSubmitStatus(null);
 
     const formDataToSend = new FormData();
+    formDataToSend.append("firstname", formData.firstname);
     formDataToSend.append("name", formData.name);
     formDataToSend.append("email", formData.email);
     formDataToSend.append("subject", formData.subject);
@@ -49,6 +51,7 @@ export default function Contact() {
       if (response.ok) {
         setSubmitStatus("success");
         setFormData({
+          firstname: "",
           name: "",
           email: "",
           address: "",
@@ -96,16 +99,30 @@ export default function Contact() {
               </div>
             )}
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">Nom</label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium">Prénom</label>
+                <Input
+                  id="firstname"
+                  name="firstname"
+                  type="text"
+                  value={formData.firstname}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium">Nom</label>
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
