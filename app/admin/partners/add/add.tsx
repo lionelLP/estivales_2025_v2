@@ -129,7 +129,7 @@ export default function CreatePartner() {
             onChange={handleLogoSelect}
             maxFiles={1}
             accept="image/*"
-            multiple={false}
+            id="partner-logo-upload"
           />
           <p className="text-sm text-gray-500">
             Format recommandé : PNG ou JPG, taille maximale : 2MB
@@ -143,7 +143,7 @@ export default function CreatePartner() {
             onChange={(files) => setBanner(files)}
             maxFiles={1}
             accept="image/*"
-            multiple={false}
+            id="partner-banner-upload"
           />
           <p className="text-sm text-gray-500">
             Format recommandé : 1920x1080px, taille maximale : 5MB
