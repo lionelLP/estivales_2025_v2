@@ -12,6 +12,9 @@ export const MenuBar = ({
   onImageUpload,
   disableImage = false,
 }: MenuBarProps) => {
+  // Define an active class for all selected buttons
+  const activeClass = "bg-zinc-600";
+
   const handleImageUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
@@ -37,30 +40,24 @@ export const MenuBar = ({
   return (
     <div className="flex flex-wrap gap-2 p-2 mb-4 border-b">
       <div className="flex flex-wrap gap-2 w-full border-b pb-2">
-        {/* Styles de texte */}
+        {/* Text styles */}
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-2 rounded ${
-            editor.isActive("bold") ? "bg-gray-200" : ""
-          }`}
+          className={`p-2 rounded ${editor.isActive("bold") ? activeClass : ""}`}
           title="Gras"
         >
           <i className="fas fa-bold"></i>
         </button>
         <button
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-2 rounded ${
-            editor.isActive("italic") ? "bg-gray-200" : ""
-          }`}
+          className={`p-2 rounded ${editor.isActive("italic") ? activeClass : ""}`}
           title="Italique"
         >
           <i className="fas fa-italic"></i>
         </button>
         <button
           onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className={`p-2 rounded ${
-            editor.isActive("underline") ? "bg-gray-200" : ""
-          }`}
+          className={`p-2 rounded ${editor.isActive("underline") ? activeClass : ""}`}
           title="Souligné"
         >
           <i className="fas fa-underline"></i>
@@ -68,30 +65,24 @@ export const MenuBar = ({
 
         <div className="w-px h-6 bg-gray-300 mx-2"></div>
 
-        {/* Alignement */}
+        {/* Text alignment */}
         <button
           onClick={() => editor.chain().focus().setTextAlign("left").run()}
-          className={`p-2 rounded ${
-            editor.isActive({ textAlign: "left" }) ? "bg-gray-200" : ""
-          }`}
+          className={`p-2 rounded ${editor.isActive({ textAlign: "left" }) ? activeClass : ""}`}
           title="Aligner à gauche"
         >
           <i className="fas fa-align-left"></i>
         </button>
         <button
           onClick={() => editor.chain().focus().setTextAlign("center").run()}
-          className={`p-2 rounded ${
-            editor.isActive({ textAlign: "center" }) ? "bg-gray-200" : ""
-          }`}
+          className={`p-2 rounded ${editor.isActive({ textAlign: "center" }) ? activeClass : ""}`}
           title="Centrer"
         >
           <i className="fas fa-align-center"></i>
         </button>
         <button
           onClick={() => editor.chain().focus().setTextAlign("right").run()}
-          className={`p-2 rounded ${
-            editor.isActive({ textAlign: "right" }) ? "bg-gray-200" : ""
-          }`}
+          className={`p-2 rounded ${editor.isActive({ textAlign: "right" }) ? activeClass : ""}`}
           title="Aligner à droite"
         >
           <i className="fas fa-align-right"></i>
@@ -99,7 +90,7 @@ export const MenuBar = ({
       </div>
 
       <div className="flex flex-wrap gap-2 w-full">
-        {/* Couleurs */}
+        {/* Colors */}
         <input
           type="color"
           onInput={(e) =>
@@ -115,7 +106,7 @@ export const MenuBar = ({
 
         <div className="w-px h-6 bg-gray-300 mx-2"></div>
 
-        {/* Autres outils */}
+        {/* Additional tools */}
         <button
           onClick={() => {
             const url = window.prompt("URL du lien:");
@@ -123,9 +114,7 @@ export const MenuBar = ({
               editor.chain().focus().setLink({ href: url }).run();
             }
           }}
-          className={`p-2 rounded ${
-            editor.isActive("link") ? "bg-gray-200" : ""
-          }`}
+          className={`p-2 rounded ${editor.isActive("link") ? activeClass : ""}`}
           title="Insérer un lien"
         >
           <i className="fas fa-link"></i>
