@@ -22,4 +22,4 @@ export const metadata: Metadata = {
   },
 };
 
-export { default } from "./create";
+export { default } from "./edits";

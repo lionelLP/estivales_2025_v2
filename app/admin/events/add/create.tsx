@@ -1,8 +1,8 @@
 "use client";
 import { FileUpload } from "@/components/common/file-upload";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface Suggestion {
   properties: {
@@ -55,7 +55,28 @@ export default function CreateEvent() {
         brochurePath = path;
       }
 
-      // Création de l'événement avec le chemin de la brochure
+      // Upload des images si elles existent
+      let imagePaths = [];
+      if (images.length > 0) {
+        const formDataImages = new FormData();
+        images.forEach((file) => {
+          formDataImages.append("files", file);
+        });
+
+        const uploadImagesResponse = await fetch("/api/upload/images", {
+          method: "POST",
+          body: formDataImages,
+        });
+
+        if (!uploadImagesResponse.ok) {
+          throw new Error("Erreur lors de l'upload des images");
+        }
+
+        const { paths } = await uploadImagesResponse.json();
+        imagePaths = paths;
+      }
+
+      // Création de l'événement avec le chemin de la brochure et des images
       const response = await fetch("/api/events", {
         method: "POST",
         headers: {
@@ -64,6 +85,7 @@ export default function CreateEvent() {
         body: JSON.stringify({
           ...formData,
           brochure_path: brochurePath,
+          image_paths: imagePaths,
         }),
       });
 
@@ -115,6 +137,9 @@ export default function CreateEvent() {
       <h1 className="text-2xl font-bold mb-6">Créer un nouvel événement</h1>
 
       <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+        {error && (
+          <div className="p-4 text-red-500 bg-red-50 rounded-lg">{error}</div>
+        )}
         {/* Titre */}
         <div className="space-y-2">
           <label htmlFor="title" className="block text-sm font-medium">
@@ -280,10 +305,10 @@ export default function CreateEvent() {
         <div className="space-y-2">
           <label className="block text-sm font-medium">Brochure (PDF)</label>
           <FileUpload
+            id="event-brochure-upload"
             onChange={(files) => setBrochure(files)}
             maxFiles={1}
             accept=".pdf"
-            multiple={false}
           />
           <p className="text-sm text-gray-500">Un seul fichier PDF autorisé</p>
         </div>
@@ -294,10 +319,10 @@ export default function CreateEvent() {
             Images de l&apos;événement
           </label>
           <FileUpload
+            id="event-images-upload"
             onChange={(files) => setImages(files)}
             maxFiles={200}
             accept="image/*"
-            multiple={true}
           />
           <p className="text-sm text-gray-500">Jusqu&apos;à 200 images</p>
         </div>

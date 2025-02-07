@@ -269,10 +269,10 @@ export default function EditEvent({
         <div className="space-y-2">
           <label className="block text-sm font-medium">Brochure (PDF)</label>
           <FileUpload
+            id="event-brochure-upload"
             onChange={(files) => setBrochure(files)}
             maxFiles={1}
             accept=".pdf"
-            multiple={false}
           />
           {currentBrochurePath && (
             <p className="text-sm text-gray-500">
@@ -287,10 +287,10 @@ export default function EditEvent({
             Images de l&apos;événement
           </label>
           <FileUpload
+            id="event-images-upload"
             onChange={(files) => setImages(files)}
             maxFiles={200}
             accept="image/*"
-            multiple={true}
           />
         </div>
 
