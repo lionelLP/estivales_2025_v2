@@ -18,9 +18,11 @@ Sur la page d'accueil du panneau d'administration, vous verrez les différentes 
 
 #### Partenaires
 
+La section "Partenaires" est destinée à inquer aux utilisateur les potentielles collaborations que vou avez avec certaines entreprises/institutions.
+
 ![Illustration partenaires](README/image-4.png)
 
-Dans la section "A propos" sur chaque elements vous avez un icone de corbeille et de pinceau qui permet la suppression de l'élément ainsi que la modification de l'élément.
+Dans la section "Partenaires" sur chaque elements vous avez un icone de corbeille et de pinceau qui permet la suppression de l'élément ainsi que la modification de l'élément.
 
 ![alt text](README/image-11.png)
 
@@ -30,6 +32,8 @@ Et pour ajouter un partenaire il suffit de cliquer sur le bouton "Ajouter un par
 
 #### A propos
 
+La section "A propos" est un espace dans lequel vous pouvez vous présenter plus en détail. Vous pouvez utiliser cet espace comme bon vous semble.
+
 ![A propos](README/image-5.png)
 
 Dans la section "A propos" ecriver ce que vous souhaitez et utiliser la barre de mise en forme pour mettre en forme votre texte.
@@ -38,9 +42,11 @@ Dans la section "A propos" ecriver ce que vous souhaitez et utiliser la barre de
 
 #### Evenements
 
+Le nerf de la guerre, c'est ici que vous allez pouvoir ajouter, modifier ou supprimer des événements.
+
 ![Evenements](README/image-6.png)
 
-Dans la section "Evenements" vous pouvez ajouter un évènement en cliquant sur le bouton "Ajouter un évènement" en haut à droite, puis de remplir le formulaire.
+Dans la section "Evenements" vous pouvez ajouter un évènement en cliquant sur le bouton "Ajouter un évènement" en haut à droite, puis remplir le formulaire.
 
 ![alt text](README/image-14.png)
 
@@ -50,9 +56,11 @@ Vous pouvez également modifier et supprimer un évènement en cliquant sur l'ic
 
 #### Revue de presse
 
+La section "Revue de presse" vous permet de mettre en avant des articles de journeax qui vous concernent ou qui vous semblent pertinents
+
 ![Revue de presse](README/image-7.png)
 
-Pour la revue de presse, collé simplement le lien de l'article dans le champ "URL de l'article" et cliquez sur "Extraire".
+Pour la revue de presse, collez simplement le lien de l'article dans le champ "URL de l'article" et cliquez sur "Extraire".
 
 ![alt text](README/image-16.png)
 
@@ -62,6 +70,8 @@ Une fois l'extraction terminée, vous verrez les informations de l'article extra
 
 #### Utilisateurs
 
+C'est ici que vous allez pouvoir créer un compte administrateur. !!! Un administrateur possède les droits les plus élever sur le site, il doit être attribué avec considération à une personne de confiance totale dont le rôle est d'éditer sur le site. !!!
+
 ![Utilisateurs](README/image-9.png)
 
 Pour crée un nouvelle utilisateur, il suffit de remplire le formulaire et de cliquer sur "Créer".
@@ -69,6 +79,8 @@ Pour crée un nouvelle utilisateur, il suffit de remplire le formulaire et de cl
 Attention l'utilisateur doit avoir un mot de passe d'au moins 14 caractères, possedantune majuscule et un caractère spécial. Ce mot de passe pouras bien sur être modifié par l'utilisateur.
 
 #### Gestion des medias
+
+Cette section permet de supprimer manuellement chaque photo, elle permet également d'assigner des photos au carrousel de la page d'accueil.
 
 ![Revue de presse](README/image-8.png)
 
@@ -80,9 +92,9 @@ Dans la page medias vous pouvez voir tous les medias qui on été ajouter via de
 
 #### Newsletter
 
-![alt text](README/image-10.png)
-
 Dans la sections vous pouvez envoyer une newsletter à tous les utilisateurs qui ce sont inscrit à la newsletter.
+
+![alt text](README/image-10.png)
 
 Pour rappelle une newsletter est egalement envoyé par mail à chaque nouvelle création d'évènement.
 
