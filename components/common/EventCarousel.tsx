@@ -40,6 +40,7 @@ export function EventCarousel({ images, onImageClick }: EventCarouselProps) {
             className="object-contain rounded-lg cursor-pointer"
             onClick={() => onImageClick(images[currentIndex].url)}
             priority
+            unoptimized
           />
         </motion.div>
       </AnimatePresence>

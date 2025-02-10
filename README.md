@@ -18,9 +18,11 @@ Sur la page d'accueil du panneau d'administration, vous verrez les différentes 
 
 #### Partenaires
 
+La section "Partenaires" est destinée à inquer aux utilisateur les potentielles collaborations que vou avez avec certaines entreprises/institutions.
+
 ![Illustration partenaires](README/image-4.png)
 
-Dans la section "A propos" sur chaque elements vous avez un icone de corbeille et de pinceau qui permet la suppression de l'élément ainsi que la modification de l'élément.
+Dans la section "Partenaires" sur chaque elements vous avez un icone de corbeille et de pinceau qui permet la suppression de l'élément ainsi que la modification de l'élément.
 
 ![alt text](README/image-11.png)
 
@@ -30,6 +32,8 @@ Et pour ajouter un partenaire il suffit de cliquer sur le bouton "Ajouter un par
 
 #### A propos
 
+La section "A propos" est un espace dans lequel vous pouvez vous présenter plus en détail. Vous pouvez utiliser cet espace comme bon vous semble.
+
 ![A propos](README/image-5.png)
 
 Dans la section "A propos" ecriver ce que vous souhaitez et utiliser la barre de mise en forme pour mettre en forme votre texte.
@@ -38,9 +42,11 @@ Dans la section "A propos" ecriver ce que vous souhaitez et utiliser la barre de
 
 #### Evenements
 
+Le nerf de la guerre, c'est ici que vous allez pouvoir ajouter, modifier ou supprimer des événements.
+
 ![Evenements](README/image-6.png)
 
-Dans la section "Evenements" vous pouvez ajouter un évènement en cliquant sur le bouton "Ajouter un évènement" en haut à droite, puis de remplir le formulaire.
+Dans la section "Evenements" vous pouvez ajouter un évènement en cliquant sur le bouton "Ajouter un évènement" en haut à droite, puis remplir le formulaire.
 
 ![alt text](README/image-14.png)
 
@@ -50,9 +56,11 @@ Vous pouvez également modifier et supprimer un évènement en cliquant sur l'ic
 
 #### Revue de presse
 
+La section "Revue de presse" vous permet de mettre en avant des articles de journeax qui vous concernent ou qui vous semblent pertinents
+
 ![Revue de presse](README/image-7.png)
 
-Pour la revue de presse, collé simplement le lien de l'article dans le champ "URL de l'article" et cliquez sur "Extraire".
+Pour la revue de presse, collez simplement le lien de l'article dans le champ "URL de l'article" et cliquez sur "Extraire".
 
 ![alt text](README/image-16.png)
 
@@ -62,6 +70,8 @@ Une fois l'extraction terminée, vous verrez les informations de l'article extra
 
 #### Utilisateurs
 
+C'est ici que vous allez pouvoir créer un compte administrateur. !!! Un administrateur possède les droits les plus élever sur le site, il doit être attribué avec considération à une personne de confiance totale dont le rôle est d'éditer sur le site. !!!
+
 ![Utilisateurs](README/image-9.png)
 
 Pour crée un nouvelle utilisateur, il suffit de remplire le formulaire et de cliquer sur "Créer".
@@ -69,6 +79,8 @@ Pour crée un nouvelle utilisateur, il suffit de remplire le formulaire et de cl
 Attention l'utilisateur doit avoir un mot de passe d'au moins 14 caractères, possedantune majuscule et un caractère spécial. Ce mot de passe pouras bien sur être modifié par l'utilisateur.
 
 #### Gestion des medias
+
+Cette section permet de supprimer manuellement chaque photo, elle permet également d'assigner des photos au carrousel de la page d'accueil.
 
 ![Revue de presse](README/image-8.png)
 
@@ -80,9 +92,9 @@ Dans la page medias vous pouvez voir tous les medias qui on été ajouter via de
 
 #### Newsletter
 
-![alt text](README/image-10.png)
-
 Dans la sections vous pouvez envoyer une newsletter à tous les utilisateurs qui ce sont inscrit à la newsletter.
+
+![alt text](README/image-10.png)
 
 Pour rappelle une newsletter est egalement envoyé par mail à chaque nouvelle création d'évènement.
 
@@ -199,7 +211,11 @@ JWT_SECRET=       # Chaîne aléatoire pour sécuriser les tokens
 
 La base de données est configurée via Docker. Assurez-vous que les variables DB*\* et MYSQL*\* correspondent entre elles. Le `DB_HOST` doit être `db` car c'est le nom du service dans le docker-compose.
 
+<<<<<<< HEAD
 Crée un token du repository git et mettez le dans le fichier `.env` comme indiqué.
+=======
+Le script situé dans docker/mysql/exemple-insert.sql permet de reconstruire une base de données qui contient déjà des données d'exemple pour accéder plus mettre en place plus rapidement un environnement similaire à ce que que pourait ressembler le site une fois en ligne
+>>>>>>> 6622be9ebc9e38995f1208ece7494cb5d952042b
 
 #### 2. Serveur SMTP
 
@@ -253,176 +269,6 @@ docker compose up -d
 
 Le système d'authentification utilise JWT (JSON Web Tokens).
 
-### Processus de connexion
-
-```15:114:app/api/auth/login/route.ts
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { email, password } = body;
-
-    console.log("Tentative de connexion pour:", email);
-
-    if (!email || !password) {
-      return NextResponse.json(
-        { message: "Email et mot de passe requis" },
-        { status: 400 }
-      );
-    }
-
-    const connection = await pool.getConnection();
-
-    try {
-      // Récupérer l'utilisateur par email
-      const [users] = await connection.query<User[]>(
-        "SELECT id, email, password, username, userType FROM User WHERE email = ?",
-        [email]
-      );
-
-      console.log("Résultat de la requête:", users);
-
-      if (!Array.isArray(users) || users.length === 0) {
-        console.log("Aucun utilisateur trouvé avec cet email");
-        return NextResponse.json(
-          { message: "Email ou mot de passe incorrect" },
-          { status: 401 }
-        );
-      }
-
-      const user = users[0];
-      console.log("Utilisateur trouvé:", {
-        id: user.id,
-        email: user.email,
-        userType: user.userType,
-      });
-
-      // Vérifier le mot de passe
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      console.log("Mot de passe valide:", isPasswordValid);
-
-      if (!isPasswordValid) {
-        return NextResponse.json(
-          { message: "Email ou mot de passe incorrect" },
-          { status: 401 }
-        );
-      }
-      // Générer le token JWT
-      const token = await new jose.SignJWT({
-        userId: user.id,
-        userType: user.userType,
-      })
-        .setProtectedHeader({ alg: "HS256" })
-        .setExpirationTime("7d")
-        .sign(
-          new TextEncoder().encode(process.env.JWT_SECRET || "votre_secret")
-        );
-
-      // Pour déboguer
-      console.log("User data:", {
-        id: user.id,
-        userType: user.userType,
-        email: user.email,
-      });
-
-      const response = NextResponse.json(
-        {
-          success: true,
-          user: {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            userType: user.userType,
-          },
-        },
-        { status: 200 }
-      );
-
-      response.cookies.set({
-        name: "token",
-        value: token,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-      });
-
-      return response;
-    } finally {
-      connection.release();
-    }
-  } catch (error) {
-    console.error("Erreur lors de la connexion:", error);
-    return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
-  }
-}
-```
-
-### Réinitialisation du mot de passe
-
-```7:67:app/api/auth/forgot-password/route.ts
-export async function POST(request: Request) {
-  try {
-    const { email } = await request.json();
-    const connection = await pool.getConnection();
-
-    try {
-      // Check if user exists
-      const [users] = await connection.execute(
-        'SELECT id FROM User WHERE email = ?',
-        [email]
-      );
-
-      if (!Array.isArray(users) || users.length === 0) {
-        return NextResponse.json(
-          { message: "Si cette adresse existe, vous recevrez un email de réinitialisation." },
-          { status: 200 }
-        );
-      }
-
-      // Generate reset token
-      const resetToken = generateConfirmationToken();
-      const expiresAt = getExpirationDate();
-
-      // Store reset token
-      await connection.execute(
-        'INSERT INTO PasswordReset (user_id, reset_token, expires_at) VALUES (?, ?, ?)',
-        [users[0].id, resetToken, expiresAt]
-      );
-
-      // Send reset email
-      const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password/${resetToken}`;
-
-      await sendEmail(
-        email,
-        'Réinitialisation de votre mot de passe',
-        createEmailTemplate({
-          title: 'Réinitialisation de votre mot de passe',
-          content: `
-            <p>Vous avez demandé la réinitialisation de votre mot de passe.</p>
-            <p>Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :</p>
-            <p>Ce lien expire dans 24 heures.</p>
-          `,
-          buttonText: 'Réinitialiser mon mot de passe',
-          buttonUrl: resetUrl
-        })
-      );
-
-      return NextResponse.json({
-        message: "Si cette adresse existe, vous recevrez un email de réinitialisation."
-      });
-    } finally {
-      connection.release();
-    }
-  } catch (error) {
-    console.error('Password reset error:', error);
-    return NextResponse.json(
-      { message: "Une erreur est survenue" },
-      { status: 500 }
-    );
-  }
-}
-```
-
 ## Gestion des fichiers
 
 ### Upload d'images
@@ -431,82 +277,6 @@ Les images sont stockées dans le dossier `public/uploads/` avec des sous-dossie
 
 - `partners/` : Images des partenaires
 - `events/` : Images des événements
-
-### Exemple d'implémentation
-
-```6:76:app/api/upload/images/route.ts
-export async function POST(request: Request) {
-  const middlewareResponse = await apiMiddleware(request);
-  if (middlewareResponse.status !== 200) {
-    return middlewareResponse;
-  }
-
-  try {
-    const formData = await request.formData();
-    const files = formData.getAll("files") as File[];
-    const eventId = formData.get("eventId");
-
-    if (!files || files.length === 0) {
-      return NextResponse.json(
-        { error: "Aucun fichier fourni" },
-        { status: 400 }
-      );
-    }
-
-    const connection = await pool.getConnection();
-    const uploadedFiles = [];
-
-    try {
-      for (const file of files) {
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const filename = `${Date.now()}_${file.name}`;
-        const filepath = path.join(
-          process.cwd(),
-          "public",
-          "uploads",
-          "events",
-          filename
-        );
-        const relativePath = `/uploads/events/${filename}`;
-
-        await writeFile(filepath, buffer);
-
-        // Insérer dans la table Media
-        const [mediaResult] = await connection.execute(
-          `INSERT INTO Media (url, type, title, size) VALUES (?, ?, ?, ?)`,
-          [relativePath, file.type, file.name, file.size]
-        );
-
-        const mediaId = (mediaResult as any).insertId;
-
-        // Créer la relation dans Event_Media
-        if (eventId) {
-          await connection.execute(
-            `INSERT INTO Event_Media (event_id, media_id) VALUES (?, ?)`,
-            [eventId, mediaId]
-          );
-        }
-
-        uploadedFiles.push({
-          id: mediaId,
-          url: relativePath,
-          name: file.name,
-        });
-      }
-
-      return NextResponse.json({ files: uploadedFiles });
-    } finally {
-      connection.release();
-    }
-  } catch (error) {
-    console.error("Erreur upload:", error);
-    return NextResponse.json(
-      { error: "Erreur lors de l'upload" },
-      { status: 500 }
-    );
-  }
-}
-```
 
 ## API Routes
 
@@ -527,30 +297,8 @@ Toutes les routes protégées utilisent un middleware de vérification du token 
 
 Toutes les routes administratives sont protégées par vérification du token et du type d'utilisateur.
 
-## Contribution
+## Sitemap
 
-Pour contribuer au projet :
-
-1. Créer une nouvelle branche pour chaque fonctionnalité
-2. Suivre les conventions de nommage existantes
-3. Documenter les nouvelles fonctionnalités
-4. Créer une merge request pour validation
-
-## Scripts disponibles
-
-```5:16:package.json
-  "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "docker:build": "docker build -t estivales-brou -f docker/config/Dockerfile .",
-    "docker:run": "docker run -p 3000:3000 --env-file .env estivales-brou",
-    "docker:compose": "docker-compose -f docker/config/docker-compose.yml up -d",
-    "docker:compose:build": "docker-compose -f docker/config/docker-compose.yml up -d --build",
-    "docker:deploy": "./docker/scripts/deploy.sh",
-    "docker:update": "./docker/scripts/update.sh"
-  },
-```
-
-Cette documentation fournit les bases pour poursuivre le développement du projet. Pour plus de détails sur une fonctionnalité spécifique, consulter les commentaires dans le code source.
+Pour génerer le robots.txt ainsi que le sitemap du site manuellement vous devez executer la commande :
+```bash
+npm run sitemap
