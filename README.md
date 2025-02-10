@@ -195,9 +195,11 @@ JWT_SECRET=       # Chaîne aléatoire pour sécuriser les tokens
 
 ### Guide de configuration
 
-#### 1. Base de données
+#### 1. Base de données et Git
 
 La base de données est configurée via Docker. Assurez-vous que les variables DB*\* et MYSQL*\* correspondent entre elles. Le `DB_HOST` doit être `db` car c'est le nom du service dans le docker-compose.
+
+Crée un token du repository git et mettez le dans le fichier `.env` comme indiqué.
 
 #### 2. Serveur SMTP
 
