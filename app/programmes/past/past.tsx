@@ -32,6 +32,8 @@ export default function ProgrammesPast() {
     location: "Tous",
     dateRange: { from: undefined, to: undefined },
   });
+  const [noEventsFound, setNoEventsFound] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
 
   useEffect(() => {
     const loadingId = registerLoadingComponent();
@@ -57,6 +59,8 @@ export default function ProgrammesPast() {
 
           if (pastEvents.length === 0) {
             setevents([]);
+            setNoEventsFound(true);
+            componentLoaded(loadingId);
             return;
           }
 
@@ -79,6 +83,7 @@ export default function ProgrammesPast() {
 
           // Formatage initial des événements pour la timeline
           formatEventsForTimeline(pastEvents);
+          setNoEventsFound(false);
 
           componentLoaded(loadingId);
         } else {
@@ -98,6 +103,13 @@ export default function ProgrammesPast() {
   // Fonction pour filtrer les événements selon les critères
   useEffect(() => {
     if (allEvents.length === 0) return;
+
+    setIsFiltering(
+      searchQuery.trim() !== "" ||
+        filterCriteria.location !== "Tous" ||
+        filterCriteria.dateRange.from !== undefined ||
+        filterCriteria.dateRange.to !== undefined
+    );
 
     console.log("Filtrage avec critères:", filterCriteria);
     console.log("Recherche:", searchQuery);
@@ -143,7 +155,13 @@ export default function ProgrammesPast() {
       );
     }
 
-    formatEventsForTimeline(filtered);
+    if (filtered.length === 0) {
+      setNoEventsFound(true);
+      setevents([]);
+    } else {
+      setNoEventsFound(false);
+      formatEventsForTimeline(filtered);
+    }
   }, [allEvents, filterCriteria, searchQuery]);
 
   // Fonction pour formater les événements pour la timeline
@@ -239,15 +257,33 @@ export default function ProgrammesPast() {
     setFilterCriteria(filters);
   };
 
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
-
-  if (events.length === 0 && !error) {
-    return (
-      <div className="text-center text-gray-500">Aucun événement passé</div>
-    );
-  }
+  // Message à afficher en fonction du contexte
+  const renderNoEventsMessage = () => {
+    if (isFiltering) {
+      return (
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-8 text-center shadow-md border border-pink-100 dark:border-pink-900 my-8">
+          <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mb-2">
+            Aucun événement trouvé
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Aucun événement ne correspond à vos critères de recherche. Veuillez
+            modifier vos filtres.
+          </p>
+        </div>
+      );
+    } else {
+      return (
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-8 text-center shadow-md border border-pink-100 dark:border-pink-900 my-8">
+          <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mb-2">
+            Aucun événement passé
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Il n&apos;y a actuellement aucun événement dans notre historique.
+          </p>
+        </div>
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen pt-20">
@@ -268,7 +304,17 @@ export default function ProgrammesPast() {
               locations={uniqueLocations}
             />
           </div>
-          <Timeline data={events} />
+
+          {error ? (
+            <div className="text-red-500 bg-red-50 dark:bg-red-950/20 p-4 rounded-lg border border-red-200 dark:border-red-800 my-4">
+              {error}
+            </div>
+          ) : noEventsFound ? (
+            renderNoEventsMessage()
+          ) : (
+            <Timeline data={events} />
+          )}
+
           {selectedEvent && (
             <EventDetailModal
               event={selectedEvent}
