@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     try {
       await access(uploadDir);
       console.log("Le répertoire d'upload existe déjà");
-    } catch (err) {
+    } catch {
       console.log("Création du répertoire d'upload:", uploadDir);
       await mkdir(uploadDir, { recursive: true });
     }
