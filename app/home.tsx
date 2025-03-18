@@ -12,9 +12,15 @@ export default function Home() {
   const [uniqueLocations, setUniqueLocations] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterCriteria, setFilterCriteria] = useState({
+  const [filterCriteria, setFilterCriteria] = useState<{
+    location: string;
+    dateRange: {
+      from: Date | undefined;
+      to: Date | undefined;
+    };
+  }>({
     location: "Tous",
-    category: "Tous",
+    dateRange: { from: undefined, to: undefined },
   });
 
   useEffect(() => {
@@ -56,7 +62,13 @@ export default function Home() {
     setSearchQuery(query);
   };
 
-  const handleFilter = (filters: { location: string; category: string }) => {
+  const handleFilter = (filters: {
+    location: string;
+    dateRange: {
+      from: Date | undefined;
+      to: Date | undefined;
+    };
+  }) => {
     console.log("Filtres:", filters);
     setFilterCriteria(filters);
   };

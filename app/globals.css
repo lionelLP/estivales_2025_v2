@@ -41,6 +41,17 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --foreground-50: 0 0% 98%;
+    --foreground-100: 240 5% 96%;
+    --foreground-200: 240 6% 90%;
+    --foreground-300: 240 5% 84%;
+    --foreground-400: 240 5% 65%;
+    --foreground-500: 240 4% 46%;
+    --foreground-600: 240 5% 34%;
+    --foreground-700: 240 5% 26%;
+    --foreground-800: 240 4% 16%;
+    --foreground-900: 240 6% 10%;
+    --foreground-950: 240 10% 4%;
   }
   .dark {
     color-scheme: dark;

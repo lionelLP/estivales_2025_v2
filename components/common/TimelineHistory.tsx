@@ -2,7 +2,7 @@
 
 import { Timeline } from "@/components/ui/timeline";
 import { Event } from "@/lib/types/event";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { EventDetailModal } from "./EventDetailModal";
 
 interface TimelineEntry {
@@ -14,19 +14,27 @@ interface TimelineHistoryProps {
   searchQuery?: string;
   filterCriteria?: {
     location: string;
-    category: string;
+    dateRange?: {
+      from: Date | undefined;
+      to: Date | undefined;
+    };
   };
 }
 
 export function TimelineHistory({
   searchQuery = "",
-  filterCriteria = { location: "Tous", category: "Tous" },
+  filterCriteria = {
+    location: "Tous",
+    dateRange: { from: undefined, to: undefined },
+  },
 }: TimelineHistoryProps) {
-  const [events, setevents] = useState<TimelineEntry[]>([]);
+  const [events, setEvents] = useState<TimelineEntry[]>([]);
   const [error, setError] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+  const [isFiltering, setIsFiltering] = useState(false);
 
   // Récupérer les événements depuis l'API
   useEffect(() => {
@@ -45,14 +53,14 @@ export function TimelineHistory({
           });
 
           if (futurePublicEvents.length === 0) {
-            setevents([]);
+            setAllEvents([]);
+            setFilteredEvents([]);
+            setEvents([]);
             return;
           }
 
           setAllEvents(futurePublicEvents);
-
-          // Formatage initial sans filtres
-          formatEventsForTimeline(futurePublicEvents);
+          setFilteredEvents(futurePublicEvents);
         } else {
           setError("Erreur lors de la récupération des événements");
         }
@@ -69,6 +77,8 @@ export function TimelineHistory({
   useEffect(() => {
     if (allEvents.length === 0) return;
 
+    setIsFiltering(true);
+
     console.log("TimelineHistory - Filtrage avec critères:", filterCriteria);
     console.log("TimelineHistory - Recherche:", searchQuery);
 
@@ -81,7 +91,24 @@ export function TimelineHistory({
       );
     }
 
-    // Ajouter d'autres critères de filtrage ici si nécessaire
+    // Filtrer par plage de dates si définie
+    if (filterCriteria.dateRange?.from) {
+      const fromDate = new Date(filterCriteria.dateRange.from);
+      filtered = filtered.filter((event) => {
+        const eventDate = new Date(event.event_date);
+        return eventDate >= fromDate;
+      });
+    }
+
+    if (filterCriteria.dateRange?.to) {
+      const toDate = new Date(filterCriteria.dateRange.to);
+      // Ajouter un jour pour inclure les événements du dernier jour
+      toDate.setDate(toDate.getDate() + 1);
+      filtered = filtered.filter((event) => {
+        const eventDate = new Date(event.event_date);
+        return eventDate < toDate;
+      });
+    }
 
     // Filtrer par texte de recherche si disponible
     if (searchQuery.trim() !== "") {
@@ -96,18 +123,23 @@ export function TimelineHistory({
       );
     }
 
-    formatEventsForTimeline(filtered);
+    setFilteredEvents(filtered);
+
+    // Petit délai pour garantir que l'animation se fait correctement
+    setTimeout(() => {
+      setIsFiltering(false);
+    }, 100);
   }, [allEvents, filterCriteria, searchQuery]);
 
-  // Fonction pour formater les événements pour la timeline
-  const formatEventsForTimeline = (eventsToFormat: Event[]) => {
-    if (eventsToFormat.length === 0) {
-      setevents([]);
+  // Formater les événements pour la timeline avec useMemo pour éviter les calculs inutiles
+  useMemo(() => {
+    if (filteredEvents.length === 0) {
+      setEvents([]);
       return;
     }
 
     // Grouper les événements par date
-    const eventsByDate = eventsToFormat.reduce(
+    const eventsByDate = filteredEvents.reduce(
       (acc: { [key: string]: Event[] }, event: Event) => {
         const date = new Date(event.event_date).toLocaleDateString("fr-FR", {
           day: "numeric",
@@ -175,8 +207,8 @@ export function TimelineHistory({
         return dateA.getTime() - dateB.getTime();
       });
 
-    setevents(timelineData);
-  };
+    setEvents(timelineData);
+  }, [filteredEvents]);
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
@@ -184,13 +216,23 @@ export function TimelineHistory({
 
   if (events.length === 0) {
     return (
-      <div className="text-center text-gray-500">Aucun événement à venir</div>
+      <div className="text-center text-gray-500 py-8">
+        {isFiltering
+          ? "Filtrage en cours..."
+          : "Aucun événement ne correspond aux critères de recherche"}
+      </div>
     );
   }
 
   return (
-    <div className="w-full ">
-      <Timeline data={events} />
+    <div className="w-full">
+      {isFiltering ? (
+        <div className="text-center py-4 text-blue-500">
+          Mise à jour des résultats...
+        </div>
+      ) : (
+        <Timeline key={`timeline-${filteredEvents.length}`} data={events} />
+      )}
       {selectedEvent && (
         <EventDetailModal
           event={selectedEvent}

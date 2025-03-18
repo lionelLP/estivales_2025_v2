@@ -22,9 +22,15 @@ export default function ProgrammesPast() {
   const [uniqueLocations, setUniqueLocations] = useState<string[]>([]);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterCriteria, setFilterCriteria] = useState({
+  const [filterCriteria, setFilterCriteria] = useState<{
+    location: string;
+    dateRange: {
+      from: Date | undefined;
+      to: Date | undefined;
+    };
+  }>({
     location: "Tous",
-    category: "Tous",
+    dateRange: { from: undefined, to: undefined },
   });
 
   useEffect(() => {
@@ -105,7 +111,24 @@ export default function ProgrammesPast() {
       );
     }
 
-    // Ajouter d'autres critères de filtrage ici si nécessaire
+    // Filtrer par plage de dates si définie
+    if (filterCriteria.dateRange.from) {
+      const fromDate = new Date(filterCriteria.dateRange.from);
+      filtered = filtered.filter((event) => {
+        const eventDate = new Date(event.event_date);
+        return eventDate >= fromDate;
+      });
+    }
+
+    if (filterCriteria.dateRange.to) {
+      const toDate = new Date(filterCriteria.dateRange.to);
+      // Ajouter un jour pour inclure les événements du dernier jour
+      toDate.setDate(toDate.getDate() + 1);
+      filtered = filtered.filter((event) => {
+        const eventDate = new Date(event.event_date);
+        return eventDate < toDate;
+      });
+    }
 
     // Filtrer par texte de recherche si disponible
     if (searchQuery.trim() !== "") {
@@ -205,7 +228,13 @@ export default function ProgrammesPast() {
     setSearchQuery(query);
   };
 
-  const handleFilter = (filters: { location: string; category: string }) => {
+  const handleFilter = (filters: {
+    location: string;
+    dateRange: {
+      from: Date | undefined;
+      to: Date | undefined;
+    };
+  }) => {
     console.log("Filtres past:", filters);
     setFilterCriteria(filters);
   };

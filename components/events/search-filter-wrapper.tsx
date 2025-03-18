@@ -6,7 +6,13 @@ import { RechercheEvenement } from "@/components/events/recherche-evenement";
 export interface SearchFilterWrapperProps {
   mode: "past" | "toCome";
   onSearchCallback?: (query: string) => void;
-  onFilterCallback?: (filters: { location: string; category: string }) => void;
+  onFilterCallback?: (filters: {
+    location: string;
+    dateRange: {
+      from: Date | undefined;
+      to: Date | undefined;
+    };
+  }) => void;
   locations?: string[];
 }
 
@@ -23,7 +29,13 @@ export function SearchFilterWrapper({
     }
   };
 
-  const handleFilter = (filters: { location: string; category: string }) => {
+  const handleFilter = (filters: {
+    location: string;
+    dateRange: {
+      from: Date | undefined;
+      to: Date | undefined;
+    };
+  }) => {
     if (onFilterCallback) {
       onFilterCallback(filters);
     }
