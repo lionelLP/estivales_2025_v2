@@ -21,25 +21,13 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
   const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
+    container: containerRef,
+    offset: ["start start", "end start"],
   });
 
-  const translateFirst = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [0, window.innerWidth < 768 ? -200 : -400]
-  );
-  const translateSecond = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [0, window.innerWidth < 768 ? 200 : 400]
-  );
-  const translateThird = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [0, window.innerWidth < 768 ? -200 : -400]
-  );
+  const translateFirst = useTransform(scrollYProgress, [0, 1], [0, -200]);
+  const translateSecond = useTransform(scrollYProgress, [0, 1], [0, 200]);
+  const translateThird = useTransform(scrollYProgress, [0, 1], [0, -200]);
 
   const isYoutubeUrl = (url: string) => {
     return url.includes("youtube.com") || url.includes("youtu.be");
@@ -52,73 +40,143 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
     return match && match[2].length === 11 ? match[2] : null;
   };
 
-  const rows: Media[][] = [[], [], []];
-  media.forEach((item, idx) => {
-    rows[idx % 3].push(item);
-  });
+  const third = Math.ceil(media.length / 3);
+  const firstPart = media.slice(0, third);
+  const secondPart = media.slice(third, 2 * third);
+  const thirdPart = media.slice(2 * third);
 
   return (
     <>
       <div
         ref={containerRef}
-        className="min-h-screen h-auto flex items-start justify-center overflow-hidden"
+        className="h-[40rem] items-start overflow-y-auto w-full"
       >
-        <div className="flex items-start justify-center">
-          <div className="grid grid-cols-3 gap-4 px-4 max-w-7xl mx-auto">
-            {rows.map((row, rowIndex) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start max-w-5xl mx-auto gap-10 py-40 px-10">
+          <div className="grid gap-10">
+            {firstPart.map((item, idx) => (
               <motion.div
-                key={rowIndex}
-                style={{
-                  y:
-                    rowIndex === 1
-                      ? translateSecond
-                      : rowIndex === 2
-                      ? translateThird
-                      : translateFirst,
+                key={`grid-1-${idx}`}
+                style={{ y: translateFirst }}
+                className="group relative rounded-lg overflow-hidden cursor-pointer"
+                onClick={() => {
+                  if (isYoutubeUrl(item.url)) {
+                    setSelectedVideo(item.url);
+                  }
                 }}
-                className="flex flex-col gap-4"
               >
-                {row.map((item) => (
-                  <div
-                    key={item.id}
-                    className="group relative rounded-lg overflow-hidden cursor-pointer"
-                    onClick={() => {
-                      if (isYoutubeUrl(item.url)) {
-                        setSelectedVideo(item.url);
-                      }
-                    }}
-                  >
-                    {isYoutubeUrl(item.url) ? (
-                      <div className="h-[200px] md:h-[350px] w-full md:w-[250px] relative">
-                        <div className="relative w-full h-full bg-black flex items-center justify-center">
-                          <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center">
-                            <svg
-                              className="w-6 h-6 md:w-8 md:h-8 text-white"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path d="M8 5v14l11-7z" />
-                            </svg>
-                          </div>
-                        </div>
+                {isYoutubeUrl(item.url) ? (
+                  <div className="h-[200px] md:h-[350px] w-full relative">
+                    <div className="relative w-full h-full bg-black flex items-center justify-center">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center">
+                        <svg
+                          className="w-6 h-6 md:w-8 md:h-8 text-white"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
                       </div>
-                    ) : (
-                      <ImageViewer
+                    </div>
+                  </div>
+                ) : (
+                  <ImageViewer src={item.url} alt={item.alt_text || item.title}>
+                    <div className="h-[200px] md:h-[350px] w-full relative">
+                      <Image
                         src={item.url}
                         alt={item.alt_text || item.title}
-                      >
-                        <div className="h-[200px] md:h-[350px] w-full md:w-[250px] relative">
-                          <Image
-                            src={item.url}
-                            alt={item.alt_text || item.title}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                      </ImageViewer>
-                    )}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </div>
+                  </ImageViewer>
+                )}
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="grid gap-10">
+            {secondPart.map((item, idx) => (
+              <motion.div
+                key={`grid-2-${idx}`}
+                style={{ y: translateSecond }}
+                className="group relative rounded-lg overflow-hidden cursor-pointer"
+                onClick={() => {
+                  if (isYoutubeUrl(item.url)) {
+                    setSelectedVideo(item.url);
+                  }
+                }}
+              >
+                {isYoutubeUrl(item.url) ? (
+                  <div className="h-[200px] md:h-[350px] w-full relative">
+                    <div className="relative w-full h-full bg-black flex items-center justify-center">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center">
+                        <svg
+                          className="w-6 h-6 md:w-8 md:h-8 text-white"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </div>
                   </div>
-                ))}
+                ) : (
+                  <ImageViewer src={item.url} alt={item.alt_text || item.title}>
+                    <div className="h-[200px] md:h-[350px] w-full relative">
+                      <Image
+                        src={item.url}
+                        alt={item.alt_text || item.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </div>
+                  </ImageViewer>
+                )}
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="grid gap-10">
+            {thirdPart.map((item, idx) => (
+              <motion.div
+                key={`grid-3-${idx}`}
+                style={{ y: translateThird }}
+                className="group relative rounded-lg overflow-hidden cursor-pointer"
+                onClick={() => {
+                  if (isYoutubeUrl(item.url)) {
+                    setSelectedVideo(item.url);
+                  }
+                }}
+              >
+                {isYoutubeUrl(item.url) ? (
+                  <div className="h-[200px] md:h-[350px] w-full relative">
+                    <div className="relative w-full h-full bg-black flex items-center justify-center">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center">
+                        <svg
+                          className="w-6 h-6 md:w-8 md:h-8 text-white"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <ImageViewer src={item.url} alt={item.alt_text || item.title}>
+                    <div className="h-[200px] md:h-[350px] w-full relative">
+                      <Image
+                        src={item.url}
+                        alt={item.alt_text || item.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </div>
+                  </ImageViewer>
+                )}
               </motion.div>
             ))}
           </div>
