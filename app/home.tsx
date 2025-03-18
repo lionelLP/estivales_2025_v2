@@ -1,8 +1,66 @@
+"use client";
+
 import ImageCarousel from "@/components/common/ImageCarousel";
 import { TimelineHistory } from "@/components/common/TimelineHistory";
+import { SearchFilterWrapper } from "@/components/events/search-filter-wrapper";
+import { Event } from "@/lib/types/event";
+import { Loader2 } from "lucide-react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [uniqueLocations, setUniqueLocations] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCriteria, setFilterCriteria] = useState({
+    location: "Tous",
+    category: "Tous",
+  });
+
+  useEffect(() => {
+    const fetchEventLocations = async () => {
+      try {
+        const response = await fetch("/api/events");
+        if (response.ok) {
+          const data = await response.json();
+
+          // Filtrer les événements futurs
+          const now = new Date();
+          const futureEvents = data.filter((event: Event) => {
+            const eventDate = new Date(event.event_date);
+            return eventDate > now;
+          });
+
+          // Extraire les lieux uniques
+          const locations: string[] = futureEvents
+            .map((event: Event) => event.location)
+            .filter(
+              (location: string | undefined): location is string => !!location
+            );
+
+          // Dédupliquer les lieux
+          setUniqueLocations([...new Set(locations)]);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération des lieux:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEventLocations();
+  }, []);
+
+  const handleSearch = (query: string) => {
+    console.log("Recherche:", query);
+    setSearchQuery(query);
+  };
+
+  const handleFilter = (filters: { location: string; category: string }) => {
+    console.log("Filtres:", filters);
+    setFilterCriteria(filters);
+  };
+
   return (
     <div className="min-h-screen dark:bg-dark-mode">
       <ImageCarousel />
@@ -57,7 +115,26 @@ export default function Home() {
         <h2 className="text-3xl font-bold text-center mb-12 text-bleu-fonce dark:text-bleu-clair">
           Actualités
         </h2>
-        <TimelineHistory />
+        <div className="mb-8">
+          {isLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <Loader2 className="animate-spin h-8 w-8 text-blue-500" />
+              <span className="ml-2 text-lg">Chargement des filtres...</span>
+            </div>
+          ) : (
+            <SearchFilterWrapper
+              mode="toCome"
+              onSearchCallback={handleSearch}
+              onFilterCallback={handleFilter}
+              locations={uniqueLocations}
+            />
+          )}
+        </div>
+
+        <TimelineHistory
+          searchQuery={searchQuery}
+          filterCriteria={filterCriteria}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,8 @@
 "use client";
 
 import { EventDetailModal } from "@/components/common/EventDetailModal";
+import { FiltreEvenement } from "@/components/events/filtre-evenement";
+import { RechercheEvenement } from "@/components/events/recherche-evenement";
 import { Timeline } from "@/components/ui/timeline";
 import { useLoading } from "@/contexts/LoadingContext";
 import { Event } from "@/lib/types/event";
@@ -17,6 +19,13 @@ export default function ProgrammesPast() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { registerLoadingComponent, componentLoaded } = useLoading();
+  const [uniqueLocations, setUniqueLocations] = useState<string[]>([]);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCriteria, setFilterCriteria] = useState({
+    location: "Tous",
+    category: "Tous",
+  });
 
   useEffect(() => {
     const loadingId = registerLoadingComponent();
@@ -26,6 +35,7 @@ export default function ProgrammesPast() {
         const response = await fetch("/api/events");
         if (response.ok) {
           const data = await response.json();
+          console.log("Données brutes des événements:", data);
 
           // Filtrer les événements passés
           const now = new Date();
@@ -34,104 +44,177 @@ export default function ProgrammesPast() {
             return eventDate <= now;
           });
 
+          console.log("Événements passés:", pastEvents);
+
+          // Stocker tous les événements pour les filtrer plus tard
+          setAllEvents(pastEvents);
+
           if (pastEvents.length === 0) {
             setevents([]);
             return;
           }
 
-          // Grouper les événements par date
-          const eventsByDate = pastEvents.reduce(
-            (acc: { [key: string]: Event[] }, event: Event) => {
-              const date = new Date(event.event_date).toLocaleDateString(
-                "fr-FR",
-                {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                }
-              );
-              if (!acc[date]) {
-                acc[date] = [];
-              }
-              acc[date].push(event);
-              return acc;
-            },
-            {}
-          );
+          // Extraire les lieux uniques des événements
+          const locations: string[] = pastEvents
+            .map((event: Event) => {
+              console.log("Location d'un événement:", event.location);
+              return event.location;
+            })
+            .filter(
+              (location: string | undefined): location is string => !!location
+            );
 
-          // Transformer en format Timeline
-          const timelineData: TimelineEntry[] = Object.entries<Event[]>(
-            eventsByDate
-          )
-            .map(([date, dateEvents]) => ({
-              title: date,
-              content: (
-                <div>
-                  <div className="mb-8">
-                    {dateEvents.map((event: Event) => (
-                      <div key={event.id} className="mb-4">
-                        <h3 className="text-neutral-800 dark:text-neutral-200 text-sm font-semibold">
-                          {event.title}
-                        </h3>
-                        {event.subtitle && (
-                          <p className="text-neutral-700 dark:text-neutral-300 text-xs">
-                            {event.subtitle}
-                          </p>
-                        )}
-                        <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
-                          {new Date(event.event_date).toLocaleTimeString(
-                            "fr-FR",
-                            {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )}
-                        </p>
-                        <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
-                          {event.location}
-                        </p>
-                        <button
-                          onClick={() => {
-                            setSelectedEvent(event);
-                            setIsModalOpen(true);
-                          }}
-                          className="inline-block mt-2 px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-medium hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
-                        >
-                          Voir les détails
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ),
-            }))
-            .sort((a, b) => {
-              const dateA = new Date(eventsByDate[a.title][0].event_date);
-              const dateB = new Date(eventsByDate[b.title][0].event_date);
-              return dateB.getTime() - dateA.getTime(); // Tri inversé pour avoir les plus récents en premier
-            });
+          console.log("Locations extraites:", locations);
 
-          setevents(timelineData);
+          // Dédupliquer les lieux
+          const uniqueLocationsSet = [...new Set(locations)];
+          console.log("Locations uniques:", uniqueLocationsSet);
+          setUniqueLocations(uniqueLocationsSet);
+
+          // Formatage initial des événements pour la timeline
+          formatEventsForTimeline(pastEvents);
+
+          componentLoaded(loadingId);
         } else {
           setError("Erreur lors de la récupération des événements");
+          componentLoaded(loadingId);
         }
-      } catch (err) {
-        console.error("Erreur lors de la récupération des événements:", err);
+      } catch (error) {
+        console.error("Erreur:", error);
         setError("Erreur lors de la récupération des événements");
-      } finally {
         componentLoaded(loadingId);
       }
     };
 
     fetchevents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Fonction pour filtrer les événements selon les critères
+  useEffect(() => {
+    if (allEvents.length === 0) return;
+
+    console.log("Filtrage avec critères:", filterCriteria);
+    console.log("Recherche:", searchQuery);
+
+    let filtered = [...allEvents];
+
+    // Filtrer par lieu si un lieu spécifique est sélectionné
+    if (filterCriteria.location !== "Tous") {
+      filtered = filtered.filter(
+        (event) => event.location === filterCriteria.location
+      );
+    }
+
+    // Ajouter d'autres critères de filtrage ici si nécessaire
+
+    // Filtrer par texte de recherche si disponible
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(
+        (event) =>
+          event.title.toLowerCase().includes(query) ||
+          event.subtitle?.toLowerCase().includes(query) ||
+          false ||
+          event.description?.toLowerCase().includes(query) ||
+          false
+      );
+    }
+
+    formatEventsForTimeline(filtered);
+  }, [allEvents, filterCriteria, searchQuery]);
+
+  // Fonction pour formater les événements pour la timeline
+  const formatEventsForTimeline = (eventsToFormat: Event[]) => {
+    if (eventsToFormat.length === 0) {
+      setevents([]);
+      return;
+    }
+
+    // Grouper les événements par date
+    const eventsByDate = eventsToFormat.reduce(
+      (acc: { [key: string]: Event[] }, event: Event) => {
+        const date = new Date(event.event_date).toLocaleDateString("fr-FR", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+        acc[date].push(event);
+        return acc;
+      },
+      {}
+    );
+
+    // Transformer en format Timeline
+    const timelineData: TimelineEntry[] = (
+      Object.entries(eventsByDate) as [string, Event[]][]
+    )
+      .map(([date, dateEvents]) => ({
+        title: date,
+        content: (
+          <div>
+            <div className="mb-8">
+              {dateEvents.map((event: Event) => (
+                <div key={event.id} className="mb-4">
+                  <h3 className="text-neutral-800 dark:text-neutral-200 text-sm font-semibold">
+                    {event.title}
+                  </h3>
+                  {event.subtitle && (
+                    <p className="text-neutral-700 dark:text-neutral-300 text-xs">
+                      {event.subtitle}
+                    </p>
+                  )}
+                  <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
+                    {new Date(event.event_date).toLocaleTimeString("fr-FR", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
+                    {event.location}
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSelectedEvent(event);
+                      setIsModalOpen(true);
+                    }}
+                    className="inline-block mt-2 px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-medium hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                  >
+                    Voir les détails
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ),
+      }))
+      .sort((a, b) => {
+        const dateA = new Date(eventsByDate[a.title][0].event_date);
+        const dateB = new Date(eventsByDate[b.title][0].event_date);
+        return dateB.getTime() - dateA.getTime(); // Tri inversé pour avoir les plus récents en premier
+      });
+
+    setevents(timelineData);
+  };
+
+  // Gestionnaires pour la recherche et le filtrage
+  const handleSearch = (query: string) => {
+    console.log("Recherche past:", query);
+    setSearchQuery(query);
+  };
+
+  const handleFilter = (filters: { location: string; category: string }) => {
+    console.log("Filtres past:", filters);
+    setFilterCriteria(filters);
+  };
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
   }
 
-  if (events.length === 0) {
+  if (events.length === 0 && !error) {
     return (
       <div className="text-center text-gray-500">Aucun événement passé</div>
     );
@@ -148,21 +231,26 @@ export default function ProgrammesPast() {
               </h1>
             </div>
           </div>
+          <div className="mb-8">
+            <RechercheEvenement mode="past" onSearch={handleSearch} />
+            <FiltreEvenement
+              mode="past"
+              onFilter={handleFilter}
+              locations={uniqueLocations}
+            />
+          </div>
+          <Timeline data={events} />
+          {selectedEvent && (
+            <EventDetailModal
+              event={selectedEvent}
+              isOpen={isModalOpen}
+              onClose={() => {
+                setIsModalOpen(false);
+                setSelectedEvent(null);
+              }}
+            />
+          )}
         </div>
-      </div>
-
-      <div className="container mx-auto px-4">
-        <Timeline data={events} />
-        {selectedEvent && (
-          <EventDetailModal
-            event={selectedEvent}
-            isOpen={isModalOpen}
-            onClose={() => {
-              setIsModalOpen(false);
-              setSelectedEvent(null);
-            }}
-          />
-        )}
       </div>
     </div>
   );

@@ -10,12 +10,25 @@ interface TimelineEntry {
   content: React.ReactNode;
 }
 
-export function TimelineHistory() {
+interface TimelineHistoryProps {
+  searchQuery?: string;
+  filterCriteria?: {
+    location: string;
+    category: string;
+  };
+}
+
+export function TimelineHistory({
+  searchQuery = "",
+  filterCriteria = { location: "Tous", category: "Tous" },
+}: TimelineHistoryProps) {
   const [events, setevents] = useState<TimelineEntry[]>([]);
   const [error, setError] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
 
+  // Récupérer les événements depuis l'API
   useEffect(() => {
     const fetchevents = async () => {
       try {
@@ -36,70 +49,10 @@ export function TimelineHistory() {
             return;
           }
 
-          // Grouper les événements par date
-          const eventsByDate = futurePublicEvents.reduce(
-            (acc: { [key: string]: Event[] }, event: Event) => {
-              const date = new Date(event.event_date).toLocaleDateString(
-                "fr-FR",
-                {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                }
-              );
-              if (!acc[date]) {
-                acc[date] = [];
-              }
-              acc[date].push(event);
-              return acc;
-            },
-            {}
-          );
+          setAllEvents(futurePublicEvents);
 
-          // Transformer en format Timeline
-          const timelineData = Object.entries(eventsByDate)
-            .map(([date, events]) => ({
-              title: date,
-              content: (
-                <div>
-                  <div className="mb-8">
-                    {(events as Event[]).map((event: Event) => (
-                      <div key={event.id} className="mb-4">
-                        <h3 className="text-neutral-800 dark:text-neutral-200 text-sm font-semibold">
-                          {event.title}
-                        </h3>
-                        {event.subtitle && (
-                          <p className="text-neutral-700 dark:text-neutral-300 text-xs">
-                            {event.subtitle}
-                          </p>
-                        )}
-                        <button
-                          onClick={() => {
-                            setSelectedEvent(event);
-                            setIsModalOpen(true);
-                          }}
-                          className="inline-block mt-2 px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-medium hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
-                        >
-                          Voir le détail
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ),
-            }))
-            .sort((a, b) => {
-              // Find the first event from each group to compare dates
-              const eventsA = eventsByDate[a.title];
-              const eventsB = eventsByDate[b.title];
-
-              const dateA = new Date(eventsA[0].event_date);
-              const dateB = new Date(eventsB[0].event_date);
-
-              return dateA.getTime() - dateB.getTime();
-            });
-
-          setevents(timelineData);
+          // Formatage initial sans filtres
+          formatEventsForTimeline(futurePublicEvents);
         } else {
           setError("Erreur lors de la récupération des événements");
         }
@@ -111,6 +64,119 @@ export function TimelineHistory() {
 
     fetchevents();
   }, []);
+
+  // Effet pour appliquer les filtres
+  useEffect(() => {
+    if (allEvents.length === 0) return;
+
+    console.log("TimelineHistory - Filtrage avec critères:", filterCriteria);
+    console.log("TimelineHistory - Recherche:", searchQuery);
+
+    let filtered = [...allEvents];
+
+    // Filtrer par lieu si un lieu spécifique est sélectionné
+    if (filterCriteria.location !== "Tous") {
+      filtered = filtered.filter(
+        (event) => event.location === filterCriteria.location
+      );
+    }
+
+    // Ajouter d'autres critères de filtrage ici si nécessaire
+
+    // Filtrer par texte de recherche si disponible
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(
+        (event) =>
+          event.title.toLowerCase().includes(query) ||
+          event.subtitle?.toLowerCase().includes(query) ||
+          false ||
+          event.description?.toLowerCase().includes(query) ||
+          false
+      );
+    }
+
+    formatEventsForTimeline(filtered);
+  }, [allEvents, filterCriteria, searchQuery]);
+
+  // Fonction pour formater les événements pour la timeline
+  const formatEventsForTimeline = (eventsToFormat: Event[]) => {
+    if (eventsToFormat.length === 0) {
+      setevents([]);
+      return;
+    }
+
+    // Grouper les événements par date
+    const eventsByDate = eventsToFormat.reduce(
+      (acc: { [key: string]: Event[] }, event: Event) => {
+        const date = new Date(event.event_date).toLocaleDateString("fr-FR", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+        acc[date].push(event);
+        return acc;
+      },
+      {}
+    );
+
+    // Transformer en format Timeline
+    const timelineData = Object.entries(eventsByDate)
+      .map(([date, events]) => ({
+        title: date,
+        content: (
+          <div>
+            <div className="mb-8">
+              {(events as Event[]).map((event: Event) => (
+                <div key={event.id} className="mb-4">
+                  <h3 className="text-neutral-800 dark:text-neutral-200 text-sm font-semibold">
+                    {event.title}
+                  </h3>
+                  {event.subtitle && (
+                    <p className="text-neutral-700 dark:text-neutral-300 text-xs">
+                      {event.subtitle}
+                    </p>
+                  )}
+                  <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
+                    {new Date(event.event_date).toLocaleTimeString("fr-FR", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
+                    {event.location}
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSelectedEvent(event);
+                      setIsModalOpen(true);
+                    }}
+                    className="inline-block mt-2 px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-medium hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                  >
+                    Voir le détail
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ),
+      }))
+      .sort((a, b) => {
+        // Find the first event from each group to compare dates
+        const eventsA = eventsByDate[a.title];
+        const eventsB = eventsByDate[b.title];
+
+        const dateA = new Date(eventsA[0].event_date);
+        const dateB = new Date(eventsB[0].event_date);
+
+        return dateA.getTime() - dateB.getTime();
+      });
+
+    setevents(timelineData);
+  };
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
