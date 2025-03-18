@@ -1,5 +1,5 @@
 import pool from "@/lib/db/mysql";
-import { writeFile } from "fs/promises";
+import { writeFile, mkdir, access } from "fs/promises";
 import { ResultSetHeader } from "mysql2";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
@@ -7,6 +7,7 @@ import { convertToWebP, isImage } from "@/lib/imageTransformer";
 import { apiMiddleware } from "../../middleware";
 
 export async function POST(request: NextRequest) {
+  console.log("Début de traitement upload image");
   const middlewareResponse = await apiMiddleware(request);
   if (middlewareResponse.status !== 200) {
     return middlewareResponse;
@@ -24,69 +25,175 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Vérifier si le répertoire d'upload existe, sinon le créer
+    const uploadDir = path.join(process.cwd(), "public", "uploads", "events");
+
+    try {
+      await access(uploadDir);
+      console.log("Le répertoire d'upload existe déjà");
+    } catch (err) {
+      console.log("Création du répertoire d'upload:", uploadDir);
+      await mkdir(uploadDir, { recursive: true });
+    }
+
     const connection = await pool.getConnection();
     const uploadedFiles = [];
 
     try {
+      // Vérifier la structure de la table Media pour déterminer les champs disponibles
+      console.log("Vérification de la structure de la table Media");
+      const [tableInfo] = await connection.execute("DESCRIBE Media");
+      const columns = (tableInfo as any[]).map((col) => col.Field);
+      console.log("Colonnes disponibles:", columns);
+
       for (const file of files) {
-        const buffer = Buffer.from(await file.arrayBuffer());
-        if (!isImage(file.name)) {
-          throw new Error(`Invalid image format for file: ${file.name}`);
-        }
-        const originalName = path.parse(file.name).name;
-        const sanitizedOriginalName = originalName.replace(/[^a-zA-Z0-9-_]/g, "_");
-        const filename = `${Date.now()}_${sanitizedOriginalName}.webp`;
-        const filepath = path.join(
-          process.cwd(),
-          "public",
-          "uploads",
-          "events",
-          filename
+        console.log(
+          `Traitement du fichier: ${file.name}, taille: ${file.size}, type: ${file.type}`
         );
-        const relativePath = `/uploads/events/${filename}`;
 
-        // Convert the image to WebP
+        // Convertir le fichier en Buffer
+        let buffer;
         try {
-          console.log('Starting WebP conversion for file:', file.name);
-          const webpBuffer = await convertToWebP(buffer);
-          console.log('WebP conversion successful. Buffer size:', webpBuffer.length);
-        } catch (convError) {
-          console.error('Conversion failed for', file.name, convError);
-          throw new Error(`Failed to convert ${file.name} to WebP`);
-        }
-        const webpBuffer = await convertToWebP(buffer);
-        await writeFile(filepath, webpBuffer);
-
-        // Insert into the Media table
-        const [mediaResult] = await connection.execute(
-          `INSERT INTO Media (url, type, title, size) VALUES (?, ?, ?, ?)`,
-          [relativePath, 'image/webp', file.name, webpBuffer.length]
-        );
-        const mediaId = (mediaResult as ResultSetHeader).insertId;
-
-        // Create the relationship in Event_Media
-        if (eventId) {
-          await connection.execute(
-            `INSERT INTO Event_Media (event_id, media_id) VALUES (?, ?)`,
-            [eventId, mediaId]
+          buffer = Buffer.from(await file.arrayBuffer());
+          console.log(`Buffer créé, taille: ${buffer.length}`);
+        } catch (bufferError) {
+          console.error("Erreur lors de la création du buffer:", bufferError);
+          return NextResponse.json(
+            { error: `Erreur lors de la lecture du fichier ${file.name}` },
+            { status: 500 }
           );
         }
 
-        uploadedFiles.push({
-          id: mediaId,
-          url: relativePath,
-          name: file.name,
-        });
+        // Vérifier si c'est bien une image
+        if (!isImage(file.name)) {
+          console.error(`Format non supporté: ${file.name}`);
+          return NextResponse.json(
+            { error: `Format d'image non supporté: ${file.name}` },
+            { status: 400 }
+          );
+        }
+
+        // Créer un nom de fichier unique
+        const originalName = path.parse(file.name).name;
+        const sanitizedOriginalName = originalName.replace(
+          /[^a-zA-Z0-9-_]/g,
+          "_"
+        );
+        const timestamp = Date.now();
+        const filename = `${timestamp}_${sanitizedOriginalName}.webp`;
+        const filepath = path.join(uploadDir, filename);
+        const relativePath = `/uploads/events/${filename}`;
+
+        console.log(`Nom de fichier généré: ${filename}`);
+        console.log(`Chemin complet: ${filepath}`);
+
+        // Convertir l'image en WebP et l'écrire sur le disque
+        let webpBuffer;
+        try {
+          console.log("Début de la conversion WebP pour:", file.name);
+          webpBuffer = await convertToWebP(buffer);
+          console.log(
+            "Conversion WebP réussie. Taille du buffer:",
+            webpBuffer.length
+          );
+
+          // Écrire le fichier sur le disque
+          await writeFile(filepath, webpBuffer);
+          console.log("Fichier écrit avec succès:", filepath);
+        } catch (convError) {
+          console.error("Échec de la conversion pour", file.name, convError);
+          return NextResponse.json(
+            {
+              error: `Erreur lors du traitement de l'image ${file.name}`,
+              details:
+                convError instanceof Error
+                  ? convError.message
+                  : String(convError),
+            },
+            { status: 500 }
+          );
+        }
+
+        try {
+          // Préparer la requête SQL en fonction des colonnes disponibles
+          let query, params;
+
+          if (columns.includes("is_published")) {
+            console.log("Utilisation de la colonne is_published");
+            query =
+              "INSERT INTO Media (url, type, title, size, is_published) VALUES (?, ?, ?, ?, ?)";
+            params = [
+              relativePath,
+              "image/webp",
+              file.name,
+              webpBuffer.length,
+              1,
+            ];
+          } else {
+            console.log(
+              "La colonne is_published n'existe pas, utilisation d'une requête simplifiée"
+            );
+            query =
+              "INSERT INTO Media (url, type, title, size) VALUES (?, ?, ?, ?)";
+            params = [relativePath, "image/webp", file.name, webpBuffer.length];
+          }
+
+          console.log("Requête SQL:", query);
+          console.log("Paramètres:", params);
+
+          // Insérer dans la base de données
+          console.log("Insertion dans la base de données");
+          const [mediaResult] = await connection.execute(query, params);
+
+          const mediaId = (mediaResult as ResultSetHeader).insertId;
+          console.log("Média créé avec ID:", mediaId);
+
+          // Créer la relation Event_Media si necessaire
+          if (eventId) {
+            console.log("Création de la relation Event_Media");
+            await connection.execute(
+              `INSERT INTO Event_Media (event_id, media_id) VALUES (?, ?)`,
+              [eventId, mediaId]
+            );
+          }
+
+          uploadedFiles.push({
+            id: mediaId,
+            url: relativePath,
+            name: file.name,
+          });
+        } catch (dbError) {
+          console.error(
+            "Erreur lors de l'insertion en base de données:",
+            dbError
+          );
+          return NextResponse.json(
+            {
+              error: "Erreur lors de l'enregistrement en base de données",
+              details:
+                dbError instanceof Error ? dbError.message : String(dbError),
+            },
+            { status: 500 }
+          );
+        }
       }
 
+      console.log(
+        "Upload terminé avec succès:",
+        uploadedFiles.length,
+        "fichiers"
+      );
       return NextResponse.json({ files: uploadedFiles });
     } finally {
       connection.release();
     }
   } catch (error) {
-    console.error("Erreur upload:", error);
+    console.error("Erreur générale lors de l'upload:", error);
     return NextResponse.json(
-      { error: "Erreur lors de l'upload" },
+      {
+        error: "Erreur lors de l'upload",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }

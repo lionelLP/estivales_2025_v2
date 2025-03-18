@@ -10,10 +10,10 @@ interface Media {
   url: string;
   type: string;
   title: string;
-  alt_text: string | null;
-  uploaded_at: string;
-  size: number;
-  is_favorite: boolean;
+  alt_text?: string | null;
+  uploaded_at?: string;
+  size?: number;
+  is_favorite?: boolean;
 }
 
 export const ParallaxScroll = ({ media }: { media: Media[] }) => {
@@ -41,8 +41,13 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
     [0, window.innerWidth < 768 ? -200 : -400]
   );
 
-  const isYoutubeUrl = (url: string) => {
-    return url.includes("youtube.com") || url.includes("youtu.be");
+  const isVideo = (item: Media) => {
+    // Assurez-vous que cette vérification est correcte
+    return (
+      item.type === "video/youtube" ||
+      (item.url &&
+        (item.url.includes("youtube.com") || item.url.includes("youtu.be")))
+    );
   };
 
   const getYoutubeVideoId = (url: string) => {
@@ -56,6 +61,14 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
   media.forEach((item, idx) => {
     rows[idx % 3].push(item);
   });
+
+  const getYoutubeThumbnail = (url: string) => {
+    const videoId = getYoutubeVideoId(url);
+    if (!videoId) return "";
+
+    // Utiliser l'API de vignettes YouTube, qui est autorisée dans next.config.js
+    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  };
 
   return (
     <>
@@ -83,15 +96,28 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
                     key={item.id}
                     className="group relative rounded-lg overflow-hidden cursor-pointer"
                     onClick={() => {
-                      if (isYoutubeUrl(item.url)) {
+                      if (isVideo(item)) {
                         setSelectedVideo(item.url);
                       }
                     }}
                   >
-                    {isYoutubeUrl(item.url) ? (
+                    {isVideo(item) ? (
                       <div className="h-[200px] md:h-[350px] w-full md:w-[250px] relative">
                         <div className="relative w-full h-full bg-black flex items-center justify-center">
-                          <div className="w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center">
+                          {/* Utiliser une image statique pour les miniatures YouTube */}
+                          <div
+                            className="w-full h-full bg-cover bg-center"
+                            style={{
+                              backgroundImage: `url(${getYoutubeThumbnail(
+                                item.url
+                              )})`,
+                              backgroundSize: "cover",
+                            }}
+                          >
+                            <div className="absolute inset-0 bg-black opacity-40"></div>
+                          </div>
+
+                          <div className="absolute w-12 h-12 md:w-16 md:h-16 bg-red-600 rounded-full flex items-center justify-center">
                             <svg
                               className="w-6 h-6 md:w-8 md:h-8 text-white"
                               fill="currentColor"

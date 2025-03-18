@@ -56,6 +56,7 @@ interface FileUploadProps {
   initialFiles?: File[];
   id: string;
   accept?: string;
+  multiple?: boolean;
 }
 
 export const FileUpload: React.FC<FileUploadProps> = ({
@@ -64,6 +65,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   initialFiles = [],
   id,
   accept,
+  multiple = true,
 }) => {
   const [files, setFiles] = useState<File[]>(initialFiles);
   const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
@@ -91,7 +93,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   const { getRootProps, isDragActive } = useDropzone({
-    multiple: true,
+    multiple,
     noClick: true,
     onDrop: handleFileChange,
     onDropRejected: (error) => {
@@ -110,7 +112,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           ref={fileInputRef}
           id={`file-upload-handle-${id}`}
           type="file"
-          multiple
+          multiple={multiple}
           accept={accept}
           onChange={(e) => handleFileChange(Array.from(e.target.files || []))}
           className="hidden"
