@@ -72,7 +72,7 @@ export default function MediaPage() {
           }
 
           const validMedia = data.filter(
-            (item: any) =>
+            (item: Media) =>
               item &&
               item.url &&
               typeof item.url === "string" &&

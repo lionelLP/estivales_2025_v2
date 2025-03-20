@@ -1,9 +1,8 @@
 "use client";
 
+import { FileUpload } from "@/components/common/file-upload";
 import { ImageViewer } from "@/components/common/ImageViewer";
-import { Heart, Trash2, Plus } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,13 +10,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-const DialogClose = DialogPrimitive.Close;
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileUpload } from "@/components/common/file-upload";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { Heart, Plus, Trash2, X } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+const DialogClose = DialogPrimitive.Close;
 
 interface Media {
   id: number;
@@ -250,7 +250,11 @@ export default function MediasPage() {
               <Plus className="mr-2 h-4 w-4" /> Ajouter un média
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[500px] relative">
+            <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Fermer</span>
+            </DialogClose>
             <DialogHeader>
               <DialogTitle>Ajouter un nouveau média</DialogTitle>
             </DialogHeader>
@@ -317,9 +321,6 @@ export default function MediasPage() {
             </Tabs>
             {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
             <div className="flex justify-end gap-2 mt-4">
-              <DialogClose asChild data-dialog-close>
-                <Button variant="outline">Annuler</Button>
-              </DialogClose>
               <Button
                 onClick={handleAddMedia}
                 disabled={loading}

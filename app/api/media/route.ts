@@ -15,7 +15,9 @@ export async function GET(request: NextRequest) {
       // Vérifier la structure de la table Media pour déterminer les champs disponibles
       console.log("Vérification de la structure de la table Media");
       const [tableInfo] = await connection.execute("DESCRIBE Media");
-      const columns = (tableInfo as any[]).map((col) => col.Field);
+      const columns = (tableInfo as { Field: string }[]).map(
+        (col) => col.Field
+      );
       console.log("Colonnes disponibles:", columns);
 
       let query;
@@ -38,7 +40,7 @@ export async function GET(request: NextRequest) {
       const [rows] = await connection.execute(query);
 
       // Filtrer les résultats pour ne garder que les médias avec des URL valides
-      const validRows = (rows as any[]).filter(
+      const validRows = (rows as { url: string }[]).filter(
         (row) =>
           row && row.url && typeof row.url === "string" && row.url.trim() !== ""
       );

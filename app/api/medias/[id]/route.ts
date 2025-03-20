@@ -58,14 +58,14 @@ export async function PUT(
         [mediaId]
       );
 
-      if ((rows as any[]).length === 0) {
+      if ((rows as RowDataPacket[]).length === 0) {
         return NextResponse.json(
           { error: "Média non trouvé" },
           { status: 404 }
         );
       }
 
-      return NextResponse.json((rows as any)[0]);
+      return NextResponse.json((rows as RowDataPacket[])[0] as MediaRow);
     } finally {
       connection.release();
     }

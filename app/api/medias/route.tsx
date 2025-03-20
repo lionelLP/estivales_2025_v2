@@ -87,7 +87,9 @@ export async function POST(request: NextRequest) {
       // Vérifier la structure de la table Media pour déterminer les champs disponibles
       console.log("Vérification de la structure de la table Media");
       const [tableInfo] = await connection.execute("DESCRIBE Media");
-      const columns = (tableInfo as any[]).map((col) => col.Field);
+      const columns = (tableInfo as { Field: string }[]).map(
+        (col) => col.Field
+      );
       console.log("Colonnes disponibles:", columns);
 
       // Préparer les données pour l'insertion
@@ -120,7 +122,7 @@ export async function POST(request: NextRequest) {
         console.log("Insertion réussie, résultat:", result);
 
         // Récupérer l'ID du média créé
-        const mediaId = (result as any).insertId;
+        const mediaId = (result as { insertId: number }).insertId;
 
         if (!mediaId) {
           throw new Error("Impossible de récupérer l'ID du média créé");
@@ -132,11 +134,11 @@ export async function POST(request: NextRequest) {
           [mediaId]
         );
 
-        if (!mediaRows || !(mediaRows as any[])[0]) {
+        if (!mediaRows || !(mediaRows as { id: number }[])[0]) {
           throw new Error("Média créé mais impossible de le récupérer");
         }
 
-        const mediaData = (mediaRows as any[])[0];
+        const mediaData = (mediaRows as { id: number }[])[0];
         console.log("Média créé avec succès:", mediaData);
         return NextResponse.json(mediaData);
       } catch (dbError) {

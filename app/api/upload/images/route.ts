@@ -1,9 +1,9 @@
 import pool from "@/lib/db/mysql";
-import { writeFile, mkdir, access } from "fs/promises";
+import { convertToWebP, isImage } from "@/lib/imageTransformer";
+import { access, mkdir, writeFile } from "fs/promises";
 import { ResultSetHeader } from "mysql2";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
-import { convertToWebP, isImage } from "@/lib/imageTransformer";
 import { apiMiddleware } from "../../middleware";
 
 export async function POST(request: NextRequest) {
@@ -43,7 +43,9 @@ export async function POST(request: NextRequest) {
       // Vérifier la structure de la table Media pour déterminer les champs disponibles
       console.log("Vérification de la structure de la table Media");
       const [tableInfo] = await connection.execute("DESCRIBE Media");
-      const columns = (tableInfo as any[]).map((col) => col.Field);
+      const columns = (tableInfo as { Field: string }[]).map(
+        (col) => col.Field
+      );
       console.log("Colonnes disponibles:", columns);
 
       for (const file of files) {
