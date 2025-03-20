@@ -111,3 +111,8 @@ body {
     border-color: hsl(var(--border)) !important;
   }
 }
+
+/* Add this to hide scrollbar for WebKit browsers */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
