@@ -10,10 +10,10 @@ interface Media {
   url: string;
   type: string;
   title: string;
-  alt_text: string | null;
-  uploaded_at: string;
-  size: number;
-  is_favorite: boolean;
+  alt_text?: string | null;
+  uploaded_at?: string;
+  size?: number;
+  is_favorite?: boolean;
 }
 
 export const ParallaxScroll = ({ media }: { media: Media[] }) => {
@@ -29,8 +29,16 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
   const translateSecond = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const translateThird = useTransform(scrollYProgress, [0, 1], [0, -200]);
 
+  const isVideo = (item: Media) => {
+    return (
+      item.type === "video/youtube" ||
+      (item.url &&
+        (item.url.includes("youtube.com") || item.url.includes("youtu.be")))
+    );
+  };
+
   const isYoutubeUrl = (url: string) => {
-    return url.includes("youtube.com") || url.includes("youtu.be");
+    return url && (url.includes("youtube.com") || url.includes("youtu.be"));
   };
 
   const getYoutubeVideoId = (url: string) => {
@@ -44,6 +52,14 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
   const firstPart = media.slice(0, third);
   const secondPart = media.slice(third, 2 * third);
   const thirdPart = media.slice(2 * third);
+
+  const getYoutubeThumbnail = (url: string) => {
+    const videoId = getYoutubeVideoId(url);
+    if (!videoId) return "";
+
+    // Utiliser l'API de vignettes YouTube, qui est autorisée dans next.config.js
+    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  };
 
   return (
     <>
@@ -59,7 +75,7 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
                 style={{ y: translateFirst }}
                 className="group relative rounded-lg overflow-hidden cursor-pointer"
                 onClick={() => {
-                  if (isYoutubeUrl(item.url)) {
+                  if (isVideo(item)) {
                     setSelectedVideo(item.url);
                   }
                 }}
@@ -76,6 +92,16 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
                           <path d="M8 5v14l11-7z" />
                         </svg>
                       </div>
+                      
+                      <div 
+                        className="absolute inset-0"
+                        style={{
+                          backgroundImage: `url(${getYoutubeThumbnail(item.url)})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          opacity: 0.6
+                        }}
+                      />
                     </div>
                   </div>
                 ) : (
@@ -102,7 +128,7 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
                 style={{ y: translateSecond }}
                 className="group relative rounded-lg overflow-hidden cursor-pointer"
                 onClick={() => {
-                  if (isYoutubeUrl(item.url)) {
+                  if (isVideo(item)) {
                     setSelectedVideo(item.url);
                   }
                 }}
@@ -119,6 +145,16 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
                           <path d="M8 5v14l11-7z" />
                         </svg>
                       </div>
+                      
+                      <div 
+                        className="absolute inset-0"
+                        style={{
+                          backgroundImage: `url(${getYoutubeThumbnail(item.url)})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          opacity: 0.6
+                        }}
+                      />
                     </div>
                   </div>
                 ) : (
@@ -145,7 +181,7 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
                 style={{ y: translateThird }}
                 className="group relative rounded-lg overflow-hidden cursor-pointer"
                 onClick={() => {
-                  if (isYoutubeUrl(item.url)) {
+                  if (isVideo(item)) {
                     setSelectedVideo(item.url);
                   }
                 }}
@@ -162,6 +198,16 @@ export const ParallaxScroll = ({ media }: { media: Media[] }) => {
                           <path d="M8 5v14l11-7z" />
                         </svg>
                       </div>
+                      
+                      <div 
+                        className="absolute inset-0"
+                        style={{
+                          backgroundImage: `url(${getYoutubeThumbnail(item.url)})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          opacity: 0.6
+                        }}
+                      />
                     </div>
                   </div>
                 ) : (

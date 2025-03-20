@@ -211,11 +211,8 @@ JWT_SECRET=       # Chaîne aléatoire pour sécuriser les tokens
 
 La base de données est configurée via Docker. Assurez-vous que les variables DB*\* et MYSQL*\* correspondent entre elles. Le `DB_HOST` doit être `db` car c'est le nom du service dans le docker-compose.
 
-<<<<<<< HEAD
 Crée un token du repository git et mettez le dans le fichier `.env` comme indiqué.
-=======
 Le script situé dans docker/mysql/exemple-insert.sql permet de reconstruire une base de données qui contient déjà des données d'exemple pour accéder plus mettre en place plus rapidement un environnement similaire à ce que que pourait ressembler le site une fois en ligne
->>>>>>> 6622be9ebc9e38995f1208ece7494cb5d952042b
 
 #### 2. Serveur SMTP
 
@@ -300,5 +297,7 @@ Toutes les routes administratives sont protégées par vérification du token et
 ## Sitemap
 
 Pour génerer le robots.txt ainsi que le sitemap du site manuellement vous devez executer la commande :
+
 ```bash
 npm run sitemap
+```

@@ -1,6 +1,8 @@
 "use client";
 
 import { EventDetailModal } from "@/components/common/EventDetailModal";
+import { FiltreEvenement } from "@/components/events/filtre-evenement";
+import { RechercheEvenement } from "@/components/events/recherche-evenement";
 import { Timeline } from "@/components/ui/timeline";
 import { useLoading } from "@/contexts/LoadingContext";
 import { Event } from "@/lib/types/event";
@@ -17,6 +19,24 @@ export default function ProgrammesToCome() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { registerLoadingComponent, componentLoaded } = useLoading();
+  const [uniqueLocations, setUniqueLocations] = useState<string[]>([]);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  // filteredEvents est utilisé dans le flux de données et pour la cohérence du code
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCriteria, setFilterCriteria] = useState<{
+    location: string;
+    dateRange: {
+      from: Date | undefined;
+      to: Date | undefined;
+    };
+  }>({
+    location: "Tous",
+    dateRange: { from: undefined, to: undefined },
+  });
+  const [noEventsFound, setNoEventsFound] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
 
   useEffect(() => {
     const loadingId = registerLoadingComponent();
@@ -26,6 +46,7 @@ export default function ProgrammesToCome() {
         const response = await fetch("/api/events");
         if (response.ok) {
           const data = await response.json();
+          console.log("Données brutes des événements:", data);
 
           // Filtrer les événements futurs
           const now = new Date();
@@ -34,110 +55,243 @@ export default function ProgrammesToCome() {
             return eventDate > now;
           });
 
+          console.log("Événements futurs:", futureEvents);
+
+          // Stocker tous les événements pour les filtrer plus tard
+          setAllEvents(futureEvents);
+          setFilteredEvents(futureEvents);
+
           if (futureEvents.length === 0) {
             setevents([]);
+            setNoEventsFound(true);
+            componentLoaded(loadingId);
             return;
           }
 
-          // Grouper les événements par date
-          const eventsByDate = futureEvents.reduce(
-            (acc: { [key: string]: Event[] }, event: Event) => {
-              const date = new Date(event.event_date).toLocaleDateString(
-                "fr-FR",
-                {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                }
-              );
-              if (!acc[date]) {
-                acc[date] = [];
-              }
-              acc[date].push(event);
-              return acc;
-            },
-            {}
-          );
+          // Extraire les lieux uniques des événements
+          const locations: string[] = futureEvents
+            .map((event: Event) => {
+              console.log("Location d'un événement:", event.location);
+              return event.location;
+            })
+            .filter(
+              (location: string | undefined): location is string => !!location
+            );
 
-          // Transformer en format Timeline
-          const timelineData = Object.entries(eventsByDate)
-            .map(([date, events]) => ({
-              title: date,
-              content: (
-                <div>
-                  <div className="mb-8">
-                    {(events as Event[]).map((event: Event) => (
-                      <div key={event.id} className="mb-4">
-                        <h3 className="text-neutral-800 dark:text-neutral-200 text-sm font-semibold">
-                          {event.title}
-                        </h3>
-                        {event.subtitle && (
-                          <p className="text-neutral-700 dark:text-neutral-300 text-xs">
-                            {event.subtitle}
-                          </p>
-                        )}
-                        <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
-                          {new Date(event.event_date).toLocaleTimeString(
-                            "fr-FR",
-                            {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )}
-                        </p>
-                        <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
-                          {event.location}
-                        </p>
-                        <button
-                          onClick={() => {
-                            setSelectedEvent(event);
-                            setIsModalOpen(true);
-                          }}
-                          className="inline-block mt-2 px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-medium hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
-                        >
-                          Voir les détails
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ),
-            }))
-            .sort((a, b) => {
-              const dateA = new Date(eventsByDate[a.title][0].event_date);
-              const dateB = new Date(eventsByDate[b.title][0].event_date);
-              return dateA.getTime() - dateB.getTime();
-            });
+          console.log("Locations extraites:", locations);
 
-          setevents(timelineData);
+          // Dédupliquer les lieux
+          const uniqueLocationsSet = [...new Set(locations)];
+          console.log("Locations uniques:", uniqueLocationsSet);
+          setUniqueLocations(uniqueLocationsSet);
+
+          // Formatage initial des événements pour la timeline
+          formatEventsForTimeline(futureEvents);
+          setNoEventsFound(false);
+
+          componentLoaded(loadingId);
         } else {
           setError("Erreur lors de la récupération des événements");
+          componentLoaded(loadingId);
         }
-      } catch (err) {
-        console.error("Erreur lors de la récupération des événements:", err);
+      } catch (error) {
+        console.error("Erreur:", error);
         setError("Erreur lors de la récupération des événements");
-      } finally {
         componentLoaded(loadingId);
       }
     };
 
     fetchevents();
-
-    return () => {
-      componentLoaded(loadingId);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
+  // Effet pour appliquer les filtres
+  useEffect(() => {
+    if (allEvents.length === 0) return;
 
-  if (events.length === 0) {
-    return (
-      <div className="text-center text-gray-500">Aucun événement à venir</div>
+    setIsFiltering(
+      searchQuery.trim() !== "" ||
+        filterCriteria.location !== "Tous" ||
+        filterCriteria.dateRange.from !== undefined ||
+        filterCriteria.dateRange.to !== undefined
     );
-  }
+
+    console.log("Filtrage avec critères:", filterCriteria);
+    console.log("Recherche:", searchQuery);
+
+    let filtered = [...allEvents];
+
+    // Filtrer par lieu si un lieu spécifique est sélectionné
+    if (filterCriteria.location !== "Tous") {
+      filtered = filtered.filter(
+        (event) => event.location === filterCriteria.location
+      );
+    }
+
+    // Filtrer par plage de dates si définie
+    if (filterCriteria.dateRange.from) {
+      const fromDate = new Date(filterCriteria.dateRange.from);
+      filtered = filtered.filter((event) => {
+        const eventDate = new Date(event.event_date);
+        return eventDate >= fromDate;
+      });
+    }
+
+    if (filterCriteria.dateRange.to) {
+      const toDate = new Date(filterCriteria.dateRange.to);
+      // Ajouter un jour pour inclure les événements du dernier jour
+      toDate.setDate(toDate.getDate() + 1);
+      filtered = filtered.filter((event) => {
+        const eventDate = new Date(event.event_date);
+        return eventDate < toDate;
+      });
+    }
+
+    // Filtrer par texte de recherche si disponible
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(
+        (event) =>
+          event.title.toLowerCase().includes(query) ||
+          event.subtitle?.toLowerCase().includes(query) ||
+          false ||
+          event.description?.toLowerCase().includes(query) ||
+          false
+      );
+    }
+
+    setFilteredEvents(filtered);
+
+    if (filtered.length === 0) {
+      setNoEventsFound(true);
+      setevents([]);
+    } else {
+      setNoEventsFound(false);
+      formatEventsForTimeline(filtered);
+    }
+  }, [allEvents, filterCriteria, searchQuery]);
+
+  // Fonction pour formater les événements pour la timeline
+  const formatEventsForTimeline = (eventsToFormat: Event[]) => {
+    if (eventsToFormat.length === 0) {
+      setevents([]);
+      return;
+    }
+
+    // Grouper les événements par date
+    const eventsByDate = eventsToFormat.reduce(
+      (acc: { [key: string]: Event[] }, event: Event) => {
+        const date = new Date(event.event_date).toLocaleDateString("fr-FR", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+        acc[date].push(event);
+        return acc;
+      },
+      {}
+    );
+
+    // Transformer en format Timeline
+    const timelineData = Object.entries(eventsByDate)
+      .map(([date, events]) => ({
+        title: date,
+        content: (
+          <div>
+            <div className="mb-8">
+              {(events as Event[]).map((event: Event) => (
+                <div key={event.id} className="mb-4">
+                  <h3 className="text-neutral-800 dark:text-neutral-200 text-sm font-semibold">
+                    {event.title}
+                  </h3>
+                  {event.subtitle && (
+                    <p className="text-neutral-700 dark:text-neutral-300 text-xs">
+                      {event.subtitle}
+                    </p>
+                  )}
+                  <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
+                    {new Date(event.event_date).toLocaleTimeString("fr-FR", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
+                    {event.location}
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSelectedEvent(event);
+                      setIsModalOpen(true);
+                    }}
+                    className="inline-block mt-2 px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-medium hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                  >
+                    Voir les détails
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ),
+      }))
+      .sort((a, b) => {
+        const dateA = new Date(eventsByDate[a.title][0].event_date);
+        const dateB = new Date(eventsByDate[b.title][0].event_date);
+        return dateA.getTime() - dateB.getTime();
+      });
+
+    setevents(timelineData);
+  };
+
+  // Ajouter un log pour vérifier uniqueLocations à chaque rendu
+  console.log("uniqueLocations lors du rendu:", uniqueLocations);
+
+  // Gestionnaires pour la recherche et le filtrage
+  const handleSearch = (query: string) => {
+    console.log("Recherche toCome:", query);
+    setSearchQuery(query);
+  };
+
+  const handleFilter = (filters: {
+    location: string;
+    dateRange: {
+      from: Date | undefined;
+      to: Date | undefined;
+    };
+  }) => {
+    console.log("Filtres toCome:", filters);
+    setFilterCriteria(filters);
+  };
+
+  // Message à afficher en fonction du contexte
+  const renderNoEventsMessage = () => {
+    if (isFiltering) {
+      return (
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-8 text-center shadow-md border border-pink-100 dark:border-pink-900 my-8">
+          <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mb-2">
+            Aucun événement trouvé
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Aucun événement ne correspond à vos critères de recherche. Veuillez
+            modifier vos filtres.
+          </p>
+        </div>
+      );
+    } else {
+      return (
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-8 text-center shadow-md border border-pink-100 dark:border-pink-900 my-8">
+          <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mb-2">
+            Aucun événement à venir
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Il n&apos;y a actuellement aucun événement programmé. Revenez
+            bientôt pour découvrir nos prochains spectacles.
+          </p>
+        </div>
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen pt-20">
@@ -150,11 +304,28 @@ export default function ProgrammesToCome() {
               </h1>
             </div>
           </div>
+          <div className="mb-8">
+            <RechercheEvenement mode="toCome" onSearch={handleSearch} />
+            <FiltreEvenement
+              mode="toCome"
+              onFilter={handleFilter}
+              locations={uniqueLocations}
+            />
+          </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4">
-        <Timeline data={events} />
+        {error ? (
+          <div className="text-red-500 bg-red-50 dark:bg-red-950/20 p-4 rounded-lg border border-red-200 dark:border-red-800 my-4">
+            {error}
+          </div>
+        ) : noEventsFound ? (
+          renderNoEventsMessage()
+        ) : (
+          <Timeline data={events} />
+        )}
+
         {selectedEvent && (
           <EventDetailModal
             event={selectedEvent}

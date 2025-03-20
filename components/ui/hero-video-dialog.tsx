@@ -1,5 +1,7 @@
 "use client";
 
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { AnimatePresence, motion } from "framer-motion";
 import { Play, XIcon } from "lucide-react";
 import Image from "next/image";
@@ -121,6 +123,11 @@ export default function HeroVideoDialog({
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
               className="relative w-full max-w-4xl aspect-video mx-4 md:mx-0"
             >
+              <VisuallyHidden>
+                <DialogPrimitive.Title>
+                  {thumbnailAlt || "Vidéo"}
+                </DialogPrimitive.Title>
+              </VisuallyHidden>
               <motion.button className="absolute -top-16 right-0 text-white text-xl bg-neutral-900/50 ring-1 backdrop-blur-md rounded-full p-2 dark:bg-neutral-100/50 dark:text-black">
                 <XIcon className="size-5" />
               </motion.button>
