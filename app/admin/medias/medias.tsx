@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Heart, Plus, Trash2, X } from "lucide-react";
+import { Heart, Play, Plus, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 const DialogClose = DialogPrimitive.Close;
@@ -38,6 +38,8 @@ export default function MediasPage() {
   const [images, setImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchMedias = async () => {
@@ -237,6 +239,49 @@ export default function MediasPage() {
     }
   };
 
+  // Fonction pour obtenir l'URL de la miniature YouTube
+  const getYouTubeThumbnailUrl = (youtubeUrl: string) => {
+    let videoId = "";
+
+    // Extraire l'ID de la vidéo YouTube à partir de l'URL
+    if (youtubeUrl.includes("youtube.com/watch")) {
+      // Format: https://www.youtube.com/watch?v=VIDEO_ID
+      const urlParams = new URLSearchParams(new URL(youtubeUrl).search);
+      videoId = urlParams.get("v") || "";
+    } else if (youtubeUrl.includes("youtu.be")) {
+      // Format: https://youtu.be/VIDEO_ID
+      videoId = youtubeUrl.split("/").pop() || "";
+    }
+
+    // Retourner l'URL de la miniature haute qualité
+    return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "";
+  };
+
+  // Fonction pour convertir une URL YouTube en URL embed
+  const getYouTubeEmbedUrl = (youtubeUrl: string) => {
+    let videoId = "";
+
+    // Extraire l'ID de la vidéo YouTube à partir de l'URL
+    if (youtubeUrl.includes("youtube.com/watch")) {
+      // Format: https://www.youtube.com/watch?v=VIDEO_ID
+      const urlParams = new URLSearchParams(new URL(youtubeUrl).search);
+      videoId = urlParams.get("v") || "";
+    } else if (youtubeUrl.includes("youtu.be")) {
+      // Format: https://youtu.be/VIDEO_ID
+      videoId = youtubeUrl.split("/").pop() || "";
+    }
+
+    // Retourner l'URL d'embed
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+  };
+
+  // Ouvrir le modal avec la vidéo
+  const openVideoModal = (url: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setSelectedVideo(url);
+    setIsVideoModalOpen(true);
+  };
+
   const filteredMedias =
     filter === "all" ? medias : medias.filter((media) => media.is_favorite);
 
@@ -251,7 +296,10 @@ export default function MediasPage() {
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px] relative">
-            <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+            <DialogClose
+              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+              data-dialog-close
+            >
               <X className="h-4 w-4" />
               <span className="sr-only">Fermer</span>
             </DialogClose>
@@ -362,30 +410,26 @@ export default function MediasPage() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredMedias.map((media) => (
           <div key={media.id} className="relative group">
-            <ImageViewer src={media.url} alt={media.title}>
-              <div className="aspect-square relative rounded-lg overflow-hidden cursor-pointer">
+            {media.type === "video/youtube" ? (
+              // Rendu pour les vidéos YouTube (sans le bouton de favoris)
+              <div
+                className="aspect-square relative rounded-lg overflow-hidden cursor-pointer"
+                onClick={(e) => openVideoModal(media.url, e)}
+              >
                 <Image
-                  src={media.url}
+                  src={getYouTubeThumbnailUrl(media.url)}
                   alt={media.title}
                   fill
                   className="object-cover transition-transform group-hover:scale-110"
                 />
+                {/* Bouton Play pour indiquer que c'est une vidéo */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="bg-black bg-opacity-50 rounded-full p-3">
+                    <Play className="w-8 h-8 text-white" />
+                  </div>
+                </div>
                 <div className="absolute top-2 right-2 flex gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(media.id);
-                    }}
-                    className="p-2 rounded-full bg-white/80 hover:bg-white transition-all"
-                  >
-                    <Heart
-                      className={`w-5 h-5 ${
-                        media.is_favorite
-                          ? "fill-pink-500 text-pink-500"
-                          : "text-gray-600"
-                      }`}
-                    />
-                  </button>
+                  {/* Suppression du bouton favoris pour les vidéos */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -397,11 +441,74 @@ export default function MediasPage() {
                   </button>
                 </div>
               </div>
-            </ImageViewer>
+            ) : (
+              // Rendu pour les images (avec le bouton de favoris conservé)
+              <ImageViewer src={media.url} alt={media.title}>
+                <div className="aspect-square relative rounded-lg overflow-hidden cursor-pointer">
+                  <Image
+                    src={media.url}
+                    alt={media.title}
+                    fill
+                    className="object-cover transition-transform group-hover:scale-110"
+                  />
+                  <div className="absolute top-2 right-2 flex gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(media.id);
+                      }}
+                      className="p-2 rounded-full bg-white/80 hover:bg-white transition-all"
+                    >
+                      <Heart
+                        className={`w-5 h-5 ${
+                          media.is_favorite
+                            ? "fill-pink-500 text-pink-500"
+                            : "text-gray-600"
+                        }`}
+                      />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteMedia(media.id);
+                      }}
+                      className="p-2 rounded-full bg-white/80 hover:bg-white transition-all"
+                    >
+                      <Trash2 className="w-5 h-5 text-red-500" />
+                    </button>
+                  </div>
+                </div>
+              </ImageViewer>
+            )}
             <p className="mt-2 text-sm text-center truncate">{media.title}</p>
           </div>
         ))}
       </div>
+
+      {/* Modal pour visionner les vidéos YouTube */}
+      <Dialog open={isVideoModalOpen} onOpenChange={setIsVideoModalOpen}>
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh] p-0">
+          <div className="p-4 relative">
+            <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Fermer</span>
+            </DialogClose>
+          </div>
+          {selectedVideo && (
+            <div className="aspect-video w-full">
+              <iframe
+                width="100%"
+                height="100%"
+                src={`${getYouTubeEmbedUrl(selectedVideo)}?autoplay=1`}
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
