@@ -2,7 +2,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useAuthentication } from "@/hooks/useAuthentication";
 import { motion } from "framer-motion";
-import { CircleUser, LogOut, User, UserPlus } from "lucide-react";
+import { CircleUser, LogOut, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
