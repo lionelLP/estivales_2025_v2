@@ -105,16 +105,6 @@ export default function MobileNavbar() {
             ) : (
               <>
                 <Link
-                  href="/register"
-                  className="flex items-center justify-center gap-2 w-1/2 bg-white dark:bg-dark-mode text-red-brou border-2 border-red-brou hover:bg-gray-50 dark:hover:bg-dark-mode rounded-full py-2 px-4 transition-colors duration-200"
-                  onClick={handleLinkClick}
-                >
-                  <UserPlus className="w-5 h-5 text-red-brou" />
-                  <span className="font-medium text-red-brou">
-                    S&apos;inscrire
-                  </span>
-                </Link>
-                <Link
                   href="/login"
                   className="flex items-center justify-center gap-2 w-1/2 bg-primary text-white bg-red-brou rounded-full py-2 px-4 transition-colors duration-200"
                   onClick={handleLinkClick}
