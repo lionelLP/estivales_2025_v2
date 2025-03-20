@@ -9,6 +9,75 @@ interface MediaRow extends RowDataPacket {
   url: string;
 }
 
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const middlewareResponse = await apiMiddleware(request);
+  if (middlewareResponse.status !== 200) {
+    return middlewareResponse;
+  }
+
+  try {
+    const mediaId = (await params).id;
+    const body = await request.json();
+    const { title, is_published } = body;
+
+    const connection = await pool.getConnection();
+    try {
+      // Construire la requête SQL de mise à jour
+      let sql = "UPDATE Media SET ";
+      const updateParts = [];
+      const values = [];
+
+      if (title !== undefined) {
+        updateParts.push("title = ?");
+        values.push(title);
+      }
+
+      if (is_published !== undefined) {
+        updateParts.push("is_published = ?");
+        values.push(is_published ? 1 : 0);
+      }
+
+      if (updateParts.length === 0) {
+        return NextResponse.json(
+          { error: "Aucune donnée à mettre à jour" },
+          { status: 400 }
+        );
+      }
+
+      sql += updateParts.join(", ") + " WHERE id = ?";
+      values.push(mediaId);
+
+      await connection.execute(sql, values);
+
+      // Récupérer le média mis à jour
+      const [rows] = await connection.execute(
+        "SELECT * FROM Media WHERE id = ?",
+        [mediaId]
+      );
+
+      if ((rows as RowDataPacket[]).length === 0) {
+        return NextResponse.json(
+          { error: "Média non trouvé" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json((rows as RowDataPacket[])[0] as MediaRow);
+    } finally {
+      connection.release();
+    }
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du média:", error);
+    return NextResponse.json(
+      { error: "Erreur lors de la mise à jour du média" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
