@@ -2,21 +2,15 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Installation de git
-RUN apk add --no-cache git
+# Copie des fichiers du projet depuis le contexte local
+COPY . .
 
-# Arguments pour le token GitLab
-ARG GITLAB_TOKEN
-
-# Configuration de git pour utiliser le token avec votre GitLab IUT
-RUN git config --global url."https://oauth2:${GITLAB_TOKEN}@iutbg-gitlab.iutbourg.univ-lyon1.fr/".insteadOf "https://iutbg-gitlab.iutbourg.univ-lyon1.fr/"
-
-# si le dossier .git existe, c'est que le projet est déjà cloné
-RUN if [ -d "/app/.git" ]; then echo "Le projet existe déjà, mise à jour..."; git pull; else echo "Clonage du projet..."; git clone https://iutbg-gitlab.iutbourg.univ-lyon1.fr/sae-but31/2024-25-web/estivales-brou.git .; fi
-
+# Installation des dépendances
 RUN npm install --os=linux --libc=musl sharp
 
+# Construction de l'application
 RUN npm run build 
 
+# Démarrage de l'application
 CMD ["npm", "run", "start"]
 

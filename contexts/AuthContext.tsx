@@ -23,15 +23,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const checkAuth = async () => {
+      console.log("Vérification de l'authentification...");
       try {
+        console.log("Envoi de la requête à /api/auth/check");
         const response = await fetch("/api/auth/check", {
           credentials: "include",
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache",
+          },
         });
+
+        console.log("Réponse reçue:", response.status);
 
         if (response.ok) {
           const userData = await response.json();
+          console.log("Données utilisateur reçues:", userData);
           setUser(userData);
         } else {
+          console.log("Réponse non valide, status:", response.status);
           setUser(null);
         }
       } catch (error) {

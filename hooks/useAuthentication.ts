@@ -11,27 +11,45 @@ export function useAuthentication() {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     setError("");
+    console.log("Tentative de connexion avec:", { email });
 
     try {
+      console.log("Envoi de la requête de connexion...");
       const response = await fetch("/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        },
         credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
+      console.log("Réponse de connexion reçue:", response.status);
       const data = await response.json();
+      console.log("Données de connexion:", {
+        success: data.success,
+        hasUser: !!data.user,
+      });
 
       if (response.ok) {
+        console.log(
+          "Connexion réussie. Type d'utilisateur:",
+          data.user.userType
+        );
         setUser({
           ...data.user,
-          userType: data.user.userType,
+          userType: Number(data.user.userType),
         });
+
+        console.log("Redirection vers", data.user.userType === 0 ? "/" : "/");
         router.push(data.user.userType === 0 ? "/" : "/");
       } else {
+        console.error("Erreur de connexion:", data.message);
         setError(data.message || "Erreur lors de la connexion");
       }
-    } catch {
+    } catch (err) {
+      console.error("Exception lors de la connexion:", err);
       setError("Une erreur s'est produite lors de la connexion");
     } finally {
       setIsLoading(false);
@@ -39,14 +57,21 @@ export function useAuthentication() {
   };
 
   const logout = async () => {
+    console.log("Tentative de déconnexion...");
     try {
       const response = await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+        },
       });
 
+      console.log("Réponse de déconnexion:", response.status);
       if (response.ok) {
         setUser(null);
+        console.log("Déconnexion réussie, redirection vers /login");
         router.push("/login");
       }
     } catch (error) {

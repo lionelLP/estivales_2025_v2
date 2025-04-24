@@ -8,15 +8,25 @@ export async function GET() {
     const token = cookieStore.get("token");
 
     if (!token) {
+      console.log("Aucun token trouvé dans les cookies");
       return NextResponse.json({ message: "Non authentifié" }, { status: 401 });
     }
+
+    console.log("Token trouvé, vérification en cours");
 
     // Vérifier le token
     const decoded = await verifyToken(token.value);
 
     if (!decoded) {
+      console.log("Token invalide ou expiré");
       return NextResponse.json({ message: "Token invalide" }, { status: 401 });
     }
+
+    console.log("Token vérifié avec succès:", {
+      id: decoded.userId,
+      userType: decoded.userType,
+      email: decoded.email,
+    });
 
     return NextResponse.json({
       id: decoded.userId,

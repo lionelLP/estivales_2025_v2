@@ -66,7 +66,8 @@ export async function POST(request: Request) {
       // Générer le token JWT
       const token = await new jose.SignJWT({
         userId: user.id,
-        userType: user.userType,
+        userType: Number(user.userType),
+        email: user.email,
       })
         .setProtectedHeader({ alg: "HS256" })
         .setExpirationTime("7d")
@@ -81,6 +82,10 @@ export async function POST(request: Request) {
         email: user.email,
       });
 
+      // Pour debug - URL de la requête
+      const requestUrl = request.headers.get("host") || "";
+      console.log("Request URL host:", requestUrl);
+
       const response = NextResponse.json(
         {
           success: true,
@@ -94,14 +99,27 @@ export async function POST(request: Request) {
         { status: 200 }
       );
 
-      response.cookies.set({
+      // Pour environnement de développement, définir domaine basé sur l'hôte actuel
+      const cookieOptions = {
         name: "token",
         value: token,
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        secure: false, // Désactiver secure en développement pour permettre http
+        sameSite: "lax" as const,
         path: "/",
-      });
+        maxAge: 7 * 24 * 60 * 60, // 7 jours en secondes
+      };
+
+      // En production, on utilise le domaine spécifique et secure: true
+      if (process.env.NODE_ENV === "production" && process.env.DOMAIN) {
+        Object.assign(cookieOptions, {
+          domain: process.env.DOMAIN,
+          secure: true,
+        });
+      }
+
+      console.log("Cookie options:", { ...cookieOptions, value: "[HIDDEN]" });
+      response.cookies.set(cookieOptions);
 
       return response;
     } finally {
