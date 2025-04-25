@@ -23,8 +23,8 @@ else
     git clone https://iutbg-gitlab.iutbourg.univ-lyon1.fr/sae-but31/2024-25-web/estivales-brou.git .
     npm install --os=linux --libc=musl sharp
 fi
-npm run sitemap
 npm run build
+npm run sitemap
 npm run start
 EOF
 
