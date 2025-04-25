@@ -53,30 +53,10 @@ export default function CreateEvent() {
 
         const { path } = await uploadResponse.json();
         brochurePath = path;
+        console.log("Brochure uploadée avec succès, chemin:", brochurePath);
       }
 
-      // Upload des images si elles existent
-      let imagePaths = [];
-      if (images.length > 0) {
-        const formDataImages = new FormData();
-        images.forEach((file) => {
-          formDataImages.append("files", file);
-        });
-
-        const uploadImagesResponse = await fetch("/api/upload/images", {
-          method: "POST",
-          body: formDataImages,
-        });
-
-        if (!uploadImagesResponse.ok) {
-          throw new Error("Erreur lors de l'upload des images");
-        }
-
-        const { paths } = await uploadImagesResponse.json();
-        imagePaths = paths;
-      }
-
-      // Création de l'événement avec le chemin de la brochure et des images
+      // Création de l'événement avec le chemin de la brochure
       const response = await fetch("/api/events", {
         method: "POST",
         headers: {
@@ -84,13 +64,42 @@ export default function CreateEvent() {
         },
         body: JSON.stringify({
           ...formData,
-          brochure_path: brochurePath,
-          image_paths: imagePaths,
+          brochure_path: brochurePath, // Utiliser directement le chemin de la brochure
         }),
       });
 
       if (!response.ok) {
         throw new Error("Erreur lors de la création de l'événement");
+      }
+
+      const eventData = await response.json();
+      const eventId = eventData.eventId;
+
+      console.log("Événement créé avec ID:", eventId);
+
+      // Upload des images si elles existent
+      if (images.length > 0 && eventId) {
+        const formDataImages = new FormData();
+        images.forEach((file) => {
+          formDataImages.append("files", file);
+        });
+        // Ajout de l'ID de l'événement
+        formDataImages.append("eventId", eventId.toString());
+
+        const uploadImagesResponse = await fetch("/api/upload/images", {
+          method: "POST",
+          body: formDataImages,
+        });
+
+        if (!uploadImagesResponse.ok) {
+          console.error(
+            "Erreur lors de l'upload des images, mais l'événement a été créé"
+          );
+        } else {
+          console.log(
+            "Images uploadées avec succès et associées à l'événement"
+          );
+        }
       }
 
       router.push("/admin/events");

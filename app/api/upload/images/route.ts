@@ -18,6 +18,8 @@ export async function POST(request: NextRequest) {
     const files = formData.getAll("files") as File[];
     const eventId = formData.get("eventId");
 
+    console.log("Upload d'images avec eventId:", eventId);
+
     if (!files || files.length === 0) {
       return NextResponse.json(
         { error: "Aucun fichier fourni" },
@@ -152,10 +154,25 @@ export async function POST(request: NextRequest) {
 
           // Créer la relation Event_Media si necessaire
           if (eventId) {
-            console.log("Création de la relation Event_Media");
-            await connection.execute(
-              `INSERT INTO Event_Media (event_id, media_id) VALUES (?, ?)`,
-              [eventId, mediaId]
+            console.log(
+              `Création de la relation Event_Media entre l'événement ${eventId} et le média ${mediaId}`
+            );
+            try {
+              await connection.execute(
+                `INSERT INTO Event_Media (event_id, media_id) VALUES (?, ?)`,
+                [eventId, mediaId]
+              );
+              console.log("Relation Event_Media créée avec succès");
+            } catch (relationError) {
+              console.error(
+                "Erreur lors de la création de la relation Event_Media:",
+                relationError
+              );
+              // On continue même si la création de la relation échoue
+            }
+          } else {
+            console.log(
+              "Pas d'eventId fourni, la relation Event_Media n'est pas créée"
             );
           }
 

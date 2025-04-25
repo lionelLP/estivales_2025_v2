@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { title, url, type } = body;
+    const { title, url, type, eventId } = body;
 
     if (!url) {
       console.log("URL manquante dans la requête");
@@ -131,6 +131,26 @@ export async function POST(request: NextRequest) {
           throw new Error("Impossible de récupérer l'ID du média créé");
         }
 
+        // Si un eventId est fourni, créer la relation Event_Media
+        if (eventId) {
+          console.log(
+            `Création de la relation Event_Media entre l'événement ${eventId} et le média ${mediaId}`
+          );
+          try {
+            await connection.execute(
+              `INSERT INTO Event_Media (event_id, media_id) VALUES (?, ?)`,
+              [eventId, mediaId]
+            );
+            console.log("Relation Event_Media créée avec succès");
+          } catch (relationError) {
+            console.error(
+              "Erreur lors de la création de la relation Event_Media:",
+              relationError
+            );
+            // On continue même si la création de la relation échoue
+          }
+        }
+
         // Récupérer les données complètes du média pour la réponse
         const [mediaRows] = await connection.execute(
           `SELECT * FROM Media WHERE id = ?`,
@@ -146,6 +166,7 @@ export async function POST(request: NextRequest) {
         const transformedMediaData = {
           ...mediaData,
           url: transformMediaUrls([mediaData as MediaType])[0].url,
+          eventId: eventId || null, // Inclure l'eventId dans la réponse s'il existe
         };
 
         console.log("Média créé avec succès:", transformedMediaData);

@@ -1,3 +1,4 @@
+import pool from "@/lib/db/mysql";
 import { getMediaUrl } from "@/lib/utils/media-utils";
 import { access, mkdir, writeFile } from "fs/promises";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,6 +10,14 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file") as File;
     const image = formData.get("image") as File;
     const useDynamicUrl = formData.get("useDynamicUrl") === "true";
+    // Récupérer l'ID de l'événement si fourni
+    const eventId = formData.get("eventId")
+      ? String(formData.get("eventId"))
+      : null;
+    // Récupérer le titre si fourni
+    const title = formData.get("title") ? String(formData.get("title")) : null;
+
+    console.log("Upload avec eventId:", eventId, "et title:", title);
 
     if (!file && !image) {
       return NextResponse.json(
@@ -30,8 +39,13 @@ export async function POST(request: NextRequest) {
       await writeFile(path.join(uploadDir, filename), buffer);
 
       const staticPath = `/uploads/brochures/${filename}`;
+      const dynamicPath = useDynamicUrl ? getMediaUrl(staticPath) : staticPath;
+
+      // Pour les brochures, nous n'enregistrons pas dans Media car elles sont directement liées à l'événement
+      // dans le champ brochure_path. Nous retournons simplement le chemin.
+
       return NextResponse.json({
-        path: useDynamicUrl ? getMediaUrl(staticPath) : staticPath,
+        path: dynamicPath,
       });
     }
 
@@ -48,8 +62,47 @@ export async function POST(request: NextRequest) {
       await writeFile(path.join(uploadDir, filename), buffer);
 
       const staticPath = `/uploads/images/${filename}`;
+      const dynamicPath = useDynamicUrl ? getMediaUrl(staticPath) : staticPath;
+
+      // Enregistrer l'image en base de données si eventId est spécifié
+      if (eventId) {
+        try {
+          const connection = await pool.getConnection();
+          try {
+            // Insérer dans la table Media
+            const [result] = await connection.execute(
+              "INSERT INTO Media (title, url, type, is_published) VALUES (?, ?, ?, ?)",
+              [title || image.name, staticPath, "image/webp", 1]
+            );
+
+            const mediaId = (result as { insertId: number }).insertId;
+
+            // Créer la relation Event_Media
+            await connection.execute(
+              "INSERT INTO Event_Media (event_id, media_id) VALUES (?, ?)",
+              [eventId, mediaId]
+            );
+
+            console.log(
+              `Image enregistrée avec ID ${mediaId} et associée à l'événement ${eventId}`
+            );
+
+            return NextResponse.json({
+              url: dynamicPath,
+              mediaId: mediaId,
+              eventId: eventId,
+            });
+          } finally {
+            connection.release();
+          }
+        } catch (dbError) {
+          console.error("Erreur base de données:", dbError);
+          // On retourne quand même le chemin du fichier même si l'enregistrement en BDD échoue
+        }
+      }
+
       return NextResponse.json({
-        url: useDynamicUrl ? getMediaUrl(staticPath) : staticPath,
+        url: dynamicPath,
       });
     }
   } catch (error) {

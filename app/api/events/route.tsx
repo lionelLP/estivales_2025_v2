@@ -86,6 +86,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         message: "Événement créé avec succès",
+        eventId: result.insertId,
         result,
       });
     } catch (error: unknown) {
