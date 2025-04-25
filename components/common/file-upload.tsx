@@ -97,7 +97,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     noClick: true,
     onDrop: handleFileChange,
     onDropRejected: (error) => {
-      console.log(error);
+      console.error(error);
     },
   });
 

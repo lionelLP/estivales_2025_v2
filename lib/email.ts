@@ -40,12 +40,6 @@ export async function sendEmail(
   isNewsletter = false
 ) {
   try {
-    console.log("Starting email send process...", {
-      to,
-      subject,
-      isNewsletter,
-    });
-
     const headers: EmailHeaders = {};
     if (isNewsletter) {
       const unsubscribeUrl = `${
@@ -55,18 +49,6 @@ export async function sendEmail(
       headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
     }
 
-    console.log("Attempting to send email with nodemailer...");
-    console.log("SMTP Configuration:", {
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      secure: process.env.SMTP_SECURE === "true",
-      auth: {
-        user: process.env.SMTP_USER,
-        // Hide password in logs
-        pass: process.env.SMTP_PASSWORD ? "****" : "not set",
-      },
-    });
-
     const info = await transporter.sendMail({
       from: process.env.SMTP_FROM,
       to,
@@ -75,7 +57,6 @@ export async function sendEmail(
       headers,
     });
 
-    console.log("Email sent successfully:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error: unknown) {
     const mailerError = error as NodemailerError;

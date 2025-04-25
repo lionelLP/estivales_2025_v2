@@ -22,7 +22,6 @@ export async function POST(request: NextRequest) {
 
   try {
     const decoded = await verifyToken(token.value);
-    console.log("Token décodé:", decoded); // Pour le débogage
 
     if (!decoded || decoded.userType !== 0) {
       return NextResponse.json(
@@ -78,7 +77,6 @@ export async function POST(request: NextRequest) {
             location,
             booking_link,
           });
-          console.log("Notifications sent successfully for event:", title);
         } catch (notifyError) {
           console.error("Failed to send notifications:", notifyError);
         }

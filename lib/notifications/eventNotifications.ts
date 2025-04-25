@@ -18,7 +18,6 @@ interface NewsletterSubscriber extends RowDataPacket {
 }
 
 export async function notifySubscribersAboutNewEvent(event: Event) {
-  console.log("Starting notification process for event:", event.title);
   const connection = await pool.getConnection();
 
   try {
@@ -26,27 +25,19 @@ export async function notifySubscribersAboutNewEvent(event: Event) {
     const [subscribers] = await connection.execute<NewsletterSubscriber[]>(
       "SELECT email FROM Newsletter"
     );
-    console.log(
-      `Found ${
-        Array.isArray(subscribers) ? subscribers.length : 0
-      } active subscribers`
-    );
 
     if (!Array.isArray(subscribers) || subscribers.length === 0) {
-      console.log("No active subscribers found, skipping notifications");
       return;
     }
 
     // Send emails to all subscribers
     const emailPromises = subscribers.map((subscriber: { email: string }) => {
-      console.log(`Sending notification to: ${subscriber.email}`);
       return sendEmail(
         subscriber.email,
         `Nouvel événement aux Estivales ! : ${event.title}`,
         createEventNotificationEmail(event, subscriber.email),
         true
       ).then((result) => {
-        console.log(`Email result for ${subscriber.email}:`, result);
         return result;
       });
     });

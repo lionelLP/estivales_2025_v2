@@ -43,7 +43,6 @@ export default function ProgrammesPast() {
         const response = await fetch("/api/events");
         if (response.ok) {
           const data = await response.json();
-          console.log("Données brutes des événements:", data);
 
           // Filtrer les événements passés
           const now = new Date();
@@ -51,8 +50,6 @@ export default function ProgrammesPast() {
             const eventDate = new Date(event.event_date);
             return eventDate <= now;
           });
-
-          console.log("Événements passés:", pastEvents);
 
           // Stocker tous les événements pour les filtrer plus tard
           setAllEvents(pastEvents);
@@ -66,19 +63,13 @@ export default function ProgrammesPast() {
 
           // Extraire les lieux uniques des événements
           const locations: string[] = pastEvents
-            .map((event: Event) => {
-              console.log("Location d'un événement:", event.location);
-              return event.location;
-            })
+            .map((event: Event) => event.location)
             .filter(
               (location: string | undefined): location is string => !!location
             );
 
-          console.log("Locations extraites:", locations);
-
           // Dédupliquer les lieux
           const uniqueLocationsSet = [...new Set(locations)];
-          console.log("Locations uniques:", uniqueLocationsSet);
           setUniqueLocations(uniqueLocationsSet);
 
           // Formatage initial des événements pour la timeline
@@ -110,9 +101,6 @@ export default function ProgrammesPast() {
         filterCriteria.dateRange.from !== undefined ||
         filterCriteria.dateRange.to !== undefined
     );
-
-    console.log("Filtrage avec critères:", filterCriteria);
-    console.log("Recherche:", searchQuery);
 
     let filtered = [...allEvents];
 
@@ -242,7 +230,6 @@ export default function ProgrammesPast() {
 
   // Gestionnaires pour la recherche et le filtrage
   const handleSearch = (query: string) => {
-    console.log("Recherche past:", query);
     setSearchQuery(query);
   };
 
@@ -253,7 +240,6 @@ export default function ProgrammesPast() {
       to: Date | undefined;
     };
   }) => {
-    console.log("Filtres past:", filters);
     setFilterCriteria(filters);
   };
 

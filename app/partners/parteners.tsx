@@ -42,12 +42,6 @@ export default function Partenaires() {
     };
   }, [componentLoaded, registerLoadingComponent]);
 
-  // Debug logs for render state
-  console.log("Current state:", {
-    error,
-    partenairesCount: partenaires.length,
-  });
-
   const toggleDescription = (id: number, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();

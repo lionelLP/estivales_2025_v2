@@ -58,7 +58,6 @@ export default function Home() {
   }, []);
 
   const handleSearch = (query: string) => {
-    console.log("Recherche:", query);
     setSearchQuery(query);
   };
 
@@ -69,7 +68,6 @@ export default function Home() {
       to: Date | undefined;
     };
   }) => {
-    console.log("Filtres:", filters);
     setFilterCriteria(filters);
   };
 

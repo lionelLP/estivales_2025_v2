@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 export async function POST() {
-  console.log("Déconnexion en cours...");
   const response = NextResponse.json({ success: true });
 
   // Pour environnement de développement
@@ -23,7 +22,6 @@ export async function POST() {
     });
   }
 
-  console.log("Suppression du cookie token...");
   response.cookies.set(cookieOptions);
 
   return response;

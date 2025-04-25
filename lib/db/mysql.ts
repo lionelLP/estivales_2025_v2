@@ -19,9 +19,7 @@ const pool = mysql.createPool({
 // Fonction pour tester la connexion
 export async function testConnection() {
   try {
-    console.log(`Tentative de connexion à ${host}:${port}...`);
     const connection = await pool.getConnection();
-    console.log("Connexion à la base de données réussie !");
     connection.release();
     return true;
   } catch (error) {

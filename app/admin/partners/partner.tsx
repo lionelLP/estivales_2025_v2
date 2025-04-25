@@ -42,10 +42,6 @@ export default function Partenaires() {
   }, []);
 
   // Debug logs for render state
-  console.log("Current state:", {
-    error,
-    partenairesCount: partenaires.length,
-  });
 
   const handleDelete = async (id: number) => {
     if (!confirm("Êtes-vous sûr de vouloir supprimer ce partenaire ?")) {

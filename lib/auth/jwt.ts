@@ -15,11 +15,6 @@ export async function verifyToken(token: string): Promise<DecodedToken | null> {
 
     const { payload } = await jose.jwtVerify(token, secret);
 
-    console.log("Token verification result:", payload);
-
-    // Vérifier si les champs requis existent dans le payload
-    // José peut convertir les clés en camelCase ou garder la casse originale
-    // Donc nous devons vérifier les deux possibilités
     const hasUserId = payload.userId !== undefined || payload.sub !== undefined;
     const hasUserType = payload.userType !== undefined;
     const hasEmail = payload.email !== undefined;

@@ -7,7 +7,6 @@ import path from "path";
 import { apiMiddleware } from "../../middleware";
 
 export async function POST(request: NextRequest) {
-  console.log("Début de traitement upload image");
   const middlewareResponse = await apiMiddleware(request);
   if (middlewareResponse.status !== 200) {
     return middlewareResponse;
@@ -17,8 +16,6 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const files = formData.getAll("files") as File[];
     const eventId = formData.get("eventId");
-
-    console.log("Upload d'images avec eventId:", eventId);
 
     if (!files || files.length === 0) {
       return NextResponse.json(
@@ -32,9 +29,7 @@ export async function POST(request: NextRequest) {
 
     try {
       await access(uploadDir);
-      console.log("Le répertoire d'upload existe déjà");
     } catch {
-      console.log("Création du répertoire d'upload:", uploadDir);
       await mkdir(uploadDir, { recursive: true });
     }
 
@@ -43,23 +38,16 @@ export async function POST(request: NextRequest) {
 
     try {
       // Vérifier la structure de la table Media pour déterminer les champs disponibles
-      console.log("Vérification de la structure de la table Media");
       const [tableInfo] = await connection.execute("DESCRIBE Media");
       const columns = (tableInfo as { Field: string }[]).map(
         (col) => col.Field
       );
-      console.log("Colonnes disponibles:", columns);
 
       for (const file of files) {
-        console.log(
-          `Traitement du fichier: ${file.name}, taille: ${file.size}, type: ${file.type}`
-        );
-
         // Convertir le fichier en Buffer
         let buffer;
         try {
           buffer = Buffer.from(await file.arrayBuffer());
-          console.log(`Buffer créé, taille: ${buffer.length}`);
         } catch (bufferError) {
           console.error("Erreur lors de la création du buffer:", bufferError);
           return NextResponse.json(
@@ -88,24 +76,12 @@ export async function POST(request: NextRequest) {
         const filepath = path.join(uploadDir, filename);
         const relativePath = `/uploads/events/${filename}`;
 
-        console.log(`Nom de fichier généré: ${filename}`);
-        console.log(`Chemin complet: ${filepath}`);
-
         // Convertir l'image en WebP et l'écrire sur le disque
         let webpBuffer;
         try {
-          console.log("Début de la conversion WebP pour:", file.name);
           webpBuffer = await convertToWebP(buffer);
-          console.log(
-            "Conversion WebP réussie. Taille du buffer:",
-            webpBuffer.length
-          );
-
-          // Écrire le fichier sur le disque
           await writeFile(filepath, webpBuffer);
-          console.log("Fichier écrit avec succès:", filepath);
         } catch (convError) {
-          console.error("Échec de la conversion pour", file.name, convError);
           return NextResponse.json(
             {
               error: `Erreur lors du traitement de l'image ${file.name}`,
@@ -123,7 +99,6 @@ export async function POST(request: NextRequest) {
           let query, params;
 
           if (columns.includes("is_published")) {
-            console.log("Utilisation de la colonne is_published");
             query =
               "INSERT INTO Media (url, type, title, size, is_published) VALUES (?, ?, ?, ?, ?)";
             params = [
@@ -134,35 +109,23 @@ export async function POST(request: NextRequest) {
               1,
             ];
           } else {
-            console.log(
-              "La colonne is_published n'existe pas, utilisation d'une requête simplifiée"
-            );
             query =
               "INSERT INTO Media (url, type, title, size) VALUES (?, ?, ?, ?)";
             params = [relativePath, "image/webp", file.name, webpBuffer.length];
           }
 
-          console.log("Requête SQL:", query);
-          console.log("Paramètres:", params);
-
           // Insérer dans la base de données
-          console.log("Insertion dans la base de données");
           const [mediaResult] = await connection.execute(query, params);
 
           const mediaId = (mediaResult as ResultSetHeader).insertId;
-          console.log("Média créé avec ID:", mediaId);
 
           // Créer la relation Event_Media si necessaire
           if (eventId) {
-            console.log(
-              `Création de la relation Event_Media entre l'événement ${eventId} et le média ${mediaId}`
-            );
             try {
               await connection.execute(
                 `INSERT INTO Event_Media (event_id, media_id) VALUES (?, ?)`,
                 [eventId, mediaId]
               );
-              console.log("Relation Event_Media créée avec succès");
             } catch (relationError) {
               console.error(
                 "Erreur lors de la création de la relation Event_Media:",
@@ -170,10 +133,6 @@ export async function POST(request: NextRequest) {
               );
               // On continue même si la création de la relation échoue
             }
-          } else {
-            console.log(
-              "Pas d'eventId fourni, la relation Event_Media n'est pas créée"
-            );
           }
 
           uploadedFiles.push({
@@ -197,11 +156,6 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      console.log(
-        "Upload terminé avec succès:",
-        uploadedFiles.length,
-        "fichiers"
-      );
       return NextResponse.json({ files: uploadedFiles });
     } finally {
       connection.release();

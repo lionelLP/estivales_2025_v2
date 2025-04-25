@@ -46,7 +46,6 @@ export default function ProgrammesToCome() {
         const response = await fetch("/api/events");
         if (response.ok) {
           const data = await response.json();
-          console.log("Données brutes des événements:", data);
 
           // Filtrer les événements futurs
           const now = new Date();
@@ -54,8 +53,6 @@ export default function ProgrammesToCome() {
             const eventDate = new Date(event.event_date);
             return eventDate > now;
           });
-
-          console.log("Événements futurs:", futureEvents);
 
           // Stocker tous les événements pour les filtrer plus tard
           setAllEvents(futureEvents);
@@ -70,19 +67,13 @@ export default function ProgrammesToCome() {
 
           // Extraire les lieux uniques des événements
           const locations: string[] = futureEvents
-            .map((event: Event) => {
-              console.log("Location d'un événement:", event.location);
-              return event.location;
-            })
+            .map((event: Event) => event.location)
             .filter(
               (location: string | undefined): location is string => !!location
             );
 
-          console.log("Locations extraites:", locations);
-
           // Dédupliquer les lieux
           const uniqueLocationsSet = [...new Set(locations)];
-          console.log("Locations uniques:", uniqueLocationsSet);
           setUniqueLocations(uniqueLocationsSet);
 
           // Formatage initial des événements pour la timeline
@@ -114,9 +105,6 @@ export default function ProgrammesToCome() {
         filterCriteria.dateRange.from !== undefined ||
         filterCriteria.dateRange.to !== undefined
     );
-
-    console.log("Filtrage avec critères:", filterCriteria);
-    console.log("Recherche:", searchQuery);
 
     let filtered = [...allEvents];
 
@@ -244,12 +232,8 @@ export default function ProgrammesToCome() {
     setevents(timelineData);
   };
 
-  // Ajouter un log pour vérifier uniqueLocations à chaque rendu
-  console.log("uniqueLocations lors du rendu:", uniqueLocations);
-
   // Gestionnaires pour la recherche et le filtrage
   const handleSearch = (query: string) => {
-    console.log("Recherche toCome:", query);
     setSearchQuery(query);
   };
 
@@ -260,7 +244,6 @@ export default function ProgrammesToCome() {
       to: Date | undefined;
     };
   }) => {
-    console.log("Filtres toCome:", filters);
     setFilterCriteria(filters);
   };
 

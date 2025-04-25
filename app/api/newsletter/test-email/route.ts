@@ -8,17 +8,6 @@ interface CustomError extends Error {
 
 export async function GET() {
   try {
-    // Log environment variables (excluding sensitive data)
-    console.log("Environment check:", {
-      SMTP_HOST: process.env.SMTP_HOST,
-      SMTP_PORT: process.env.SMTP_PORT,
-      SMTP_USER: process.env.SMTP_USER,
-      SMTP_FROM: process.env.SMTP_FROM,
-      NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
-      JWT_SECRET: process.env.JWT_SECRET ? "set" : "not set",
-      SMTP_PASSWORD: process.env.SMTP_PASSWORD ? "set" : "not set",
-    });
-
     const result = await sendEmail(
       "your-email@example.com",
       "Test Email Configuration",

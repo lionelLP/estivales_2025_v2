@@ -11,10 +11,8 @@ export function useAuthentication() {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     setError("");
-    console.log("Tentative de connexion avec:", { email });
 
     try {
-      console.log("Envoi de la requête de connexion...");
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
@@ -25,27 +23,15 @@ export function useAuthentication() {
         body: JSON.stringify({ email, password }),
       });
 
-      console.log("Réponse de connexion reçue:", response.status);
       const data = await response.json();
-      console.log("Données de connexion:", {
-        success: data.success,
-        hasUser: !!data.user,
-      });
 
       if (response.ok) {
-        console.log(
-          "Connexion réussie. Type d'utilisateur:",
-          data.user.userType
-        );
         setUser({
           ...data.user,
           userType: Number(data.user.userType),
         });
-
-        console.log("Redirection vers", data.user.userType === 0 ? "/" : "/");
         router.push(data.user.userType === 0 ? "/" : "/");
       } else {
-        console.error("Erreur de connexion:", data.message);
         setError(data.message || "Erreur lors de la connexion");
       }
     } catch (err) {
@@ -57,7 +43,6 @@ export function useAuthentication() {
   };
 
   const logout = async () => {
-    console.log("Tentative de déconnexion...");
     try {
       const response = await fetch("/api/auth/logout", {
         method: "POST",
@@ -68,10 +53,8 @@ export function useAuthentication() {
         },
       });
 
-      console.log("Réponse de déconnexion:", response.status);
       if (response.ok) {
         setUser(null);
-        console.log("Déconnexion réussie, redirection vers /login");
         router.push("/login");
       }
     } catch (error) {

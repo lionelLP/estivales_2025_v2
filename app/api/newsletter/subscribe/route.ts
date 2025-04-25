@@ -15,7 +15,6 @@ interface CustomError extends Error {
 export async function POST(request: Request) {
   try {
     const { email } = await request.json();
-    console.log("Received email:", email);
 
     // Check all required environment variables
     const requiredEnvVars = [
@@ -39,7 +38,6 @@ export async function POST(request: Request) {
     }
 
     const connection = await pool.getConnection();
-    console.log("Database connection established");
 
     try {
       // Check if email already exists in Newsletter
@@ -47,7 +45,6 @@ export async function POST(request: Request) {
         "SELECT email FROM Newsletter WHERE email = ?",
         [email]
       );
-      console.log("Existing check completed:", existing);
 
       if (Array.isArray(existing) && existing.length > 0) {
         return NextResponse.json(
@@ -59,18 +56,15 @@ export async function POST(request: Request) {
       // Generate confirmation token
       const confirmationToken = generateConfirmationToken();
       const expiresAt = getExpirationDate();
-      console.log("Token generated:", { confirmationToken, expiresAt });
 
       // Store pending subscription
       await connection.execute(
         "INSERT INTO NewsletterPending (email, confirmation_token, created_at, expires_at) VALUES (?, ?, NOW(), ?)",
         [email, confirmationToken, expiresAt]
       );
-      console.log("Pending subscription stored");
 
       // Send confirmation email
       const confirmUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/newsletter/confirm/${confirmationToken}`;
-      console.log("Confirmation URL:", confirmUrl);
 
       const emailResult = await sendEmail(
         email,

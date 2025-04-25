@@ -1,5 +1,5 @@
-import sharp from "sharp";
 import path from "path";
+import sharp from "sharp";
 
 /**
  * Convertit un buffer d'image en format WebP
@@ -9,8 +9,6 @@ import path from "path";
  */
 export async function convertToWebP(buffer: Buffer): Promise<Buffer> {
   try {
-    console.log("Conversion WebP: Début du processus");
-
     // Réduire l'utilisation de la mémoire pour éviter les erreurs OOM
     sharp.cache(false);
     sharp.concurrency(1);
@@ -28,14 +26,12 @@ export async function convertToWebP(buffer: Buffer): Promise<Buffer> {
       })
       .toBuffer();
 
-    console.log("Conversion WebP: Succès");
     return webpBuffer;
   } catch (error) {
     console.error("Erreur lors de la conversion WebP:", error);
 
     // Essayer une méthode de secours si la première échoue
     try {
-      console.log("Tentative de conversion alternative avec moins d'options");
       const webpBuffer = await sharp(buffer, {
         failOn: "none",
         limitInputPixels: 50000000, // Limite la taille d'entrée maximum
@@ -43,7 +39,6 @@ export async function convertToWebP(buffer: Buffer): Promise<Buffer> {
         .webp({ quality: 75 })
         .toBuffer();
 
-      console.log("Conversion alternative réussie");
       return webpBuffer;
     } catch (secondError) {
       console.error("Échec de la méthode alternative:", secondError);

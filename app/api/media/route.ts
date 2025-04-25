@@ -3,10 +3,6 @@ import { MediaType, transformMediaUrls } from "@/lib/utils/media-utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-  console.log("Requête API media reçue", {
-    isPublic: request.headers.get("x-public-request") === "true",
-  });
-
   try {
     const connection = await pool.getConnection();
     try {
@@ -14,12 +10,10 @@ export async function GET(request: NextRequest) {
         request.headers.get("x-public-request") === "true";
 
       // Vérifier la structure de la table Media pour déterminer les champs disponibles
-      console.log("Vérification de la structure de la table Media");
       const [tableInfo] = await connection.execute("DESCRIBE Media");
       const columns = (tableInfo as { Field: string }[]).map(
         (col) => col.Field
       );
-      console.log("Colonnes disponibles:", columns);
 
       let query;
 
@@ -36,8 +30,6 @@ export async function GET(request: NextRequest) {
         query = "SELECT * FROM Media ORDER BY uploaded_at DESC";
       }
 
-      console.log("Exécution de la requête SQL:", query);
-
       const [rows] = await connection.execute(query);
 
       // Filtrer les résultats pour ne garder que les médias avec des URL valides
@@ -48,11 +40,6 @@ export async function GET(request: NextRequest) {
 
       // Transformer les URLs pour utiliser l'API de fichiers dynamiques si nécessaire
       const transformedRows = transformMediaUrls(validRows as MediaType[]);
-
-      console.log("Résultats récupérés:", {
-        count: transformedRows.length,
-        sample: transformedRows.slice(0, 2),
-      });
 
       return NextResponse.json(transformedRows);
     } catch (error) {

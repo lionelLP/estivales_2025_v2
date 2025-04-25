@@ -17,8 +17,6 @@ export async function POST(request: NextRequest) {
     // Récupérer le titre si fourni
     const title = formData.get("title") ? String(formData.get("title")) : null;
 
-    console.log("Upload avec eventId:", eventId, "et title:", title);
-
     if (!file && !image) {
       return NextResponse.json(
         { error: "Aucun fichier fourni" },
@@ -81,10 +79,6 @@ export async function POST(request: NextRequest) {
             await connection.execute(
               "INSERT INTO Event_Media (event_id, media_id) VALUES (?, ?)",
               [eventId, mediaId]
-            );
-
-            console.log(
-              `Image enregistrée avec ID ${mediaId} et associée à l'événement ${eventId}`
             );
 
             return NextResponse.json({

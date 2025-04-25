@@ -38,7 +38,6 @@ export default function ArticleEditor({ onSave }: ArticleEditorProps) {
       }
 
       const data = await response.json();
-      console.log("ArticleMetadata après extraction:", data);
       setMetadata(data);
     } catch {
       setError("Erreur lors de l&apos;extraction des métadonnées");

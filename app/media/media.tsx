@@ -19,8 +19,6 @@ export default function MediaPage() {
   useEffect(() => {
     const fetchMedia = async () => {
       try {
-        console.log("Récupération des médias en cours...");
-
         const response = await fetch("/api/media", {
           headers: {
             "x-public-request": "true",
@@ -32,18 +30,9 @@ export default function MediaPage() {
           cache: "no-store",
         });
 
-        console.log("Statut de la réponse:", response.status);
-
-        const contentType = response.headers.get("content-type");
-        console.log("Type de contenu:", contentType);
-
         if (response.ok) {
           // Vérifier si le corps de la réponse est vide
           const text = await response.text();
-          console.log(
-            "Texte de la réponse:",
-            text.substring(0, 100) + (text.length > 100 ? "..." : "")
-          );
 
           if (!text || text.trim() === "") {
             console.error("Réponse vide reçue");
@@ -55,10 +44,6 @@ export default function MediaPage() {
           let data;
           try {
             data = JSON.parse(text);
-            console.log(
-              "Données récupérées:",
-              Array.isArray(data) ? `${data.length} médias` : data
-            );
           } catch (jsonError) {
             console.error("Erreur de parsing JSON:", jsonError);
             setError("Format de réponse invalide");
@@ -79,10 +64,7 @@ export default function MediaPage() {
               item.url.trim() !== ""
           );
 
-          console.log("Médias valides:", validMedia.length);
-
           if (validMedia.length === 0) {
-            console.log("Aucun média valide trouvé");
             setError("Aucun média disponible");
           } else {
             setMedia(validMedia);

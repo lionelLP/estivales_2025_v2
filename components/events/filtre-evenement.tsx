@@ -48,9 +48,7 @@ export function FiltreEvenement({
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   // Log pour vérifier les locations reçues
-  useEffect(() => {
-    console.log("FiltreEvenement - locations reçues :", locations);
-  }, [locations]);
+  useEffect(() => {}, [locations]);
 
   const handleFilter = () => {
     if (onFilter) {

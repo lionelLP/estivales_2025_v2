@@ -43,7 +43,6 @@ export function TimelineHistory({
         const response = await fetch("/api/events");
         if (response.ok) {
           const data = await response.json();
-          console.log("Données reçues:", data);
 
           // Filtrer les événements futurs et publics
           const now = new Date();
@@ -78,9 +77,6 @@ export function TimelineHistory({
     if (allEvents.length === 0) return;
 
     setIsFiltering(true);
-
-    console.log("TimelineHistory - Filtrage avec critères:", filterCriteria);
-    console.log("TimelineHistory - Recherche:", searchQuery);
 
     let filtered = [...allEvents];
 

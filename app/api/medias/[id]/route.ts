@@ -127,9 +127,6 @@ export async function DELETE(
           .catch(() => false);
         if (fileExists) {
           await fs.unlink(filePath);
-          console.log("Fichier supprimé avec succès:", filePath);
-        } else {
-          console.log("Fichier non trouvé:", filePath);
         }
       } catch (error) {
         console.error("Erreur lors de la suppression du fichier:", error);

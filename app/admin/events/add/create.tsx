@@ -53,7 +53,6 @@ export default function CreateEvent() {
 
         const { path } = await uploadResponse.json();
         brochurePath = path;
-        console.log("Brochure uploadée avec succès, chemin:", brochurePath);
       }
 
       // Création de l'événement avec le chemin de la brochure
@@ -74,9 +73,6 @@ export default function CreateEvent() {
 
       const eventData = await response.json();
       const eventId = eventData.eventId;
-
-      console.log("Événement créé avec ID:", eventId);
-
       // Upload des images si elles existent
       if (images.length > 0 && eventId) {
         const formDataImages = new FormData();
@@ -94,10 +90,6 @@ export default function CreateEvent() {
         if (!uploadImagesResponse.ok) {
           console.error(
             "Erreur lors de l'upload des images, mais l'événement a été créé"
-          );
-        } else {
-          console.log(
-            "Images uploadées avec succès et associées à l'événement"
           );
         }
       }

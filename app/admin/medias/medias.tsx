@@ -125,7 +125,6 @@ export default function MediasPage() {
           formDataUpload.append("files", file);
         });
 
-        console.log("Envoi de l'image...");
         const uploadResponse = await fetch("/api/upload/images", {
           method: "POST",
           body: formDataUpload,
@@ -140,7 +139,6 @@ export default function MediasPage() {
         }
 
         const { files } = await uploadResponse.json();
-        console.log("Fichiers uploadés:", files);
 
         // Pour chaque fichier uploadé, mettre à jour le titre
         for (const file of files) {
@@ -170,12 +168,6 @@ export default function MediasPage() {
         }
 
         // Créer un média vidéo
-        console.log("Envoi de la vidéo YouTube:", {
-          title: formData.title || "Vidéo YouTube",
-          url: formData.videoUrl,
-          type: "video/youtube",
-        });
-
         try {
           const response = await fetch("/api/medias", {
             method: "POST",
@@ -189,11 +181,7 @@ export default function MediasPage() {
             }),
           });
 
-          console.log("Statut de la réponse:", response.status);
-
           const responseData = await response.json();
-          console.log("Réponse API:", responseData);
-
           if (!response.ok) {
             throw new Error(
               responseData.error ||
