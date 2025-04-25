@@ -1,4 +1,5 @@
 import pool from "@/lib/db/mysql";
+import { MediaType, transformMediaUrls } from "@/lib/utils/media-utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -45,12 +46,15 @@ export async function GET(request: NextRequest) {
           row && row.url && typeof row.url === "string" && row.url.trim() !== ""
       );
 
+      // Transformer les URLs pour utiliser l'API de fichiers dynamiques si nécessaire
+      const transformedRows = transformMediaUrls(validRows as MediaType[]);
+
       console.log("Résultats récupérés:", {
-        count: validRows.length,
-        sample: validRows.slice(0, 2),
+        count: transformedRows.length,
+        sample: transformedRows.slice(0, 2),
       });
 
-      return NextResponse.json(validRows);
+      return NextResponse.json(transformedRows);
     } catch (error) {
       console.error("Erreur SQL:", error);
       return NextResponse.json(

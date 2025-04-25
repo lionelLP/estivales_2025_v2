@@ -1,4 +1,5 @@
 import pool from "@/lib/db/mysql";
+import { MediaType, transformMediaUrls } from "@/lib/utils/media-utils";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { apiMiddleware } from "../middleware";
@@ -27,7 +28,9 @@ export async function GET(request: NextRequest) {
       }
 
       const [rows] = await connection.execute(query);
-      return NextResponse.json(rows);
+      // Transformer les URLs pour utiliser l'API de fichiers dynamiques si nécessaire
+      const transformedRows = transformMediaUrls(rows as MediaType[]);
+      return NextResponse.json(transformedRows);
     } finally {
       connection.release();
     }
@@ -139,8 +142,14 @@ export async function POST(request: NextRequest) {
         }
 
         const mediaData = (mediaRows as { id: number }[])[0];
-        console.log("Média créé avec succès:", mediaData);
-        return NextResponse.json(mediaData);
+        // Transformer l'URL pour utiliser l'API de fichiers dynamiques si nécessaire
+        const transformedMediaData = {
+          ...mediaData,
+          url: transformMediaUrls([mediaData as MediaType])[0].url,
+        };
+
+        console.log("Média créé avec succès:", transformedMediaData);
+        return NextResponse.json(transformedMediaData);
       } catch (dbError) {
         console.error("Erreur SQL lors de l'insertion:", dbError);
         throw new Error(

@@ -1,4 +1,5 @@
 import pool from "@/lib/db/mysql";
+import { MediaType, transformMediaUrls } from "@/lib/utils/media-utils";
 import fs from "fs/promises";
 import { RowDataPacket } from "mysql2";
 import { NextRequest, NextResponse } from "next/server";
@@ -148,5 +149,63 @@ export async function DELETE(
     );
   } finally {
     connection.release();
+  }
+}
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const id = (await params).id;
+
+    if (!id || isNaN(Number(id))) {
+      return NextResponse.json(
+        { error: "ID de média invalide" },
+        { status: 400 }
+      );
+    }
+
+    const connection = await pool.getConnection();
+    try {
+      const isPublicRequest =
+        request.headers.get("x-public-request") === "true";
+
+      let query: string;
+
+      if (isPublicRequest) {
+        query = `
+          SELECT id, url, title, type 
+          FROM Media 
+          WHERE id = ? AND is_published = 1
+        `;
+      } else {
+        query = `
+          SELECT * 
+          FROM Media 
+          WHERE id = ?
+        `;
+      }
+
+      const [rows] = await connection.execute(query, [id]);
+
+      if (!rows || (rows as RowDataPacket[]).length === 0) {
+        return NextResponse.json(
+          { error: "Média non trouvé" },
+          { status: 404 }
+        );
+      }
+
+      // Transformer l'URL pour utiliser l'API de fichiers dynamiques si nécessaire
+      const mediaData = (rows as RowDataPacket[])[0] as MediaType;
+      const transformedMediaData = transformMediaUrls([mediaData])[0];
+
+      return NextResponse.json(transformedMediaData);
+    } finally {
+      connection.release();
+    }
+  } catch (error) {
+    console.error("Erreur:", error);
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

@@ -1,4 +1,5 @@
 import pool from "@/lib/db/mysql";
+import { MediaType, transformMediaUrls } from "@/lib/utils/media-utils";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -19,7 +20,10 @@ export async function GET(
         [resolvedParams.id]
       );
 
-      return NextResponse.json(rows);
+      // Transformer les URLs pour utiliser l'API de fichiers dynamiques
+      const transformedRows = transformMediaUrls(rows as MediaType[]);
+
+      return NextResponse.json(transformedRows);
     } finally {
       connection.release();
     }

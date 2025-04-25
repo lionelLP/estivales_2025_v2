@@ -2,6 +2,7 @@
 
 import { EventCarousel } from "@/components/common/EventCarousel";
 import { Event } from "@/lib/types/event";
+import { getMediaUrl } from "@/lib/utils/media-utils";
 import { Armchair, Download, MapPin } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -32,8 +33,13 @@ export function EventDetailModal({
         try {
           const response = await fetch(`/api/events/${event.id}/images`);
           if (response.ok) {
-            const data = await response.json();
-            setImages(data);
+            const data: Media[] = await response.json();
+            // Transformer les URLs des images pour utiliser l'API dynamique
+            const transformedData = data.map((image) => ({
+              ...image,
+              url: getMediaUrl(image.url),
+            }));
+            setImages(transformedData);
           }
         } catch (error) {
           console.error("Erreur lors du chargement des images:", error);
@@ -51,6 +57,11 @@ export function EventDetailModal({
   };
 
   if (!isOpen) return null;
+
+  // Traitement des URLs pour la brochure
+  const brochurePath = event.brochure_path
+    ? getMediaUrl(event.brochure_path)
+    : null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
@@ -128,9 +139,9 @@ export function EventDetailModal({
           </div>
 
           <div className="mt-8 space-y-4">
-            {event.brochure_path ? (
+            {brochurePath ? (
               <a
-                href={event.brochure_path}
+                href={brochurePath}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 text-center py-3 px-4 bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 rounded-lg transition"

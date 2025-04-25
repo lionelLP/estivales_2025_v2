@@ -1,3 +1,4 @@
+import { getMediaUrl } from "@/lib/utils/media-utils";
 import { access, mkdir, writeFile } from "fs/promises";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
@@ -7,6 +8,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const image = formData.get("image") as File;
+    const useDynamicUrl = formData.get("useDynamicUrl") === "true";
 
     if (!file && !image) {
       return NextResponse.json(
@@ -26,8 +28,10 @@ export async function POST(request: NextRequest) {
         await mkdir(uploadDir, { recursive: true });
       }
       await writeFile(path.join(uploadDir, filename), buffer);
+
+      const staticPath = `/uploads/brochures/${filename}`;
       return NextResponse.json({
-        path: `/uploads/brochures/${filename}`,
+        path: useDynamicUrl ? getMediaUrl(staticPath) : staticPath,
       });
     }
 
@@ -42,8 +46,10 @@ export async function POST(request: NextRequest) {
         await mkdir(uploadDir, { recursive: true });
       }
       await writeFile(path.join(uploadDir, filename), buffer);
+
+      const staticPath = `/uploads/images/${filename}`;
       return NextResponse.json({
-        url: `/uploads/images/${filename}`,
+        url: useDynamicUrl ? getMediaUrl(staticPath) : staticPath,
       });
     }
   } catch (error) {
