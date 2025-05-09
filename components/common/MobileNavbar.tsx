@@ -164,6 +164,13 @@ export default function MobileNavbar() {
             </motion.div>
           </div>
 
+          {/* Billetterie */}
+          <div className="flex justify-between items-center">
+            <HoveredLink href="/billetterie" onClick={handleLinkClick}>
+              <strong>Billetterie</strong>
+            </HoveredLink>
+          </div>
+
           {/* Photos */}
           <div className="flex justify-between items-center">
             <HoveredLink href="/media" onClick={handleLinkClick}>

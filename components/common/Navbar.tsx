@@ -42,6 +42,12 @@ export default function Navbar({ className }: { className?: string }) {
 
         <MenuItemNoHoverLink
           setActive={setActive}
+          item="Billetterie"
+          href="/billetterie"
+        />
+
+        <MenuItemNoHoverLink
+          setActive={setActive}
           item="Medias"
           href="/media"
         />
