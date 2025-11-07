@@ -100,6 +100,13 @@ export default function AdminPage() {
       description: "Envoyer une newsletter aux abonnés",
       color: "bg-slate-500",
     },
+    {
+      label: "Gérer des utilisateurs",
+      href: "/admin/manage-users",
+      icon: <Users className="h-12 w-12" />,
+      description: "Gérer les utilisateurs existants",
+      color: "bg-red-500",
+    }
   ];
 
   if (isLoading) {
