@@ -28,7 +28,7 @@ export default function About() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="relative mb-12 mt-12">
-        <h1 className="text-3xl font-bold text-center">À propos</h1>
+        <h1 className="text-3xl font-bold text-center">À proposAAAAAAAAAAAAA</h1>
       </div>
       <div className="prose prose-lg max-w-none">
         {isLoading ? (

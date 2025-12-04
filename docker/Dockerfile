@@ -1,9 +1,12 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
 # Installation de git
 RUN apk add --no-cache git
+
+# mettre à jour npm
+RUN npm install -g npm@11
 
 # Arguments pour le token GitLab
 ARG GITLAB_TOKEN
@@ -12,23 +15,7 @@ ARG GITLAB_TOKEN
 RUN git config --global url."https://oauth2:${GITLAB_TOKEN}@iutbg-gitlab.iutbourg.univ-lyon1.fr/".insteadOf "https://iutbg-gitlab.iutbourg.univ-lyon1.fr/"
 
 # Créer le script d'entrée
-COPY <<'EOF' /entrypoint.sh
-#!/bin/sh
-if [ -d "/app/.git" ]; then
-    echo "Le projet existe déjà, mise à jour..."
-    git pull
-    npm install --os=linux --libc=musl sharp
-else
-    echo "Clonage du projet..."
-    git clone https://iutbg-gitlab.iutbourg.univ-lyon1.fr/sae-but31/2024-25-web/estivales-brou.git .
-    npm install --os=linux --libc=musl sharp
-fi
-npm run build
-npm run sitemap
-npm run start
-EOF
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Rendre le script exécutable
-RUN chmod +x /entrypoint.sh
-
-CMD ["/entrypoint.sh"]
+CMD ["/usr/local/bin/entrypoint.sh"]
