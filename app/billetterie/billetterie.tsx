@@ -1,38 +1,32 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
+
+type Price = {
+  category: string;
+  barbier: { serie1: string; serie2: string };
+  piano: string;
+  requiem: string;
+  tenors: string;
+  pass: { serie1: string; serie2: string };
+};
 
 export default function Billetterie() {
-  const tableData = [
-    {
-      category: "",
-      barbier: { serie1: "39 €", serie2: "32 €" },
-      piano: "29 €",
-      requiem: "34 €",
-      tenors: "27 €",
-      pass: { serie1: "73 €", serie2: "66 €" },
-    },
-    {
-      category: "Préférentiel",
-      barbier: { serie1: "36 €", serie2: "29 €" },
-      piano: "27 €",
-      requiem: "31 €",
-      tenors: "25 €",
-      pass: { serie1: "67 €", serie2: "60 €" },
-    },
-    {
-      category: "Jeunes",
-      barbier: { serie1: "15 €", serie2: "10 €" },
-      piano: "10 €",
-      requiem: "12 €",
-      tenors: "8 €",
-      pass: { serie1: "27 €", serie2: "22 €" },
-    },
-  ];
+  const [tableData, setTableData] = useState<Price[]>([]);
 
+  useEffect(() => {
+    fetch("/api/prices")
+        .then(res => res.json())
+        .then((data: Price[]) => setTableData(data))
+        .catch(err => console.error(err));
+  }, []);
+
+
+  if (!tableData.length) return <p>Chargement des tarifs...</p>;
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-center mb-8 text-red-brou">
+      <h1 className="text-4xl font-bold text-center mb-8 text-blue-700">
         Billetterie
       </h1>
 

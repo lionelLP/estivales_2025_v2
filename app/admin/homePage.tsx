@@ -106,6 +106,13 @@ export default function AdminPage() {
       icon: <Users className="h-12 w-12" />,
       description: "Gérer les utilisateurs existants",
       color: "bg-red-500",
+    },
+    {
+      label: "Billetterie",
+      href: "/admin/billetterie",
+      icon: <FileText className="h-12 w-12" />,
+      description: "Modifier les prix des billets",
+      color: "bg-red-500",
     }
   ];
 
