@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 
-// Ici on stocke temporairement les prix en mémoire
 let prices = [
     {
         category: "",

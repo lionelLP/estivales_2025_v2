@@ -16,7 +16,7 @@ export default function Billetterie() {
   const [tableData, setTableData] = useState<Price[]>([]);
 
   useEffect(() => {
-    fetch("/api/prices")
+    fetch("/api/billetterie")
         .then(res => res.json())
         .then((data: Price[]) => setTableData(data))
         .catch(err => console.error(err));
@@ -26,7 +26,7 @@ export default function Billetterie() {
   if (!tableData.length) return <p>Chargement des tarifs...</p>;
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-center mb-8 text-blue-700">
+      <h1 className="text-4xl font-bold text-center pt-8 mb-8 text-red-brou">
         Billetterie
       </h1>
 

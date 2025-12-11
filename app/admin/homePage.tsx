@@ -112,7 +112,7 @@ export default function AdminPage() {
       href: "/admin/billetterie",
       icon: <FileText className="h-12 w-12" />,
       description: "Modifier les prix des billets",
-      color: "bg-red-500",
+      color: "bg-indigo-500",
     }
   ];
 

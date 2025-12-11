@@ -48,7 +48,7 @@ export default function BilletterieAdmin() {
     // Envoi des prix modifiés à l'API
     const handleSubmit = async () => {
         try {
-            const res = await fetch("/api/prices", {
+            const res = await fetch("/api/billetterie", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(prices),
