@@ -13,6 +13,15 @@ const nextConfig = {
     images: {
         domains: [],
 
+        localPatterns: [
+            {
+                pathname: '/api/media-file',
+            },
+            {
+                pathname: '/**',
+            },
+        ],
+
         remotePatterns: [
             { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
             { protocol: 'http', hostname: 'localhost', pathname: '/**' },

@@ -3,7 +3,7 @@ import { gsap } from "gsap";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
-const FormField = styled(motion.div)<{ show: boolean }>`
+const FormField = styled(motion.div)`
   --c-text: #5a5a64;
   --c-text-light: #a3a3a3;
   --c-background: #fff;
@@ -322,7 +322,6 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
           setVisible(false);
           handlePointerLeave();
         }}
-        show={show}
         className={`${className}`}
         style={{
           background: useMotionTemplate`
