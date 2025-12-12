@@ -81,6 +81,7 @@
     "@eslint/eslintrc": "^3.3.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/next": "^8.0.7",
     "@types/node": "^22.10.0",
     "@types/nodemailer": "^7.0.3",
     "@types/react": "^18.3.26",
