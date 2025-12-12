@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Heart, Play, Plus, Trash2, X } from "lucide-react";
+import { Heart, Music, Play, Plus, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 const DialogClose = DialogPrimitive.Close;
@@ -36,6 +36,7 @@ export default function MediasPage() {
     videoUrl: "",
   });
   const [images, setImages] = useState<File[]>([]);
+  const [audios, setAudios] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
@@ -185,13 +186,78 @@ export default function MediasPage() {
           if (!response.ok) {
             throw new Error(
               responseData.error ||
-                responseData.details ||
-                "Erreur lors de l'ajout de la vidéo"
+              responseData.details ||
+              "Erreur lors de l'ajout de la vidéo"
             );
           }
         } catch (fetchError) {
           console.error("Erreur lors de la requête fetch:", fetchError);
           throw fetchError;
+        }
+      } else if (formData.type === "audio") {
+        if (audios.length === 0) {
+          setError("Veuillez sélectionner un fichier audio");
+          return;
+        }
+
+        // Vérifier la taille des fichiers audio (max 10 Mo)
+        for (const audio of audios) {
+          if (audio.size > 10 * 1024 * 1024) {
+            setError(
+              `Le fichier ${audio.name} est trop volumineux. Maximum 10 Mo.`
+            );
+            return;
+          }
+        }
+
+        // Envoyer l'audio
+        const formDataUpload = new FormData();
+        audios.forEach((file) => {
+          formDataUpload.append("files", file);
+        });
+
+        // Ajout du titre
+        if (formData.title) {
+          formDataUpload.append("title", formData.title);
+        }
+
+        const uploadResponse = await fetch("/api/upload/audios", {
+          method: "POST",
+          body: formDataUpload,
+        });
+
+        if (!uploadResponse.ok) {
+          const errorText = await uploadResponse.text();
+          let errorMessage = "Erreur lors de l'upload de l'audio";
+
+          try {
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.error || errorMessage;
+            console.error("Erreur upload audio (JSON):", errorData);
+          } catch (e) {
+            console.error("Erreur upload audio (Text):", errorText);
+            errorMessage = `Erreur serveur (${uploadResponse.status}): ${errorText.substring(0, 50)}...`;
+          }
+          throw new Error(errorMessage);
+        }
+
+        // Si besoin de mettre à jour le titre après coup comme pour les images
+        const { files } = await uploadResponse.json();
+
+        // Pour chaque fichier uploadé, mettre à jour le titre si nécessaire
+        // Note: L'API upload audio gère déjà l'insertion en BDD, mais on peut vouloir mettre à jour le titre explicitement
+        for (const file of files) {
+          if (formData.title && file.name !== formData.title) {
+            await fetch(`/api/medias/${file.id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                title: formData.title,
+              }),
+            });
+          }
         }
       }
 
@@ -209,6 +275,7 @@ export default function MediasPage() {
         videoUrl: "",
       });
       setImages([]);
+      setAudios([]);
 
       // Fermer le dialogue (nous utilisons un clic programmé sur le bouton de fermeture)
       const closeButton = document.querySelector(
@@ -300,9 +367,10 @@ export default function MediasPage() {
                 setFormData({ ...formData, type: value })
               }
             >
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="image">Image</TabsTrigger>
-                <TabsTrigger value="video">Vidéo YouTube</TabsTrigger>
+                <TabsTrigger value="video">Vidéo</TabsTrigger>
+                <TabsTrigger value="audio">Audio</TabsTrigger>
               </TabsList>
               <TabsContent value="image" className="space-y-4 py-4">
                 <div className="space-y-2">
@@ -354,6 +422,32 @@ export default function MediasPage() {
                   />
                 </div>
               </TabsContent>
+              <TabsContent value="audio" className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="audio-title">Titre (optionnel)</Label>
+                  <Input
+                    id="audio-title"
+                    value={formData.title}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title: e.target.value })
+                    }
+                    placeholder="Titre de l'audio"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Télécharger un fichier audio</Label>
+                  <FileUpload
+                    onChange={setAudios}
+                    initialFiles={audios}
+                    multiple={false}
+                    accept="audio/*"
+                    id="upload-media-audio"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Formats supportés: MP3, WAV, OGG, etc.
+                  </p>
+                </div>
+              </TabsContent>
             </Tabs>
             {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
             <div className="flex justify-end gap-2 mt-4">
@@ -375,21 +469,19 @@ export default function MediasPage() {
       <div className="flex justify-center gap-4 mb-8">
         <button
           onClick={() => setFilter("all")}
-          className={`px-4 py-2 rounded-full ${
-            filter === "all"
-              ? "bg-pink-500 text-white"
-              : "bg-gray-200  dark:text-dark-mode-2 hover:bg-gray-300"
-          }`}
+          className={`px-4 py-2 rounded-full ${filter === "all"
+            ? "bg-pink-500 text-white"
+            : "bg-gray-200  dark:text-dark-mode-2 hover:bg-gray-300"
+            }`}
         >
           Tous les médias
         </button>
         <button
           onClick={() => setFilter("favorites")}
-          className={`px-4 py-2 rounded-full ${
-            filter === "favorites"
-              ? "bg-pink-500 text-white "
-              : "bg-gray-200 dark:text-dark-mode-2 hover:bg-gray-300"
-          }`}
+          className={`px-4 py-2 rounded-full ${filter === "favorites"
+            ? "bg-pink-500 text-white "
+            : "bg-gray-200 dark:text-dark-mode-2 hover:bg-gray-300"
+            }`}
         >
           Favoris
         </button>
@@ -429,6 +521,30 @@ export default function MediasPage() {
                   </button>
                 </div>
               </div>
+            ) : media.type.startsWith("audio/") ? (
+              // Rendu pour les fichiers audio
+              <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center p-4 border border-gray-200 dark:border-gray-700">
+                <Music className="w-16 h-16 text-pink-500 mb-2" />
+                <audio
+                  controls
+                  src={media.url}
+                  className="w-full mt-2"
+                  preload="none"
+                >
+                  Votre navigateur ne supporte pas l&apos;élément audio.
+                </audio>
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteMedia(media.id);
+                    }}
+                    className="p-2 rounded-full bg-white/80 hover:bg-white transition-all"
+                  >
+                    <Trash2 className="w-5 h-5 text-red-500" />
+                  </button>
+                </div>
+              </div>
             ) : (
               // Rendu pour les images (avec le bouton de favoris conservé)
               <ImageViewer src={media.url} alt={media.title}>
@@ -448,11 +564,10 @@ export default function MediasPage() {
                       className="p-2 rounded-full bg-white/80 hover:bg-white transition-all"
                     >
                       <Heart
-                        className={`w-5 h-5 ${
-                          media.is_favorite
-                            ? "fill-pink-500 text-pink-500"
-                            : "text-gray-600"
-                        }`}
+                        className={`w-5 h-5 ${media.is_favorite
+                          ? "fill-pink-500 text-pink-500"
+                          : "text-gray-600"
+                          }`}
                       />
                     </button>
                     <button
