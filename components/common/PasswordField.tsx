@@ -333,8 +333,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
               transparent 80%
             )
           `,
-        }}
-      >
+        }}>
         <div className="w-[calc(100%-4px)] h-38 bg-gray-50 dark:bg-[rgb(39,39,42)] absolute rounded-[7px]"></div>
         <Input
           type="password"
@@ -361,8 +360,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
         <Button
           ref={buttonRef}
           onClick={togglePasswordVisibility}
-          type="button"
-        >
+          type="button">
           <EyeSVG viewBox="0 0 21 21">
             <circle className="eye" cx="10.5" cy="10.5" r="2.25" />
             <path
@@ -396,8 +394,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
               ${passwordStrength === "Fort" ? "text-green-500" : ""}
               ${passwordStrength === "Moyen" ? "text-yellow-500" : ""}
               ${passwordStrength === "Faible" ? "text-red-500" : ""}
-            `}
-            >
+            `}>
               Force du mot de passe : {passwordStrength}
             </p>
           )}
