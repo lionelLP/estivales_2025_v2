@@ -5,6 +5,8 @@ import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {useRouter} from "next/navigation";
 import {useState} from "react";
+import ShinyButton from "@/components/magicui/shiny-button";
+import {Key, Mail, User, UserPlus, Users} from "lucide-react";
 
 export default function CreateUser() {
     const router = useRouter();
@@ -83,6 +85,12 @@ export default function CreateUser() {
 
     return (
         <div className="container mx-auto px-4 py-8">
+            <div className="items-center min-w-min mb-6">
+                <div className="bg-white items-center text-center rounded-full p-3 justify-self-center">
+                    <UserPlus className="w-20 h-20 text-red-brou"/>
+                </div>
+            </div>
+            {/*<UserPlus className="h-12 w-12" />*/}
             <h1 className="text-3xl font-bold text-center mb-12">
                 Créer un nouvel utilisateur
             </h1>
@@ -94,7 +102,13 @@ export default function CreateUser() {
 
                 {/* Nom d'utilisateur */}
                 <div className="space-y-2">
-                    <Label htmlFor="username">Nom d&apos;utilisateur</Label>
+                    <Label
+                        htmlFor="username"
+                        className="text-lg font-medium flex items-center gap-2"
+                    >
+                        <User className="w-5 h-5 text-red-brou"/>
+                        Nom d&apos;utilisateur
+                    </Label>
                     <Input
                         id="username"
                         name="username"
@@ -107,7 +121,13 @@ export default function CreateUser() {
 
                 {/* Email */}
                 <div className="space-y-2">
-                    <Label htmlFor="email">Adresse email</Label>
+                    <Label
+                        htmlFor="email"
+                        className="text-lg font-medium flex items-center gap-2"
+                    >
+                        <Mail className="w-5 h-5 text-red-brou"/>
+                        Adresse email
+                    </Label>
                     <Input
                         id="email"
                         name="email"
@@ -120,7 +140,11 @@ export default function CreateUser() {
 
                 {/* Mot de passe */}
                 <div className="space-y-2">
-                    <Label htmlFor="password">Mot de passe</Label>
+                    <Label htmlFor="password" className="text-lg font-medium flex items-center gap-2"
+                    >
+                        <Key className="w-5 h-5 text-red-brou"/>
+                        Mot de passe
+                    </Label>
                     <PasswordField
                         value={formData.password}
                         onChange={(value) =>
@@ -128,23 +152,25 @@ export default function CreateUser() {
                         }
                     />
                 </div>
-                {/* Bouton à droite */}
-                <button
-                    type="button"
+                {/* Bouton à génération auto mot de passe */}
+                <ShinyButton
+                    text="Générer un mot de passe"
                     onClick={() =>
                         setFormData((prev) => ({
                             ...prev,
                             password: generatePassword(),
                         }))
                     }
-                    className="px-0 mx-0 text-gray-600 hover:text-red-brou transition"
-                >
-                    Générer
-                </button>
+                    className="px-6"
+                />
 
                 {/* Type d'utilisateur */}
                 <div className="space-y-2">
-                    <Label htmlFor="userType">Type d&apos;utilisateur</Label>
+                    <Label htmlFor="userType" className="text-lg font-medium flex items-center gap-2"
+                    >
+                        <Users className="w-5 h-5 text-red-brou" />
+                        Type d&apos;utilisateur
+                    </Label>
                     <select
                         id="userType"
                         name="userType"
@@ -166,13 +192,18 @@ export default function CreateUser() {
                     >
                         Annuler
                     </button>
-                    <button
-                        type="submit"
+                    <ShinyButton
+                        text={isSubmitting ? "Création..." : "Créer l'utilisateur"}
+                        onClick={() =>
+                            setFormData((prev) => ({
+                                ...prev,
+                                password: generatePassword(),
+                            }))
+                        }
                         disabled={isSubmitting}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
-                    >
-                        {isSubmitting ? "Création..." : "Créer l'utilisateur"}
-                    </button>
+                        className="px-6"
+                        type="submit"
+                    />
                 </div>
             </form>
         </div>
