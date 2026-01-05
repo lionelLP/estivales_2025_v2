@@ -6,7 +6,7 @@ import ArticleEditor from "@/components/editor/ArticleEditor";
 
 interface ArticleInput {
   title: string;
-  url: string;
+  url?: string;
   description: string;
   publishDate: string;
   image: string;
@@ -26,7 +26,7 @@ export default function AddArticlePage() {
         },
         body: JSON.stringify({
           title: article.title,
-          link: article.url,
+          link: article.url || null,
           content: article.description,
           Creation_article: article.publishDate,
           is_published: 1,
@@ -56,4 +56,4 @@ export default function AddArticlePage() {
       <ArticleEditor onSave={handleSaveArticle} />
     </div>
   );
-} 
+}
