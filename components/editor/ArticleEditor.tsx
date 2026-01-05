@@ -6,12 +6,12 @@ interface ArticleMetadata {
   description: string;
   image: string;
   favicon?: string;
-  url: string;
+  url?: string;
   publishDate: string;
 }
 
 interface ArticleEditorProps {
-  onSave: (article: ArticleMetadata & { url: string }) => void;
+  onSave: (article: ArticleMetadata & { url?: string }) => void;
 }
 
 export default function ArticleEditor({ onSave }: ArticleEditorProps) {
@@ -49,7 +49,7 @@ export default function ArticleEditor({ onSave }: ArticleEditorProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (metadata) {
-      onSave({ ...metadata, url });
+      onSave({ ...metadata, url: url || undefined });
     }
   };
 
@@ -72,10 +72,45 @@ export default function ArticleEditor({ onSave }: ArticleEditorProps) {
             <button
               onClick={fetchMetadata}
               disabled={isLoading}
-              className="px-4 py-2 bg-black text-white rounded-lg hover:bg-opacity-80 transition disabled:opacity-50"
-            >
+              className="px-4 py-2 bg-black text-white rounded-lg hover:bg-opacity-80 transition disabled:opacity-50">
               {isLoading ? "Chargement..." : "Extraire"}
             </button>
+          </div>
+          <p className="text-center my-5">ou</p>
+          <label
+            htmlFor="imageArticle"
+            className="block text-sm font-medium mb-2">
+            Image d'un article
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="file"
+              id="imageArticle"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    setMetadata((prev) => {
+                      const image = reader.result as string;
+                      if (prev) {
+                        return { ...prev, image };
+                      }
+                      return {
+                        title: "",
+                        description: "",
+                        image,
+                        url: url || undefined,
+                        publishDate: new Date().toISOString(),
+                      };
+                    });
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+              className="w-full rounded-lg border p-2 dark:bg-black/20"
+            />
           </div>
         </div>
 
@@ -110,8 +145,7 @@ export default function ArticleEditor({ onSave }: ArticleEditorProps) {
             <div>
               <label
                 htmlFor="description"
-                className="block text-sm font-medium mb-2"
-              >
+                className="block text-sm font-medium mb-2">
                 Description
               </label>
               <textarea
@@ -127,8 +161,7 @@ export default function ArticleEditor({ onSave }: ArticleEditorProps) {
 
             <button
               type="submit"
-              className="w-full bg-black text-white py-2 rounded-lg hover:bg-opacity-80 transition"
-            >
+              className="w-full bg-black text-white py-2 rounded-lg hover:bg-opacity-80 transition">
               Enregistrer
             </button>
           </form>
