@@ -131,7 +131,18 @@ export async function GET() {
 
     try {
       const [rows] = await connection.execute(
-        "SELECT * FROM Event ORDER BY event_date DESC"
+        `SELECT 
+          e.*,
+          COALESCE(
+            (SELECT MIN(ed.date_time) FROM Event_Date ed WHERE ed.event_id = e.id),
+            e.event_date
+          ) as first_date,
+          COALESCE(
+            (SELECT MAX(ed.date_time) FROM Event_Date ed WHERE ed.event_id = e.id),
+            e.event_date
+          ) as last_date
+        FROM Event e
+        ORDER BY first_date DESC`
       );
 
       return NextResponse.json(rows);
