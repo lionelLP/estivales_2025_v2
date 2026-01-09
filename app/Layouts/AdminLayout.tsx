@@ -82,8 +82,8 @@ export default function AdminLayout({
       ),
     },
     {
-      label: "Ajouter un utilisateur",
-      href: "/admin/users/add",
+      label: "Gestion des utilisateurs",
+      href: "/admin/manage-users",
       icon: (
         <Users className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),

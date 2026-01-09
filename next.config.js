@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    turbopack: {},
     webpack: (config, { dev, isServer }) => {
         if (dev && !isServer) {
             config.watchOptions = {
@@ -11,6 +12,15 @@ const nextConfig = {
     },
     images: {
         domains: [],
+
+        localPatterns: [
+            {
+                pathname: '/api/media-file',
+            },
+            {
+                pathname: '/**',
+            },
+        ],
 
         remotePatterns: [
             { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },

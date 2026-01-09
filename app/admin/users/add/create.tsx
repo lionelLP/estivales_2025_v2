@@ -9,15 +9,15 @@ import ShinyButton from "@/components/magicui/shiny-button";
 import {Key, Mail, User, UserPlus, Users} from "lucide-react";
 
 export default function CreateUser() {
-    const router = useRouter();
-    const [formData, setFormData] = useState({
-        username: "",
-        email: "",
-        password: "",
-        userType: "1", // 1 pour utilisateur standard, 0 pour admin
-    });
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState("");
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    userType: "1",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -39,7 +39,7 @@ export default function CreateUser() {
             });
 
             if (response.ok) {
-                router.push("/admin");
+                router.push("/admin/manage-users");
                 router.refresh();
             } else {
                 const data = await response.json();
