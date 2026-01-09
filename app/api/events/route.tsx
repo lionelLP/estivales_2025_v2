@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       title,
       subtitle,
       description,
-      event_date,
+      event_dates,
       location,
       max_participants,
       is_public,
@@ -43,9 +43,18 @@ export async function POST(request: NextRequest) {
       brochure_path,
     } = body;
 
+    // Validation : au moins une date
+    if (!event_dates || event_dates.length === 0) {
+      return NextResponse.json(
+        { error: "Au moins une date est requise" },
+        { status: 400 }
+      );
+    }
+
     const connection = await pool.getConnection();
 
     try {
+      // Insérer l'événement d'abord (sans event_date temporairement)
       const [result] = await connection.execute<ResultSetHeader>(
         `INSERT INTO Event (
           title, subtitle, description, event_date, location, 
@@ -55,25 +64,35 @@ export async function POST(request: NextRequest) {
           title,
           subtitle,
           description,
-          event_date,
+          event_dates[0], // Utiliser la première date pour event_date
           location,
           max_participants,
           is_public,
           booking_link,
           brochure_path,
-          decoded.userId, // Utiliser l'ID de l'utilisateur connecté
+          decoded.userId,
         ]
       );
+
+      const eventId = result.insertId;
+
+      // Insérer toutes les dates dans Event_Date
+      for (const dateTime of event_dates) {
+        await connection.execute(
+          `INSERT INTO Event_Date (event_id, date_time) VALUES (?, ?)`,
+          [eventId, dateTime]
+        );
+      }
 
       // If event is public, send notifications immediately
       if (is_public) {
         try {
           await notifySubscribersAboutNewEvent({
-            id: result.insertId,
+            id: eventId,
             title,
             subtitle,
             description,
-            event_date,
+            event_date: event_dates[0],
             location,
             booking_link,
           });
@@ -84,8 +103,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         message: "Événement créé avec succès",
-        eventId: result.insertId,
-        result,
+        eventId: eventId,
       });
     } catch (error: unknown) {
       console.error("Erreur SQL:", error);
