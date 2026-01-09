@@ -197,7 +197,7 @@ export default function CreateUser() {
                         onClick={() =>
                             setFormData((prev) => ({
                                 ...prev,
-                                password: generatePassword(),
+                                password: formData.password,
                             }))
                         }
                         disabled={isSubmitting}
