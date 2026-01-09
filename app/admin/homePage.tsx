@@ -87,13 +87,6 @@ export default function AdminPage() {
       color: "bg-pink-500",
     },
     {
-      label: "Utilisateurs",
-      href: "/admin/users/add",
-      icon: <UserPlus className="h-12 w-12" />,
-      description: "Ajouter un utilisateur",
-      color: "bg-teal-500",
-    },
-    {
       label: "Newsletter",
       href: "/admin/newsletter",
       icon: <Mail className="h-12 w-12" />,
@@ -101,7 +94,7 @@ export default function AdminPage() {
       color: "bg-slate-500",
     },
     {
-      label: "Gérer des utilisateurs",
+      label: "Gestion des utilisateurs",
       href: "/admin/manage-users",
       icon: <Users className="h-12 w-12" />,
       description: "Gérer les utilisateurs existants",
