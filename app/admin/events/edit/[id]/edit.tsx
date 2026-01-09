@@ -2,6 +2,7 @@
 
 import { FileUpload } from "@/components/common/file-upload";
 import { Event } from "@/lib/types/event";
+import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -22,6 +23,7 @@ export default function EditEvent({
     user_id: 1,
     booking_link: "",
   });
+  const [eventDates, setEventDates] = useState<string[]>([""]);
   const [brochure, setBrochure] = useState<File[]>([]);
   const [images, setImages] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +48,7 @@ export default function EditEvent({
 
   useEffect(() => {
     const fetchEvent = async () => {
-      if (!eventId) return; // Ensure eventId is available
+      if (!eventId) return;
       try {
         const response = await fetch(`/api/events/${eventId}`);
         if (response.ok) {
@@ -56,6 +58,22 @@ export default function EditEvent({
             .slice(0, 16);
           setFormData({ ...data, event_date: eventDate });
           setCurrentBrochurePath(data.brochure_path || "");
+          
+          // Récupérer les dates depuis Event_Date
+          const datesResponse = await fetch(`/api/events/${eventId}/dates`);
+          if (datesResponse.ok) {
+            const datesData = await datesResponse.json();
+            if (datesData.dates && datesData.dates.length > 0) {
+              const formattedDates = datesData.dates.map((d: any) => 
+                new Date(d.date_time).toISOString().slice(0, 16)
+              );
+              setEventDates(formattedDates);
+            } else {
+              setEventDates([eventDate]);
+            }
+          } else {
+            setEventDates([eventDate]);
+          }
         } else {
           setError("Événement non trouvé");
         }
@@ -71,6 +89,13 @@ export default function EditEvent({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const validDates = eventDates.filter(date => date.trim() !== "");
+    if (validDates.length === 0) {
+      setError("Vous devez ajouter au moins une date");
+      return;
+    }
+    
     try {
       let brochurePath = currentBrochurePath;
       if (brochure.length > 0) {
@@ -95,6 +120,7 @@ export default function EditEvent({
         },
         body: JSON.stringify({
           ...formData,
+          event_dates: validDates,
           brochure_path: brochurePath,
         }),
       });
@@ -193,21 +219,46 @@ export default function EditEvent({
           />
         </div>
 
-        {/* Date de l'événement */}
+        {/* Dates de l'événement */}
         <div className="space-y-2">
-          <label htmlFor="event_date" className="block text-sm font-medium">
-            Date de l&apos;événement
+          <label className="block text-sm font-medium">
+            Dates de l&apos;événement
           </label>
-          <input
-            id="event_date"
-            type="datetime-local"
-            value={formData.event_date}
-            onChange={(e) =>
-              setFormData({ ...formData, event_date: e.target.value })
-            }
-            className="w-full rounded-lg border p-2"
-            required
-          />
+          <div className="space-y-2">
+            {eventDates.map((date, index) => (
+              <div key={index} className="flex gap-2">
+                <input
+                  type="datetime-local"
+                  value={date}
+                  onChange={(e) => {
+                    const newDates = [...eventDates];
+                    newDates[index] = e.target.value;
+                    setEventDates(newDates);
+                  }}
+                  className="flex-1 rounded-lg border p-2"
+                  required={index === 0}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newDates = eventDates.filter((_, i) => i !== index);
+                    setEventDates(newDates.length === 0 ? [""] : newDates);
+                  }}
+                  disabled={eventDates.length === 1}
+                  className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setEventDates([...eventDates, ""])}
+            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            + Ajouter une date
+          </button>
         </div>
 
         {/* Lieu */}

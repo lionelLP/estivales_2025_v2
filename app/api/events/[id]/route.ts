@@ -109,7 +109,7 @@ export async function PUT(
       title,
       subtitle,
       description,
-      event_date,
+      event_dates,
       location,
       max_participants,
       is_public,
@@ -119,7 +119,9 @@ export async function PUT(
 
     const connection = await pool.getConnection();
     try {
-      const [result] = await connection.execute(
+      const firstDate = event_dates && event_dates.length > 0 ? event_dates[0] : null;
+      
+      await connection.execute(
         `UPDATE Event SET 
           title = ?, 
           subtitle = ?, 
@@ -135,7 +137,7 @@ export async function PUT(
           title,
           subtitle,
           description,
-          event_date,
+          firstDate,
           location,
           max_participants,
           is_public,
@@ -145,9 +147,25 @@ export async function PUT(
         ]
       );
 
+      // Mettre à jour les dates dans Event_Date
+      if (event_dates && event_dates.length > 0) {
+        // Supprimer les anciennes dates
+        await connection.execute(
+          "DELETE FROM Event_Date WHERE event_id = ?",
+          [resolvedParams.id]
+        );
+
+        // Insérer les nouvelles dates
+        for (const dateTime of event_dates) {
+          await connection.execute(
+            "INSERT INTO Event_Date (event_id, date_time) VALUES (?, ?)",
+            [resolvedParams.id, dateTime]
+          );
+        }
+      }
+
       return NextResponse.json({
         message: "Événement mis à jour avec succès",
-        result,
       });
     } catch (error: unknown) {
       console.error("Erreur SQL:", error);
