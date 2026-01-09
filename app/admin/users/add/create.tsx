@@ -12,7 +12,7 @@ export default function CreateUser() {
     username: "",
     email: "",
     password: "",
-    userType: "1", // 1 pour utilisateur standard, 0 pour admin
+    userType: "1", 
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -37,7 +37,7 @@ export default function CreateUser() {
       });
 
       if (response.ok) {
-        router.push("/admin");
+        router.push("/admin/manage-users");
         router.refresh();
       } else {
         const data = await response.json();
