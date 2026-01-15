@@ -168,6 +168,7 @@ export function FiltreEvenement({
                       size="sm"
                       onClick={() => {
                         setDateRange({ from: undefined, to: undefined });
+                        handleFilter();
                       }}
                       className="border border-pink-200 dark:border-pink-800 text-pink-500 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20"
                     >
@@ -175,7 +176,10 @@ export function FiltreEvenement({
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => setIsCalendarOpen(false)}
+                      onClick={() => {
+                        setIsCalendarOpen(false);
+                        handleFilter();
+                      }}
                       className="bg-gradient-to-r from-pink-500 to-red-500 text-white hover:from-pink-600 hover:to-red-600"
                     >
                       Appliquer

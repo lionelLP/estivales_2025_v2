@@ -140,7 +140,10 @@ export async function GET() {
           COALESCE(
             (SELECT MAX(ed.date_time) FROM Event_Date ed WHERE ed.event_id = e.id),
             e.event_date
-          ) as last_date
+          ) as last_date,
+          (SELECT JSON_ARRAYAGG(
+            JSON_OBJECT('id', ed.id, 'date_time', ed.date_time)
+          ) FROM Event_Date ed WHERE ed.event_id = e.id) as event_dates
         FROM Event e
         ORDER BY first_date DESC`
       );

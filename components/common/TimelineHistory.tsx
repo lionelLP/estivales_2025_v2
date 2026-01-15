@@ -8,6 +8,7 @@ import { EventDetailModal } from "./EventDetailModal";
 interface TimelineEntry {
   title: string;
   content: React.ReactNode;
+  sortDate: Date;
 }
 
 interface TimelineHistoryProps {
@@ -47,8 +48,15 @@ export function TimelineHistory({
           // Filtrer les événements futurs et publics
           const now = new Date();
           const futurePublicEvents = data.filter((event: Event) => {
-            const eventDate = new Date(event.event_date);
-            return eventDate > now && event.is_public;
+            if (!event.is_public) return false;
+            
+            const dates: Date[] = Array.isArray(event.event_dates) && event.event_dates.length > 0
+              ? event.event_dates.map((d: { id: number; date_time: string }) => new Date(d.date_time))
+              : event.event_date
+              ? [new Date(event.event_date)]
+              : [];
+
+            return dates.some((d) => d > now);
           });
 
           if (futurePublicEvents.length === 0) {
@@ -88,11 +96,20 @@ export function TimelineHistory({
     }
 
     // Filtrer par plage de dates si définie
+    const getEventDates = (event: Event): Date[] => {
+      const dates: Date[] = Array.isArray(event.event_dates) && event.event_dates.length > 0
+        ? event.event_dates.map((d: { id: number; date_time: string }) => new Date(d.date_time))
+        : event.event_date
+        ? [new Date(event.event_date)]
+        : [];
+      return dates.filter((d) => !isNaN(d.getTime()));
+    };
+
     if (filterCriteria.dateRange?.from) {
       const fromDate = new Date(filterCriteria.dateRange.from);
       filtered = filtered.filter((event) => {
-        const eventDate = new Date(event.event_date);
-        return eventDate >= fromDate;
+        const dates = getEventDates(event);
+        return dates.length > 0 && dates.some((d) => d >= fromDate);
       });
     }
 
@@ -101,8 +118,8 @@ export function TimelineHistory({
       // Ajouter un jour pour inclure les événements du dernier jour
       toDate.setDate(toDate.getDate() + 1);
       filtered = filtered.filter((event) => {
-        const eventDate = new Date(event.event_date);
-        return eventDate < toDate;
+        const dates = getEventDates(event);
+        return dates.length > 0 && dates.some((d) => d < toDate);
       });
     }
 
@@ -127,81 +144,109 @@ export function TimelineHistory({
     }, 100);
   }, [allEvents, filterCriteria, searchQuery]);
 
-  // Formater les événements pour la timeline avec useMemo pour éviter les calculs inutiles
-  useMemo(() => {
+  // Formater les événements pour la timeline
+  useEffect(() => {
     if (filteredEvents.length === 0) {
       setEvents([]);
       return;
     }
 
-    // Grouper les événements par date
-    const eventsByDate = filteredEvents.reduce(
-      (acc: { [key: string]: Event[] }, event: Event) => {
-        const date = new Date(event.event_date).toLocaleDateString("fr-FR", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
+    // Expansion avec filtrage de dates si nécessaire
+    const now = new Date();
+    const fromDate = filterCriteria.dateRange?.from;
+    const toDate = filterCriteria.dateRange?.to ? (() => { const d = new Date(filterCriteria.dateRange.to); d.setDate(d.getDate() + 1); return d; })() : undefined;
+
+    const expandedEvents: Array<{ event: Event; date: Date }> = [];
+
+    filteredEvents.forEach((event) => {
+      if (event.event_dates && Array.isArray(event.event_dates) && event.event_dates.length > 0) {
+        event.event_dates.forEach((dateObj: any) => {
+          const dateTime = new Date(dateObj.date_time);
+          if (dateTime > now) {
+            const inRange = (!fromDate || dateTime >= fromDate) && (!toDate || dateTime < toDate);
+            if (inRange) {
+              expandedEvents.push({ event, date: dateTime });
+            }
+          }
         });
-        if (!acc[date]) {
-          acc[date] = [];
+      } else {
+        const dateTime = new Date(event.event_date);
+        if (dateTime > now) {
+          const inRange = (!fromDate || dateTime >= fromDate) && (!toDate || dateTime < toDate);
+          if (inRange) {
+            expandedEvents.push({ event, date: dateTime });
+          }
         }
-        acc[date].push(event);
-        return acc;
-      },
-      {}
-    );
+      }
+    });
+
+    // Trier par date et limiter à 5 prochaines séances
+    expandedEvents.sort((a, b) => a.date.getTime() - b.date.getTime());
+    const next5Sessions = expandedEvents.slice(0, 5);
+
+    // Grouper par date
+    const eventsByDateMap = new Map<string, { events: Event[]; sortDate: Date }>();
+    next5Sessions.forEach((item) => {
+      const dateKey = item.date.toLocaleDateString("fr-FR", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+      if (!eventsByDateMap.has(dateKey)) {
+        eventsByDateMap.set(dateKey, { events: [], sortDate: item.date });
+      }
+      eventsByDateMap.get(dateKey)!.events.push(item.event);
+    });
 
     // Transformer en format Timeline
-    const timelineData = Object.entries(eventsByDate)
-      .map(([date, events]) => ({
+    const timelineData = Array.from(eventsByDateMap.entries())
+      .map(([date, { events: dateEvents, sortDate }]) => ({
         title: date,
+        sortDate,
         content: (
           <div>
             <div className="mb-8">
-              {(events as Event[]).map((event: Event) => (
-                <div key={event.id} className="mb-4">
-                  <h3 className="text-neutral-800 dark:text-neutral-200 text-sm font-semibold">
-                    {event.title}
-                  </h3>
-                  {event.subtitle && (
-                    <p className="text-neutral-700 dark:text-neutral-300 text-xs">
-                      {event.subtitle}
+              {dateEvents.map((event: Event) => {
+                const eventTime = new Date(event.event_date);
+                const hasValidTime = !isNaN(eventTime.getTime());
+                return (
+                  <div key={event.id} className="mb-4">
+                    <h3 className="text-neutral-800 dark:text-neutral-200 text-sm font-semibold">
+                      {event.title}
+                    </h3>
+                    {event.subtitle && (
+                      <p className="text-neutral-700 dark:text-neutral-300 text-xs">
+                        {event.subtitle}
+                      </p>
+                    )}
+                    {hasValidTime && (
+                      <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
+                        {eventTime.toLocaleTimeString("fr-FR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    )}
+                    <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
+                      {event.location}
                     </p>
-                  )}
-                  <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
-                    {new Date(event.event_date).toLocaleTimeString("fr-FR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                  <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
-                    {event.location}
-                  </p>
-                  <button
-                    onClick={() => {
-                      setSelectedEvent(event);
-                      setIsModalOpen(true);
-                    }}
-                    className="inline-block mt-2 px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-medium hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
-                  >
-                    Voir le détail
-                  </button>
-                </div>
-              ))}
+                    <button
+                      onClick={() => {
+                        setSelectedEvent(event);
+                        setIsModalOpen(true);
+                      }}
+                      className="inline-block mt-2 px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-medium hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                    >
+                      Voir le détail
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         ),
       }))
-      .sort((a, b) => {
-        // Find the first event from each group to compare dates
-        const eventsA = eventsByDate[a.title];
-        const eventsB = eventsByDate[b.title];
-
-        const dateA = new Date(eventsA[0].event_date);
-        const dateB = new Date(eventsB[0].event_date);
-
-        return dateA.getTime() - dateB.getTime();
-      });
+      .sort((a, b) => a.sortDate.getTime() - b.sortDate.getTime());
 
     setEvents(timelineData);
   }, [filteredEvents]);

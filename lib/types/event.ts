@@ -6,6 +6,7 @@ export interface Event {
   event_date: string;
   first_date?: string;
   last_date?: string;
+  event_dates?: Array<{ id: number; date_time: string }>;
   created_at?: string;
   location?: string;
   max_participants?: number;
