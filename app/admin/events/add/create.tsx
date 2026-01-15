@@ -3,7 +3,18 @@ import { FileUpload } from "@/components/common/file-upload";
 import { Input } from "@/components/ui/input";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { MediaSelector } from "@/components/common/media-selector";
+import { X } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
+
+interface Media {
+  id: number;
+  url: string;
+  title: string;
+  type: string;
+  is_favorite: boolean;
+}
 
 interface Suggestion {
   properties: {
@@ -29,6 +40,7 @@ export default function CreateEvent() {
   const [eventDates, setEventDates] = useState<string[]>([""]);
   const [brochure, setBrochure] = useState<File[]>([]);
   const [images, setImages] = useState<File[]>([]);
+  const [selectedLibraryImages, setSelectedLibraryImages] = useState<Media[]>([]);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const router = useRouter();
@@ -36,7 +48,7 @@ export default function CreateEvent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Valider qu'il y a au moins une date
     const validDates = eventDates.filter(date => date.trim() !== "");
     if (validDates.length === 0) {
@@ -83,6 +95,19 @@ export default function CreateEvent() {
 
       const eventData = await response.json();
       const eventId = eventData.eventId;
+
+      // Lier les images de la bibliothèque si sélectionnées
+      if (selectedLibraryImages.length > 0 && eventId) {
+        const mediaIds = selectedLibraryImages.map((m) => m.id);
+        await fetch(`/api/events/${eventId}/images`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ mediaIds }),
+        });
+      }
+
       // Upload des images si elles existent
       if (images.length > 0 && eventId) {
         const formDataImages = new FormData();
@@ -154,7 +179,7 @@ export default function CreateEvent() {
         {/* Titre */}
         <div className="space-y-2">
           <label htmlFor="title" className="block text-sm font-medium">
-            Titre
+            Titre <span className="text-red-500">*</span>
           </label>
           <input
             id="title"
@@ -203,7 +228,7 @@ export default function CreateEvent() {
         {/* Dates de l'événement */}
         <div className="space-y-2">
           <label className="block text-sm font-medium">
-            Dates de l&apos;événement
+            Dates de l&apos;événement<span className="text-red-500">*</span>
           </label>
           <div className="space-y-2">
             {eventDates.map((date, index) => (
@@ -288,7 +313,7 @@ export default function CreateEvent() {
             htmlFor="max_participants"
             className="block text-sm font-medium"
           >
-            Nombre maximum de participants
+            Nombre maximum de participants <span className="text-red-500">*</span>
           </label>
           <input
             id="max_participants"
@@ -299,6 +324,9 @@ export default function CreateEvent() {
               setFormData({ ...formData, max_participants: e.target.value })
             }
             className="w-full rounded-lg border p-2"
+            required
+            onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Veuillez remplir ce champ')}
+            onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
           />
         </div>
 
@@ -361,6 +389,48 @@ export default function CreateEvent() {
             maxFiles={200}
             accept="image/*"
           />
+
+          <div className="flex flex-col gap-2 mt-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Ou depuis la bibliothèque</span>
+              <MediaSelector
+                onSelect={(newMedias) => {
+                  setSelectedLibraryImages((prev) => {
+                    // Avoid duplicates
+                    const ids = new Set(prev.map((p) => p.id));
+                    const uniqueNew = newMedias.filter((m) => !ids.has(m.id));
+                    return [...prev, ...uniqueNew];
+                  });
+                }}
+              />
+            </div>
+
+            {selectedLibraryImages.length > 0 && (
+              <div className="grid grid-cols-4 gap-4 mt-2">
+                {selectedLibraryImages.map((media) => (
+                  <div key={media.id} className="relative aspect-square rounded-lg overflow-hidden border">
+                    <Image
+                      src={media.url}
+                      alt={media.title}
+                      fill
+                      className="object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedLibraryImages((prev) =>
+                          prev.filter((m) => m.id !== media.id)
+                        )
+                      }
+                      className="absolute top-1 right-1 bg-white/80 rounded-full p-1 hover:bg-white text-red-500"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <p className="text-sm text-gray-500">Jusqu&apos;à 200 images</p>
         </div>
 

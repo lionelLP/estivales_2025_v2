@@ -1,3 +1,4 @@
+import { MediaType, transformMediaUrls } from "@/lib/utils/media-utils";
 import { apiMiddleware } from "@/app/api/middleware";
 import { verifyToken } from "@/lib/auth/jwt";
 import pool from "@/lib/db/mysql";
@@ -125,6 +126,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
+
+
 export async function GET() {
   try {
     const connection = await pool.getConnection();
@@ -148,7 +151,32 @@ export async function GET() {
         ORDER BY first_date DESC`
       );
 
-      return NextResponse.json(rows);
+      const events = rows as any[];
+
+      if (events.length > 0) {
+        // Fetch images for these events
+        const eventIds = events.map((e) => e.id);
+        const placeholders = eventIds.map(() => "?").join(",");
+
+        const [mediaRows] = await connection.execute(
+          `SELECT em.event_id, m.* 
+           FROM Media m 
+           JOIN Event_Media em ON m.id = em.media_id 
+           WHERE em.event_id IN (${placeholders})`,
+          eventIds
+        );
+
+        const mediaList = mediaRows as (MediaType & { event_id: number })[];
+        const transformedMedia = transformMediaUrls(mediaList);
+
+        events.forEach((event) => {
+          event.images = transformedMedia.filter(
+            (m) => m.event_id === event.id
+          );
+        });
+      }
+
+      return NextResponse.json(events);
     } catch (error) {
       console.error("Erreur SQL:", error);
       return NextResponse.json(
