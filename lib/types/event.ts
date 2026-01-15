@@ -1,3 +1,5 @@
+import { MediaType } from "@/lib/utils/media-utils";
+
 export interface Event {
   id?: number;
   title: string;
@@ -11,4 +13,5 @@ export interface Event {
   user_id: number;
   booking_link?: string;
   brochure_path?: string;
+  images?: MediaType[];
 }

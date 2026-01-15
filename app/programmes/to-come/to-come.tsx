@@ -101,9 +101,9 @@ export default function ProgrammesToCome() {
 
     setIsFiltering(
       searchQuery.trim() !== "" ||
-        filterCriteria.location !== "Tous" ||
-        filterCriteria.dateRange.from !== undefined ||
-        filterCriteria.dateRange.to !== undefined
+      filterCriteria.location !== "Tous" ||
+      filterCriteria.dateRange.from !== undefined ||
+      filterCriteria.dateRange.to !== undefined
     );
 
     let filtered = [...allEvents];
@@ -141,8 +141,10 @@ export default function ProgrammesToCome() {
         (event) =>
           event.title.toLowerCase().includes(query) ||
           event.subtitle?.toLowerCase().includes(query) ||
-          false ||
           event.description?.toLowerCase().includes(query) ||
+          event.images?.some((img) =>
+            img.title.toLowerCase().includes(query)
+          ) ||
           false
       );
     }
