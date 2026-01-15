@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Heart, Play, Plus, Trash2, X } from "lucide-react";
+import { Heart, Music, Play, Plus, Trash2, X, Upload, Youtube } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 const DialogClose = DialogPrimitive.Close;
@@ -33,9 +33,12 @@ export default function MediasPage() {
   const [formData, setFormData] = useState({
     title: "",
     type: "image",
+    videoType: "youtube" as "youtube" | "file",
     videoUrl: "",
   });
   const [images, setImages] = useState<File[]>([]);
+  const [audios, setAudios] = useState<File[]>([]);
+  const [videos, setVideos] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
@@ -152,7 +155,7 @@ export default function MediasPage() {
             }),
           });
         }
-      } else if (formData.type === "video") {
+      } else if (formData.type === "video" && formData.videoType === "youtube") {
         if (!formData.videoUrl) {
           setError("Veuillez entrer un lien YouTube");
           return;
@@ -167,7 +170,7 @@ export default function MediasPage() {
           return;
         }
 
-        // Créer un média vidéo
+        // Créer un média vidéo YouTube
         try {
           const response = await fetch("/api/medias", {
             method: "POST",
@@ -185,13 +188,141 @@ export default function MediasPage() {
           if (!response.ok) {
             throw new Error(
               responseData.error ||
-                responseData.details ||
-                "Erreur lors de l'ajout de la vidéo"
+              responseData.details ||
+              "Erreur lors de l'ajout de la vidéo"
             );
           }
         } catch (fetchError) {
           console.error("Erreur lors de la requête fetch:", fetchError);
           throw fetchError;
+        }
+      } else if (formData.type === "video" && formData.videoType === "file") {
+        if (videos.length === 0) {
+          setError("Veuillez sélectionner un fichier vidéo");
+          return;
+        }
+
+        // Vérifier la taille des vidéos (max 50 Mo par exemple)
+        for (const video of videos) {
+          if (video.size > 50 * 1024 * 1024) {
+            setError(
+              `La vidéo ${video.name} est trop volumineuse. Maximum 50 Mo.`
+            );
+            return;
+          }
+        }
+
+        // Envoyer la vidéo
+        const formDataUpload = new FormData();
+        videos.forEach((file) => {
+          formDataUpload.append("video", file);
+        });
+
+        // Ajout du titre
+        if (formData.title) {
+          formDataUpload.append("title", formData.title);
+        }
+
+        const uploadResponse = await fetch("/api/upload", {
+          method: "POST",
+          body: formDataUpload,
+        });
+
+        if (!uploadResponse.ok) {
+          const errorText = await uploadResponse.text();
+          let errorMessage = "Erreur lors de l'upload de la vidéo";
+
+          try {
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.error || errorMessage;
+            console.error("Erreur upload vidéo (JSON):", errorData);
+          } catch (e) {
+            console.error("Erreur upload vidéo (Text):", errorText);
+            errorMessage = `Erreur serveur (${uploadResponse.status}): ${errorText.substring(0, 50)}...`;
+          }
+          throw new Error(errorMessage);
+        }
+
+        const { files } = await uploadResponse.json();
+
+        // Mettre à jour le titre si nécessaire
+        for (const file of files) {
+          if (formData.title && file.name !== formData.title) {
+            await fetch(`/api/medias/${file.id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                title: formData.title,
+              }),
+            });
+          }
+        }
+      } else if (formData.type === "audio") {
+        if (audios.length === 0) {
+          setError("Veuillez sélectionner un fichier audio");
+          return;
+        }
+
+        // Vérifier la taille des fichiers audio (max 10 Mo)
+        for (const audio of audios) {
+          if (audio.size > 10 * 1024 * 1024) {
+            setError(
+              `Le fichier ${audio.name} est trop volumineux. Maximum 10 Mo.`
+            );
+            return;
+          }
+        }
+
+        // Envoyer l'audio
+        const formDataUpload = new FormData();
+        audios.forEach((file) => {
+          formDataUpload.append("files", file);
+        });
+
+        // Ajout du titre
+        if (formData.title) {
+          formDataUpload.append("title", formData.title);
+        }
+
+        const uploadResponse = await fetch("/api/upload/audios", {
+          method: "POST",
+          body: formDataUpload,
+        });
+
+        if (!uploadResponse.ok) {
+          const errorText = await uploadResponse.text();
+          let errorMessage = "Erreur lors de l'upload de l'audio";
+
+          try {
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.error || errorMessage;
+            console.error("Erreur upload audio (JSON):", errorData);
+          } catch (e) {
+            console.error("Erreur upload audio (Text):", errorText);
+            errorMessage = `Erreur serveur (${uploadResponse.status}): ${errorText.substring(0, 50)}...`;
+          }
+          throw new Error(errorMessage);
+        }
+
+        // Si besoin de mettre à jour le titre après coup comme pour les images
+        const { files } = await uploadResponse.json();
+
+        // Pour chaque fichier uploadé, mettre à jour le titre si nécessaire
+        // Note: L'API upload audio gère déjà l'insertion en BDD, mais on peut vouloir mettre à jour le titre explicitement
+        for (const file of files) {
+          if (formData.title && file.name !== formData.title) {
+            await fetch(`/api/medias/${file.id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                title: formData.title,
+              }),
+            });
+          }
         }
       }
 
@@ -206,9 +337,12 @@ export default function MediasPage() {
       setFormData({
         title: "",
         type: "image",
+        videoType: "youtube",
         videoUrl: "",
       });
       setImages([]);
+      setAudios([]);
+      setVideos([]);
 
       // Fermer le dialogue (nous utilisons un clic programmé sur le bouton de fermeture)
       const closeButton = document.querySelector(
@@ -300,9 +434,10 @@ export default function MediasPage() {
                 setFormData({ ...formData, type: value })
               }
             >
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="image">Image</TabsTrigger>
-                <TabsTrigger value="video">Vidéo YouTube</TabsTrigger>
+                <TabsTrigger value="video">Vidéo</TabsTrigger>
+                <TabsTrigger value="audio">Audio</TabsTrigger>
               </TabsList>
               <TabsContent value="image" className="space-y-4 py-4">
                 <div className="space-y-2">
@@ -331,6 +466,27 @@ export default function MediasPage() {
                 </div>
               </TabsContent>
               <TabsContent value="video" className="space-y-4 py-4">
+                <div className="flex gap-4 mb-4">
+                  <Button
+                    type="button"
+                    variant={formData.videoType === "youtube" ? "default" : "outline"}
+                    className={`flex-1 ${formData.videoType === "youtube" ? "bg-pink-500 hover:bg-pink-600 text-white" : ""}`}
+                    onClick={() => setFormData({ ...formData, videoType: "youtube" })}
+                  >
+                    <Youtube className="w-4 h-4 mr-2" />
+                    YouTube
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={formData.videoType === "file" ? "default" : "outline"}
+                    className={`flex-1 ${formData.videoType === "file" ? "bg-pink-500 hover:bg-pink-600 text-white" : ""}`}
+                    onClick={() => setFormData({ ...formData, videoType: "file" })}
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Fichier vidéo
+                  </Button>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="video-title">Titre (optionnel)</Label>
                   <Input
@@ -342,16 +498,59 @@ export default function MediasPage() {
                     placeholder="Titre de la vidéo"
                   />
                 </div>
+
+                {formData.videoType === "youtube" ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="video-url">Lien YouTube</Label>
+                    <Input
+                      id="video-url"
+                      value={formData.videoUrl}
+                      onChange={(e) =>
+                        setFormData({ ...formData, videoUrl: e.target.value })
+                      }
+                      placeholder="https://www.youtube.com/watch?v=..."
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label>Télécharger une vidéo</Label>
+                    <FileUpload
+                      onChange={setVideos}
+                      initialFiles={videos}
+                      multiple={false}
+                      accept="video/*"
+                      id="upload-media-video"
+                    />
+                    <p className="text-xs text-gray-500">
+                      Formats supportés: MP4, WebM, etc. Max 50 Mo.
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+              <TabsContent value="audio" className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="video-url">Lien YouTube</Label>
+                  <Label htmlFor="audio-title">Titre (optionnel)</Label>
                   <Input
-                    id="video-url"
-                    value={formData.videoUrl}
+                    id="audio-title"
+                    value={formData.title}
                     onChange={(e) =>
-                      setFormData({ ...formData, videoUrl: e.target.value })
+                      setFormData({ ...formData, title: e.target.value })
                     }
-                    placeholder="https://www.youtube.com/watch?v=..."
+                    placeholder="Titre de l'audio"
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label>Télécharger un fichier audio</Label>
+                  <FileUpload
+                    onChange={setAudios}
+                    initialFiles={audios}
+                    multiple={false}
+                    accept="audio/*"
+                    id="upload-media-audio"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Formats supportés: MP3, WAV, OGG, etc.
+                  </p>
                 </div>
               </TabsContent>
             </Tabs>
@@ -375,21 +574,19 @@ export default function MediasPage() {
       <div className="flex justify-center gap-4 mb-8">
         <button
           onClick={() => setFilter("all")}
-          className={`px-4 py-2 rounded-full ${
-            filter === "all"
-              ? "bg-pink-500 text-white"
-              : "bg-gray-200  dark:text-dark-mode-2 hover:bg-gray-300"
-          }`}
+          className={`px-4 py-2 rounded-full ${filter === "all"
+            ? "bg-pink-500 text-white"
+            : "bg-gray-200  dark:text-dark-mode-2 hover:bg-gray-300"
+            }`}
         >
           Tous les médias
         </button>
         <button
           onClick={() => setFilter("favorites")}
-          className={`px-4 py-2 rounded-full ${
-            filter === "favorites"
-              ? "bg-pink-500 text-white "
-              : "bg-gray-200 dark:text-dark-mode-2 hover:bg-gray-300"
-          }`}
+          className={`px-4 py-2 rounded-full ${filter === "favorites"
+            ? "bg-pink-500 text-white "
+            : "bg-gray-200 dark:text-dark-mode-2 hover:bg-gray-300"
+            }`}
         >
           Favoris
         </button>
@@ -399,7 +596,7 @@ export default function MediasPage() {
         {filteredMedias.map((media) => (
           <div key={media.id} className="relative group">
             {media.type === "video/youtube" ? (
-              // Rendu pour les vidéos YouTube (sans le bouton de favoris)
+              // Rendu pour les vidéos YouTube
               <div
                 className="aspect-square relative rounded-lg overflow-hidden cursor-pointer"
                 onClick={(e) => openVideoModal(media.url, e)}
@@ -418,6 +615,58 @@ export default function MediasPage() {
                 </div>
                 <div className="absolute top-2 right-2 flex gap-2">
                   {/* Suppression du bouton favoris pour les vidéos */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteMedia(media.id);
+                    }}
+                    className="p-2 rounded-full bg-white/80 hover:bg-white transition-all"
+                  >
+                    <Trash2 className="w-5 h-5 text-red-500" />
+                  </button>
+                </div>
+              </div>
+            ) : media.type.startsWith("video/") ? (
+              // Rendu pour les vidéos uploadées
+              <div
+                className="aspect-square relative rounded-lg overflow-hidden cursor-pointer bg-black"
+                onClick={(e) => openVideoModal(media.url, e)}
+              >
+                <video
+                  src={media.url}
+                  className="w-full h-full object-cover"
+                  preload="metadata"
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="bg-black bg-opacity-50 rounded-full p-3">
+                    <Play className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteMedia(media.id);
+                    }}
+                    className="p-2 rounded-full bg-white/80 hover:bg-white transition-all"
+                  >
+                    <Trash2 className="w-5 h-5 text-red-500" />
+                  </button>
+                </div>
+              </div>
+            ) : media.type.startsWith("audio/") ? (
+              // Rendu pour les fichiers audio
+              <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center p-4 border border-gray-200 dark:border-gray-700">
+                <Music className="w-16 h-16 text-pink-500 mb-2" />
+                <audio
+                  controls
+                  src={media.url}
+                  className="w-full mt-2"
+                  preload="none"
+                >
+                  Votre navigateur ne supporte pas l&apos;élément audio.
+                </audio>
+                <div className="absolute top-2 right-2 flex gap-2">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -448,11 +697,10 @@ export default function MediasPage() {
                       className="p-2 rounded-full bg-white/80 hover:bg-white transition-all"
                     >
                       <Heart
-                        className={`w-5 h-5 ${
-                          media.is_favorite
-                            ? "fill-pink-500 text-pink-500"
-                            : "text-gray-600"
-                        }`}
+                        className={`w-5 h-5 ${media.is_favorite
+                          ? "fill-pink-500 text-pink-500"
+                          : "text-gray-600"
+                          }`}
                       />
                     </button>
                     <button
@@ -484,16 +732,27 @@ export default function MediasPage() {
             </DialogClose>
           </div>
           {selectedVideo && (
-            <div className="aspect-video w-full">
-              <iframe
-                width="100%"
-                height="100%"
-                src={`${getYouTubeEmbedUrl(selectedVideo)}?autoplay=1`}
-                title="YouTube video player"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
+            <div className="aspect-video w-full h-[60vh] bg-black flex items-center justify-center">
+              {selectedVideo.includes("http") || selectedVideo.includes("youtube") ? (
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={`${getYouTubeEmbedUrl(selectedVideo)}?autoplay=1`}
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              ) : (
+                <video
+                  controls
+                  autoPlay
+                  className="w-full h-full"
+                  src={selectedVideo}
+                >
+                  Votre navigateur ne supporte pas la lecture de vidéos.
+                </video>
+              )}
             </div>
           )}
         </DialogContent>
