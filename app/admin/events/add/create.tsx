@@ -1,6 +1,7 @@
 "use client";
 import { FileUpload } from "@/components/common/file-upload";
 import { Input } from "@/components/ui/input";
+import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -20,12 +21,12 @@ export default function CreateEvent() {
     title: "",
     subtitle: "",
     description: "",
-    event_date: "",
     location: "",
     max_participants: "",
     is_public: true,
     booking_link: "",
   });
+  const [eventDates, setEventDates] = useState<string[]>([""]);
   const [brochure, setBrochure] = useState<File[]>([]);
   const [images, setImages] = useState<File[]>([]);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -35,6 +36,14 @@ export default function CreateEvent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Valider qu'il y a au moins une date
+    const validDates = eventDates.filter(date => date.trim() !== "");
+    if (validDates.length === 0) {
+      setError("Vous devez ajouter au moins une date");
+      return;
+    }
+
     try {
       // Upload de la brochure si elle existe
       let brochurePath = null;
@@ -55,7 +64,7 @@ export default function CreateEvent() {
         brochurePath = path;
       }
 
-      // Création de l'événement avec le chemin de la brochure
+      // Création de l'événement avec les dates
       const response = await fetch("/api/events", {
         method: "POST",
         headers: {
@@ -63,7 +72,8 @@ export default function CreateEvent() {
         },
         body: JSON.stringify({
           ...formData,
-          brochure_path: brochurePath, // Utiliser directement le chemin de la brochure
+          event_dates: validDates,
+          brochure_path: brochurePath,
         }),
       });
 
@@ -190,21 +200,46 @@ export default function CreateEvent() {
           />
         </div>
 
-        {/* Date de l'événement */}
+        {/* Dates de l'événement */}
         <div className="space-y-2">
-          <label htmlFor="event_date" className="block text-sm font-medium">
-            Date de l&apos;événement
+          <label className="block text-sm font-medium">
+            Dates de l&apos;événement
           </label>
-          <input
-            id="event_date"
-            type="datetime-local"
-            value={formData.event_date}
-            onChange={(e) =>
-              setFormData({ ...formData, event_date: e.target.value })
-            }
-            className="w-full rounded-lg border p-2"
-            required
-          />
+          <div className="space-y-2">
+            {eventDates.map((date, index) => (
+              <div key={index} className="flex gap-2">
+                <input
+                  type="datetime-local"
+                  value={date}
+                  onChange={(e) => {
+                    const newDates = [...eventDates];
+                    newDates[index] = e.target.value;
+                    setEventDates(newDates);
+                  }}
+                  className="flex-1 rounded-lg border p-2"
+                  required={index === 0}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newDates = eventDates.filter((_, i) => i !== index);
+                    setEventDates(newDates.length === 0 ? [""] : newDates);
+                  }}
+                  disabled={eventDates.length === 1}
+                  className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setEventDates([...eventDates, ""])}
+            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            + Ajouter une date
+          </button>
         </div>
 
         {/* Lieu avec autocomplétion */}

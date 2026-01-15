@@ -4,6 +4,9 @@ export interface Event {
   subtitle?: string;
   description?: string;
   event_date: string;
+  first_date?: string;
+  last_date?: string;
+  event_dates?: Array<{ id: number; date_time: string }>;
   created_at?: string;
   location?: string;
   max_participants?: number;

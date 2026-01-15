@@ -92,7 +92,10 @@ export default function Events() {
                 Titre
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                Date
+                Date début
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Date fin
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Lieu
@@ -123,17 +126,22 @@ export default function Events() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900 dark:text-white">
-                    {new Date(event.event_date).toLocaleDateString("fr-FR", {
+                    {new Date(event.first_date || event.event_date).toLocaleDateString("fr-FR", {
                       day: "numeric",
-                      month: "long",
+                      month: "short",
                       year: "numeric",
                     })}
                   </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {new Date(event.event_date).toLocaleTimeString("fr-FR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900 dark:text-white">
+                    {event.last_date && event.first_date !== event.last_date
+                      ? new Date(event.last_date).toLocaleDateString("fr-FR", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "-"}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

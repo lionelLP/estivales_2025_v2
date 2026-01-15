@@ -47,9 +47,14 @@ export default function ProgrammesToCome() {
         if (response.ok) {
           const data = await response.json();
 
-          // Filtrer les événements futurs
+          // Filtrer les événements futurs (vérifier toutes les dates)
           const now = new Date();
           const futureEvents = data.filter((event: Event) => {
+            // Si l'événement a des dates dans Event_Date, vérifier si au moins une est future
+            if (event.event_dates && Array.isArray(event.event_dates) && event.event_dates.length > 0) {
+              return event.event_dates.some((dateObj: any) => new Date(dateObj.date_time) > now);
+            }
+            // Sinon vérifier event_date
             const eventDate = new Date(event.event_date);
             return eventDate > now;
           });
@@ -77,7 +82,7 @@ export default function ProgrammesToCome() {
           setUniqueLocations(uniqueLocationsSet);
 
           // Formatage initial des événements pour la timeline
-          formatEventsForTimeline(futureEvents);
+          formatEventsForTimeline(futureEvents, undefined);
           setNoEventsFound(false);
 
           componentLoaded(loadingId);
@@ -115,12 +120,21 @@ export default function ProgrammesToCome() {
       );
     }
 
-    // Filtrer par plage de dates si définie
+    // Filtrer par plage de dates si définie (évaluer toutes les dates d'un événement)
+    const getEventDates = (event: Event): Date[] => {
+      const dates: Date[] = Array.isArray(event.event_dates) && event.event_dates.length > 0
+        ? event.event_dates.map((d: { id: number; date_time: string }) => new Date(d.date_time))
+        : event.event_date
+        ? [new Date(event.event_date)]
+        : [];
+      return dates.filter((d) => !isNaN(d.getTime()));
+    };
+
     if (filterCriteria.dateRange.from) {
       const fromDate = new Date(filterCriteria.dateRange.from);
       filtered = filtered.filter((event) => {
-        const eventDate = new Date(event.event_date);
-        return eventDate >= fromDate;
+        const dates = getEventDates(event);
+        return dates.length > 0 && dates.some((d) => d >= fromDate);
       });
     }
 
@@ -129,8 +143,8 @@ export default function ProgrammesToCome() {
       // Ajouter un jour pour inclure les événements du dernier jour
       toDate.setDate(toDate.getDate() + 1);
       filtered = filtered.filter((event) => {
-        const eventDate = new Date(event.event_date);
-        return eventDate < toDate;
+        const dates = getEventDates(event);
+        return dates.length > 0 && dates.some((d) => d < toDate);
       });
     }
 
@@ -154,42 +168,80 @@ export default function ProgrammesToCome() {
       setevents([]);
     } else {
       setNoEventsFound(false);
-      formatEventsForTimeline(filtered);
+      formatEventsForTimeline(filtered, filterCriteria);
     }
   }, [allEvents, filterCriteria, searchQuery]);
 
   // Fonction pour formater les événements pour la timeline
-  const formatEventsForTimeline = (eventsToFormat: Event[]) => {
+  const formatEventsForTimeline = (eventsToFormat: Event[], dateFilter?: { location: string; dateRange: { from: Date | undefined; to: Date | undefined } }) => {
     if (eventsToFormat.length === 0) {
       setevents([]);
       return;
     }
 
-    // Grouper les événements par date
-    const eventsByDate = eventsToFormat.reduce(
-      (acc: { [key: string]: Event[] }, event: Event) => {
-        const date = new Date(event.event_date).toLocaleDateString("fr-FR", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
+    // Exploser chaque événement par ses dates (uniquement les dates futures)
+    const expandedEvents: Array<{ event: Event; date: Date }> = [];
+    const now = new Date();
+    const fromDate = dateFilter?.dateRange?.from;
+    const toDate = dateFilter?.dateRange?.to ? (() => { const d = new Date(dateFilter.dateRange.to); d.setDate(d.getDate() + 1); return d; })() : undefined;
+    
+    eventsToFormat.forEach((event) => {
+      if (event.event_dates && Array.isArray(event.event_dates) && event.event_dates.length > 0) {
+        // Si l'événement a des dates dans Event_Date, les utiliser (uniquement les futures)
+        event.event_dates.forEach((dateObj: any) => {
+          const dateTime = new Date(dateObj.date_time);
+          if (dateTime > now) {
+            // Appliquer le filtre de plage si défini
+            const inRange = (!fromDate || dateTime >= fromDate) && (!toDate || dateTime < toDate);
+            if (inRange) {
+              expandedEvents.push({
+                event,
+                date: dateTime,
+              });
+            }
+          }
         });
-        if (!acc[date]) {
-          acc[date] = [];
+      } else {
+        // Sinon utiliser event_date
+        const dateTime = new Date(event.event_date);
+        if (dateTime > now) {
+          // Appliquer le filtre de plage si défini
+          const inRange = (!fromDate || dateTime >= fromDate) && (!toDate || dateTime < toDate);
+          if (inRange) {
+            expandedEvents.push({
+              event,
+              date: dateTime,
+            });
+          }
         }
-        acc[date].push(event);
-        return acc;
-      },
-      {}
-    );
+      }
+    });
+
+    // Grouper par date et garder une référence à la date réelle pour le tri
+    const eventsByDateMap = new Map<string, { events: Event[]; sortDate: Date }>();
+    
+    expandedEvents.forEach((item) => {
+      const dateKey = item.date.toLocaleDateString("fr-FR", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+      
+      if (!eventsByDateMap.has(dateKey)) {
+        eventsByDateMap.set(dateKey, { events: [], sortDate: item.date });
+      }
+      eventsByDateMap.get(dateKey)!.events.push(item.event);
+    });
 
     // Transformer en format Timeline
-    const timelineData = Object.entries(eventsByDate)
-      .map(([date, events]) => ({
+    const timelineData = Array.from(eventsByDateMap.entries())
+      .map(([date, { events, sortDate }]) => ({
         title: date,
+        sortDate,
         content: (
           <div>
             <div className="mb-8">
-              {(events as Event[]).map((event: Event) => (
+              {events.map((event: Event) => (
                 <div key={event.id} className="mb-4">
                   <h3 className="text-neutral-800 dark:text-neutral-200 text-sm font-semibold">
                     {event.title}
@@ -223,11 +275,7 @@ export default function ProgrammesToCome() {
           </div>
         ),
       }))
-      .sort((a, b) => {
-        const dateA = new Date(eventsByDate[a.title][0].event_date);
-        const dateB = new Date(eventsByDate[b.title][0].event_date);
-        return dateA.getTime() - dateB.getTime();
-      });
+      .sort((a, b) => a.sortDate.getTime() - b.sortDate.getTime());
 
     setevents(timelineData);
   };
