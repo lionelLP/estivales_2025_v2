@@ -23,14 +23,18 @@ function generateUnsubscribeToken(email: string): string {
     .digest("hex");
 }
 
+const isMailhog = process.env.SMTP_HOST === "mailhog";
+
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'mailhog',
-  port: parseInt(process.env.SMTP_PORT || '1025'),
-  secure: false, // true pour 465, false pour les autres ports
-  auth: process.env.SMTP_USER ? {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  } : undefined,
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: false,
+  auth: isMailhog
+      ? false
+      : {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
 });
 
 export async function sendEmail(
