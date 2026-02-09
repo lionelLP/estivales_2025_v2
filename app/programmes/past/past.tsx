@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 interface TimelineEntry {
   title: string;
   content: React.ReactNode;
+  sortDate: Date;
 }
 
 export default function ProgrammesPast() {
@@ -47,8 +48,24 @@ export default function ProgrammesPast() {
           // Filtrer les événements passés
           const now = new Date();
           const pastEvents = data.filter((event: Event) => {
-            const eventDate = new Date(event.event_date);
-            return eventDate <= now;
+            const dates: Date[] = Array.isArray(event.event_dates) && event.event_dates.length > 0
+              ? event.event_dates.map((d: { id: number; date_time: string }) => new Date(d.date_time))
+              : event.event_date
+              ? [new Date(event.event_date)]
+              : [];
+
+            if (dates.length > 0) {
+              return dates.some((d) => d <= now);
+            }
+
+            if (event.last_date) {
+              const last = new Date(event.last_date);
+              if (!isNaN(last.getTime())) {
+                return last <= now;
+              }
+            }
+
+            return false;
           });
 
           // Stocker tous les événements pour les filtrer plus tard
@@ -73,7 +90,7 @@ export default function ProgrammesPast() {
           setUniqueLocations(uniqueLocationsSet);
 
           // Formatage initial des événements pour la timeline
-          formatEventsForTimeline(pastEvents);
+          formatEventsForTimeline(pastEvents, undefined);
           setNoEventsFound(false);
 
           componentLoaded(loadingId);
@@ -111,12 +128,21 @@ export default function ProgrammesPast() {
       );
     }
 
-    // Filtrer par plage de dates si définie
+    // Filtrer par plage de dates si définie (basé sur toutes les dates d'un événement)
+    const getEventDates = (event: Event): Date[] => {
+      const dates: Date[] = Array.isArray(event.event_dates) && event.event_dates.length > 0
+        ? event.event_dates.map((d: { id: number; date_time: string }) => new Date(d.date_time))
+        : event.event_date
+        ? [new Date(event.event_date)]
+        : [];
+      return dates.filter((d) => !isNaN(d.getTime()));
+    };
+
     if (filterCriteria.dateRange.from) {
       const fromDate = new Date(filterCriteria.dateRange.from);
       filtered = filtered.filter((event) => {
-        const eventDate = new Date(event.event_date);
-        return eventDate >= fromDate;
+        const dates = getEventDates(event);
+        return dates.length > 0 && dates.some((d) => d >= fromDate);
       });
     }
 
@@ -125,8 +151,8 @@ export default function ProgrammesPast() {
       // Ajouter un jour pour inclure les événements du dernier jour
       toDate.setDate(toDate.getDate() + 1);
       filtered = filtered.filter((event) => {
-        const eventDate = new Date(event.event_date);
-        return eventDate < toDate;
+        const dates = getEventDates(event);
+        return dates.length > 0 && dates.some((d) => d < toDate);
       });
     }
 
@@ -148,82 +174,101 @@ export default function ProgrammesPast() {
       setevents([]);
     } else {
       setNoEventsFound(false);
-      formatEventsForTimeline(filtered);
+      formatEventsForTimeline(filtered, filterCriteria);
     }
   }, [allEvents, filterCriteria, searchQuery]);
 
   // Fonction pour formater les événements pour la timeline
-  const formatEventsForTimeline = (eventsToFormat: Event[]) => {
+  const formatEventsForTimeline = (eventsToFormat: Event[], dateFilter?: { location: string; dateRange: { from: Date | undefined; to: Date | undefined } }) => {
     if (eventsToFormat.length === 0) {
       setevents([]);
       return;
     }
 
-    // Grouper les événements par date
-    const eventsByDate = eventsToFormat.reduce(
-      (acc: { [key: string]: Event[] }, event: Event) => {
-        const date = new Date(event.event_date).toLocaleDateString("fr-FR", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
+    // Étendre les événements par chaque date et ne garder que les dates passées
+    const now = new Date();
+    const fromDate = dateFilter?.dateRange?.from;
+    const toDate = dateFilter?.dateRange?.to ? (() => { const d = new Date(dateFilter.dateRange.to); d.setDate(d.getDate() + 1); return d; })() : undefined;
+    const expandedEvents = eventsToFormat.flatMap((event) => {
+      const dates: Date[] = Array.isArray(event.event_dates) && event.event_dates.length > 0
+        ? event.event_dates.map((d: { id: number; date_time: string }) => new Date(d.date_time))
+        : event.event_date
+        ? [new Date(event.event_date)]
+        : [];
+      return dates
+        .map((date) => ({ date, event }))
+        .filter((item) => {
+          if (item.date > now) return false;
+          // Appliquer le filtre de plage si défini
+          const inRange = (!fromDate || item.date >= fromDate) && (!toDate || item.date < toDate);
+          return inRange;
         });
-        if (!acc[date]) {
-          acc[date] = [];
-        }
-        acc[date].push(event);
-        return acc;
-      },
-      {}
-    );
+    });
+
+    // Grouper par date et garder une référence à la date réelle pour le tri
+    const eventsByDateMap = new Map<string, { events: Event[]; sortDate: Date }>();
+    expandedEvents.forEach((item) => {
+      const dateKey = item.date.toLocaleDateString("fr-FR", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+      if (!eventsByDateMap.has(dateKey)) {
+        eventsByDateMap.set(dateKey, { events: [], sortDate: item.date });
+      }
+      eventsByDateMap.get(dateKey)!.events.push(item.event);
+    });
 
     // Transformer en format Timeline
-    const timelineData: TimelineEntry[] = (
-      Object.entries(eventsByDate) as [string, Event[]][]
-    )
-      .map(([date, dateEvents]) => ({
+    const timelineData: TimelineEntry[] = Array.from(eventsByDateMap.entries())
+      .map(([date, { events: dateEvents, sortDate }]) => ({
         title: date,
+        sortDate,
         content: (
           <div>
             <div className="mb-8">
-              {dateEvents.map((event: Event) => (
-                <div key={event.id} className="mb-4">
-                  <h3 className="text-neutral-800 dark:text-neutral-200 text-sm font-semibold">
-                    {event.title}
-                  </h3>
-                  {event.subtitle && (
-                    <p className="text-neutral-700 dark:text-neutral-300 text-xs">
-                      {event.subtitle}
+              {dateEvents.map((event: Event) => {
+                const eventTime = new Date(event.event_date);
+                const hasValidTime = !isNaN(eventTime.getTime());
+                return (
+                  <div key={event.id} className="mb-4">
+                    <h3 className="text-neutral-800 dark:text-neutral-200 text-sm font-semibold">
+                      {event.title}
+                    </h3>
+                    {event.subtitle && (
+                      <p className="text-neutral-700 dark:text-neutral-300 text-xs">
+                        {event.subtitle}
+                      </p>
+                    )}
+                    {hasValidTime && (
+                      <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
+                        {eventTime.toLocaleTimeString("fr-FR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    )}
+                    <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
+                      {event.location}
                     </p>
-                  )}
-                  <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
-                    {new Date(event.event_date).toLocaleTimeString("fr-FR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                  <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
-                    {event.location}
-                  </p>
-                  <button
-                    onClick={() => {
-                      setSelectedEvent(event);
-                      setIsModalOpen(true);
-                    }}
-                    className="inline-block mt-2 px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-medium hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
-                  >
-                    Voir les détails
-                  </button>
-                </div>
-              ))}
+                    <button
+                      onClick={() => {
+                        setSelectedEvent(event);
+                        setIsModalOpen(true);
+                      }}
+                      className="inline-block mt-2 px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm font-medium hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                    >
+                      Voir les détails
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         ),
       }))
-      .sort((a, b) => {
-        const dateA = new Date(eventsByDate[a.title][0].event_date);
-        const dateB = new Date(eventsByDate[b.title][0].event_date);
-        return dateB.getTime() - dateA.getTime(); // Tri inversé pour avoir les plus récents en premier
-      });
+      // Tri inversé : dates les plus récentes en premier pour les événements passés
+      .sort((a, b) => b.sortDate.getTime() - a.sortDate.getTime());
 
     setevents(timelineData);
   };

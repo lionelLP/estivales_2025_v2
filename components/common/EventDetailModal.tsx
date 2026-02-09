@@ -96,9 +96,9 @@ export function EventDetailModal({
           )}
 
           <div className="mt-6 space-y-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-start gap-2">
               <svg
-                className="w-5 h-5"
+                className="w-5 h-5 mt-0.5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -110,17 +110,39 @@ export function EventDetailModal({
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              <span>
-                {new Date(event.event_date).toLocaleDateString("fr-FR", {
-                  day: "numeric",
-                  month: "long",
-                })}{" "}
-                –{" "}
-                {new Date(event.event_date).toLocaleTimeString("fr-FR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </span>
+              <div>
+                {event.event_dates && Array.isArray(event.event_dates) && event.event_dates.length > 0 ? (
+                  <div className="space-y-1">
+                    <p className="font-semibold">Dates :</p>
+                    {event.event_dates.map((dateObj: any, index: number) => (
+                      <div key={dateObj.id || index}>
+                        {new Date(dateObj.date_time).toLocaleDateString("fr-FR", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}{" "}
+                        –{" "}
+                        {new Date(dateObj.date_time).toLocaleTimeString("fr-FR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <span>
+                    {new Date(event.event_date).toLocaleDateString("fr-FR", {
+                      day: "numeric",
+                      month: "long",
+                    })}{" "}
+                    –{" "}
+                    {new Date(event.event_date).toLocaleTimeString("fr-FR", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                )}
+              </div>
             </div>
 
             {event.location && (

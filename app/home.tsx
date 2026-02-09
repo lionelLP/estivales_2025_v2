@@ -33,8 +33,13 @@ export default function Home() {
           // Filtrer les événements futurs
           const now = new Date();
           const futureEvents = data.filter((event: Event) => {
-            const eventDate = new Date(event.event_date);
-            return eventDate > now;
+            const dates: Date[] = Array.isArray(event.event_dates) && event.event_dates.length > 0
+              ? event.event_dates.map((d: { id: number; date_time: string }) => new Date(d.date_time))
+              : event.event_date
+              ? [new Date(event.event_date)]
+              : [];
+
+            return dates.some((d) => d > now);
           });
 
           // Extraire les lieux uniques
