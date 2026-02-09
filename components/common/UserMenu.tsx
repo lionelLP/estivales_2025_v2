@@ -25,6 +25,9 @@ export default function UserMenu() {
               <span>Panneau de configuration</span>
             </Link>
           )}
+          <Link href="/profile" className="flex items-center gap-2 hover:text-neutral-500">
+            <span>Modifier mon profil</span>
+          </Link>
           <button onClick={logout} className="text-left hover:text-neutral-500">
             Se déconnecter
           </button>
