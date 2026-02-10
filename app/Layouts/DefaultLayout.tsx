@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import React from "react";
+import { usePathname } from "next/navigation";
 
 const Navbar = dynamic(() => import("../../components/common/Navbar"), {
   loading: () => null,
@@ -23,6 +24,8 @@ interface ClientLayoutProps {
 }
 
 const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
+  const pathname = usePathname();
+  const hideFooter = pathname?.startsWith("/espace-choriste");
   return (
     <div className="min-h-screen flex flex-col">
       <div className="hidden lg:block">
@@ -32,7 +35,7 @@ const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
         <MobileNavbar />
       </div>
       <main className="flex-grow lg:mt-20 dark:bg-dark-mode">{children}</main>
-      <Footer />
+      {!hideFooter && <Footer />}
     </div>
   );
 };

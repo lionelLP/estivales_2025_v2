@@ -199,8 +199,12 @@ export default function MobileNavbar() {
           </div>
           {user?.userType === 1 && (
             <div className="flex justify-between items-center">
-              <HoveredLink href="/espace-choriste" onClick={handleLinkClick}>
-                <strong>Espace choriste</strong>
+              <HoveredLink
+                href="/espace-choriste"
+                onClick={handleLinkClick}
+                className="text-red-brou font-semibold bg-red-brou/10 px-3 py-1 rounded-full inline-flex w-fit"
+              >
+                Espace Choriste
               </HoveredLink>
             </div>
           )}

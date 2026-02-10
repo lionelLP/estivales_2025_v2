@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Calendar, FileText, Mail, Users } from "lucide-react";
 
 type User = {
   userType: number;
@@ -61,8 +63,72 @@ export default function EspaceChoriste() {
     return null;
   }
 
+  const choristeLinks = [
+    {
+      label: "Répétitions",
+      href: "/espace-choriste/repetitions",
+      icon: <Users className="h-12 w-12" />,
+      description: "Calendrier, lieux, infos pratiques",
+      color: "bg-red-brou",
+    },
+    {
+      label: "Œuvres & partitions",
+      href: "/espace-choriste/oeuvres",
+      icon: <Calendar className="h-12 w-12" />,
+      description: "Partitions et musiques de travail",
+      color: "bg-blue-500",
+    },
+    {
+      label: "Infos choristes",
+      href: "/espace-choriste/infos",
+      icon: <FileText className="h-12 w-12" />,
+      description: "Contact Choriste, trombinoscope, documents",
+      color: "bg-emerald-500",
+    },
+    {
+      label: "Spectacles",
+      href: "/espace-choriste/spectacles",
+      icon: <Mail className="h-12 w-12" />,
+      description: "Consignes pour les spectacles",
+      color: "bg-amber-500",
+    },
+  ];
+
   return (
-    <div>
+    <div className="container mx-auto px-4 py-10">
+      <div className="mb-10 mt-6 space-y-3">
+        <p className="text-xs uppercase tracking-widest text-neutral-500">
+          Espace privé choristes
+        </p>
+        <h1 className="text-3xl font-bold text-neutral-900">
+          Tableau de bord choristes
+        </h1>
+        <p className="text-sm text-neutral-600">
+          Accès protégé par mot de passe, renouvelé en début de saison.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {choristeLinks.map((link, index) => (
+          <Link
+            key={index}
+            href={link.href}
+            className="group transform transition-all duration-300 hover:scale-105"
+          >
+            <div
+              className={`${link.color} p-8 rounded-xl shadow-lg text-white h-full`}
+            >
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="transform transition-transform duration-300 group-hover:scale-110">
+                  {link.icon}
+                </div>
+                <h2 className="text-2xl font-bold">{link.label}</h2>
+                <p className="text-white/80">{link.description}</p>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

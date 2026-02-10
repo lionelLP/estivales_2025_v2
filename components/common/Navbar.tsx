@@ -71,8 +71,9 @@ export default function Navbar({ className }: { className?: string }) {
         {user?.userType === 1 && (
           <MenuItemNoHoverLink
             setActive={setActive}
-            item="Espace choriste"
+            item="Espace Choriste"
             href="/espace-choriste"
+            className="font-semibold text-red-brou bg-red-brou/10 px-3 py-1 rounded-full hover:bg-red-brou/15 transition-colors"
           />
         )}
         <MenuItemWithIcon

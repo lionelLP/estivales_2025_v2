@@ -1,4 +1,5 @@
 "use client";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { LucideIcon } from "lucide-react";
 import Image from "next/image";
@@ -20,7 +21,7 @@ export const MenuItem = ({
   item,
   children,
   image,
-  href, // Ajout de la prop href
+  href, 
 }: {
   setActive: (item: string) => void;
   active: string | null;
@@ -318,12 +319,16 @@ export const ProductItem = ({
 
 export const HoveredLink = ({
   children,
+  className,
   ...rest
-}: LinkProps & { children: React.ReactNode }) => {
+}: LinkProps & { children: React.ReactNode; className?: string }) => {
   return (
     <Link
       {...rest}
-      className="text-neutral-700 dark:text-neutral-200 hover:text-black hover:dark:text-bleu-clair flex flex-col"
+      className={cn(
+        "text-neutral-700 dark:text-neutral-200 hover:text-black hover:dark:text-bleu-clair flex flex-col",
+        className
+      )}
     >
       {children}
     </Link>
@@ -334,17 +339,22 @@ export const MenuItemNoHoverLink = ({
   setActive,
   item,
   href,
+  className,
 }: {
   setActive: (item: string) => void;
   item: string;
   href: string;
+  className?: string;
 }) => {
   return (
     <div onMouseEnter={() => setActive(item)} className="relative">
       <Link href={href} className="block">
         <motion.p
           transition={{ duration: 0.3 }}
-          className="cursor-pointer text-black hover:opacity-[0.9] dark:text-white"
+          className={cn(
+            "cursor-pointer text-black hover:opacity-[0.9] dark:text-white",
+            className
+          )}
         >
           {item}
         </motion.p>
