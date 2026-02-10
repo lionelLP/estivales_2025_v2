@@ -197,6 +197,13 @@ export default function MobileNavbar() {
               <strong>Partenaires</strong>
             </HoveredLink>
           </div>
+          {user?.userType === 1 && (
+            <div className="flex justify-between items-center">
+              <HoveredLink href="/espace-choriste" onClick={handleLinkClick}>
+                <strong>Espace choriste</strong>
+              </HoveredLink>
+            </div>
+          )}
 
           {/* Mon profil */}
         </nav>

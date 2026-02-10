@@ -1,5 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 import { CircleUser } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -14,6 +15,7 @@ import UserMenu from "./UserMenu";
 
 export default function Navbar({ className }: { className?: string }) {
   const [active, setActive] = useState<string | null>(null);
+  const { user } = useAuth();
   return (
     <div
       className={cn(
@@ -66,6 +68,13 @@ export default function Navbar({ className }: { className?: string }) {
           item="Partenaires"
           href="/partners"
         />
+        {user?.userType === 1 && (
+          <MenuItemNoHoverLink
+            setActive={setActive}
+            item="Espace choriste"
+            href="/espace-choriste"
+          />
+        )}
         <MenuItemWithIcon
           setActive={setActive}
           active={active}
