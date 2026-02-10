@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { Calendar, FileText, Mail, Users } from "lucide-react";
 
@@ -10,46 +11,19 @@ type User = {
 } | null;
 
 export default function EspaceChoriste() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<User>(null);
+  const { user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch("/api/auth/check", {
-          credentials: "include",
-          cache: "no-store",
-          headers: {
-            "Cache-Control": "no-cache",
-          },
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setCurrentUser(data);
-        } else {
-          setCurrentUser(null);
-        }
-      } catch {
-        setCurrentUser(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
     if (isLoading) return;
-    if (!currentUser) {
+    if (!user) {
       router.replace("/login");
       return;
     }
-    if (currentUser.userType !== 1) {
+    if (user.userType !== 1) {
       router.replace("/unauthorized");
     }
-  }, [isLoading, currentUser, router]);
+  }, [isLoading, user, router]);
 
   if (isLoading) {
     return (
@@ -59,7 +33,7 @@ export default function EspaceChoriste() {
     );
   }
 
-  if (!currentUser || currentUser.userType !== 1) {
+  if (!user || user.userType !== 1) {
     return null;
   }
 
