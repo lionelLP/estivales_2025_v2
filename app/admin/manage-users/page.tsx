@@ -187,7 +187,7 @@ export default function ManageUsersPage() {
                   <td className="px-6 py-4 text-sm text-neutral-700 dark:text-neutral-200">{user.email}</td>
                   <td className="px-6 py-4 text-sm">
                     <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${user.userType === 0 ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-100" : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-100"}`}>
-                      {user.userType === 0 ? "Administrateur" : "Utilisateur"}
+                      {user.userType === 0 ? "Administrateur" : "Choriste"}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm flex gap-4">
@@ -210,7 +210,7 @@ export default function ManageUsersPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={closeEdit} />
           <div className="relative w-full max-w-2xl rounded-lg bg-white p-6 shadow-lg dark:bg-neutral-900">
-            <h2 className="text-xl font-semibold mb-4">Modifier l'utilisateur</h2>
+            <h2 className="text-xl font-semibold mb-4">Modifier le choriste</h2>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm mb-1">Nom d'utilisateur</label>
@@ -223,7 +223,7 @@ export default function ManageUsersPage() {
               <div>
                 <label className="block text-sm mb-1">Rôle</label>
                 <select name="userType" value={editForm.userType} onChange={handleEditChange} className="w-full rounded border p-2">
-                  <option value="1">Utilisateur</option>
+                  <option value="1">Choriste</option>
                   <option value="0">Administrateur</option>
                 </select>
               </div>

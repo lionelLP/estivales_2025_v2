@@ -26,11 +26,18 @@ export function useAuthentication() {
       const data = await response.json();
 
       if (response.ok) {
-        setUser({
+        const normalizedUser = {
           ...data.user,
           userType: Number(data.user.userType),
-        });
-        router.push(data.user.userType === 0 ? "/" : "/");
+        };
+        setUser(normalizedUser);
+        if (normalizedUser.userType === 0) {
+          router.push("/admin");
+        } else if (normalizedUser.userType === 1) {
+          router.push("/espace-choriste");
+        } else {
+          router.push("/");
+        }
       } else {
         setError(data.message || "Erreur lors de la connexion");
       }
@@ -55,7 +62,8 @@ export function useAuthentication() {
 
       if (response.ok) {
         setUser(null);
-        router.push("/login");
+        router.replace("/login");
+        router.refresh();
       }
     } catch (error) {
       console.error("Erreur lors de la déconnexion:", error);
