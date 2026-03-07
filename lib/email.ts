@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 interface EmailHeaders {
   [key: string]: string | string[] | { prepared: boolean; value: string };
@@ -25,17 +26,19 @@ function generateUnsubscribeToken(email: string): string {
 
 const isMailhog = process.env.SMTP_HOST === "mailhog";
 
-const transporter = nodemailer.createTransport({
+const transportOptions: SMTPTransport.Options = {
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT),
   secure: false,
   auth: isMailhog
-      ? false
+      ? undefined
       : {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: process.env.SMTP_USER || "",
+        pass: process.env.SMTP_PASS || "",
       },
-});
+};
+
+const transporter = nodemailer.createTransport(transportOptions);
 
 export async function sendEmail(
     to: string,
@@ -58,6 +61,7 @@ export async function sendEmail(
       to,
       subject,
       html,
+      headers: headers as any, // Ajouté ici pour que tes headers servent à quelque chose !
     });
 
     console.log('Email envoyé:', info.messageId);
