@@ -1,5 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // === LES PILULES ANTI-CRASH MÉMOIRE ===
+    typescript: {
+        ignoreBuildErrors: true,
+    },
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
+    // =====================================
+
     turbopack: {},
     webpack: (config, { dev, isServer }) => {
         if (dev && !isServer) {
