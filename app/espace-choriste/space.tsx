@@ -71,13 +71,13 @@ export default function EspaceChoriste() {
   return (
     <div className="container mx-auto px-4 py-10">
       <div className="mb-10 mt-6 space-y-3">
-        <p className="text-xs uppercase tracking-widest text-neutral-500">
+        <p className="text-xs uppercase tracking-widest text-neutral-500 text-center">
           Espace privé choristes
         </p>
-        <h1 className="text-3xl font-bold text-neutral-900">
+        <h1 className="text-4xl font-bold text-center pt-8 mb-8 text-red-brou">
           Tableau de bord choristes
         </h1>
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-neutral-60 0 text-center">
           Accès protégé par mot de passe, renouvelé en début de saison.
         </p>
       </div>

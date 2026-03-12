@@ -70,14 +70,14 @@ export default function ChoristesInfosPage() {
 
   return (
     <div className="container mx-auto px-4 py-10">
-      <div className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-neutral-500">
+      <div className="mb-5 mt-5">
+        <p className="text-xs uppercase tracking-widest text-neutral-500 text-center">
           Espace privé choristes
         </p>
-        <h1 className="text-3xl font-bold text-neutral-900">
+        <h1 className="text-4xl font-bold text-center pt-8 mb-8 text-red-brou">
           Liste des choristes
         </h1>
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-neutral-600 text-center">
           Coordonnees des membres (email et informations).
         </p>
       </div>
