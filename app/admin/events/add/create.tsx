@@ -36,6 +36,7 @@ export default function CreateEvent() {
     max_participants: "",
     is_public: true,
     booking_link: "",
+    instructions: "",
   });
   const [eventDates, setEventDates] = useState<string[]>([""]);
   const [brochure, setBrochure] = useState<File[]>([]);
@@ -366,6 +367,26 @@ export default function CreateEvent() {
           </p>
         </div>
 
+        {/* Consignes choristes */}
+        <div className="space-y-2">
+          <label htmlFor="instructions" className="block text-sm font-medium">
+            Consignes choristes
+          </label>
+          <textarea
+            id="instructions"
+            value={formData.instructions}
+            onChange={(e) =>
+              setFormData({ ...formData, instructions: e.target.value })
+            }
+            rows={4}
+            className="w-full rounded-lg border p-2"
+            placeholder="Consignes spécifiques pour les choristes pour ce spectacle..."
+          />
+          <p className="text-sm text-gray-500">
+            Ces consignes seront visibles uniquement par les choristes connectés.
+          </p>
+        </div>
+
         {/* Upload Brochure */}
         <div className="space-y-2">
           <label className="block text-sm font-medium">Brochure (PDF)</label>
@@ -440,7 +461,7 @@ export default function CreateEvent() {
         >
           Créer l&apos;événement
         </button>
-      </form>
-    </div>
+      </form >
+    </div >
   );
 }

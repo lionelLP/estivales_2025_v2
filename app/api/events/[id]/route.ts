@@ -30,7 +30,7 @@ export async function GET(
     try {
       const [rows] = await connection.execute(
         `SELECT id, title, subtitle, description, event_date, created_at, 
-         location, max_participants, is_public, user_id, brochure_path, booking_link 
+          location, max_participants, is_public, user_id, brochure_path, booking_link, instructions 
          FROM Event WHERE id = ?`,
         [resolvedParams.id]
       );
@@ -48,6 +48,7 @@ export async function GET(
         user_id: number;
         brochure_path: string | null;
         booking_link: string | null;
+        instructions: string | null;
       }
 
       const events = rows as Event[];
@@ -115,12 +116,13 @@ export async function PUT(
       is_public,
       booking_link,
       brochure_path,
+      instructions,
     } = body;
 
     const connection = await pool.getConnection();
     try {
       const firstDate = event_dates && event_dates.length > 0 ? event_dates[0] : null;
-      
+
       await connection.execute(
         `UPDATE Event SET 
           title = ?, 
@@ -131,7 +133,8 @@ export async function PUT(
           max_participants = ?, 
           is_public = ?,
           booking_link = ?,
-          brochure_path = ?
+          brochure_path = ?,
+          instructions = ?
         WHERE id = ?`,
         [
           title,
@@ -143,6 +146,7 @@ export async function PUT(
           is_public,
           booking_link,
           brochure_path,
+          instructions,
           resolvedParams.id,
         ]
       );
