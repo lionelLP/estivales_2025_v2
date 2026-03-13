@@ -82,6 +82,13 @@ export default function AdminLayout({
       ),
     },
     {
+      label: "Oeuvres choristes",
+      href: "/admin/oeuvres",
+      icon: (
+        <FileText className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+    },
+    {
       label: "Gestion des utilisateurs",
       href: "/admin/manage-users",
       icon: (

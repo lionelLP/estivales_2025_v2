@@ -5,10 +5,10 @@ import {
   FileText,
   Images,
   Mail,
+  Music2,
   Newspaper,
   PartyPopper,
   Scale,
-  UserPlus,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -92,6 +92,13 @@ export default function AdminPage() {
       icon: <Mail className="h-12 w-12" />,
       description: "Envoyer une newsletter aux abonnés",
       color: "bg-slate-500",
+    },
+    {
+      label: "Oeuvres choristes",
+      href: "/admin/oeuvres",
+      icon: <Music2 className="h-12 w-12" />,
+      description: "Gerer oeuvres, partitions et musiques de travail",
+      color: "bg-cyan-600",
     },
     {
       label: "Gestion des utilisateurs",
