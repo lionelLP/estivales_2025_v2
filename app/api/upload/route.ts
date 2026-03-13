@@ -3,8 +3,14 @@ import { getMediaUrl } from "@/lib/utils/media-utils";
 import { access, mkdir, writeFile } from "fs/promises";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
+import { apiMiddleware } from "../middleware";
 
 export async function POST(request: NextRequest) {
+  const middlewareResponse = await apiMiddleware(request);
+  if (middlewareResponse.status !== 200) {
+    return middlewareResponse;
+  }
+
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File;
