@@ -16,5 +16,6 @@ export interface Event {
   user_id: number;
   booking_link?: string;
   brochure_path?: string;
+  instructions?: string;
   images?: MediaType[];
 }
