@@ -165,8 +165,7 @@ export const Logo = () => {
   return (
     <a
       href="/"
-      className="font-normal flex items-center space-x-2 text-sm text-black dark:text-white py-1 relative z-20"
-    >
+      className="font-normal flex items-center space-x-2 text-sm text-black dark:text-white py-1 relative z-20">
       <Image
         src="/logo.png"
         alt="Logo"
@@ -177,8 +176,7 @@ export const Logo = () => {
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="font-medium whitespace-pre"
-      >
+        className="font-medium whitespace-pre">
         Administration
       </motion.span>
     </a>
@@ -189,8 +187,7 @@ export const LogoIcon = () => {
   return (
     <a
       href="/"
-      className="font-normal flex items-center space-x-2 text-sm text-black dark:text-white py-1 relative z-20"
-    >
+      className="font-normal flex items-center space-x-2 text-sm text-black dark:text-white py-1 relative z-20">
       <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
     </a>
   );
@@ -217,12 +214,11 @@ const AdminProfile = ({
       <button
         type="button"
         onClick={() => setShowMenu(!showMenu)}
-        className="flex w-full items-center justify-between -ml-[7px] bg-neutral-100 dark:bg-dark-mode-2 rounded-lg cursor-pointer"
-      >
+        className="flex w-full items-center justify-between -ml-[7px] bg-neutral-100 dark:bg-dark-mode-2 rounded-lg cursor-pointer">
         <div className="flex items-center gap-2">
           <Image
             src={`https://api.dicebear.com/6.x/miniavs/svg?seed=${encodeURIComponent(
-              `${currentUser.firstName?.toLowerCase()}`
+              `${currentUser.firstName?.toLowerCase()}`,
             )}`}
             alt="Admin Avatar"
             width={40}
@@ -243,8 +239,7 @@ const AdminProfile = ({
         {open && (
           <motion.div
             animate={{ rotate: showMenu ? 180 : 0 }}
-            transition={{ duration: 0.3 }}
-          >
+            transition={{ duration: 0.3 }}>
             <ChevronDown className="h-5 w-5 text-neutral-500 hover:text-neutral-700 transition-colors" />
           </motion.div>
         )}
@@ -270,12 +265,10 @@ const AdminMenu = ({
         display: open && showMenu ? "block" : "none",
       }}
       transition={{ duration: 0.3 }}
-      className="absolute bottom-full left-0 right-0 mb-8 bg-white dark:bg-dark-mode-2 rounded-lg shadow-lg p-2"
-    >
+      className="absolute bottom-full left-0 right-0 mb-8 bg-white dark:bg-dark-mode-2 rounded-lg shadow-lg p-2">
       <Link
         href="/profile"
-        className="flex items-center gap-2 p-2 hover:bg-neutral-100 dark:hover:bg-dark-mode-2 rounded w-full"
-      >
+        className="flex items-center gap-2 p-2 hover:bg-neutral-100 dark:hover:bg-dark-mode-2 rounded w-full">
         <User className="h-5 w-5" />
         <span>Mon profil</span>
       </Link>
