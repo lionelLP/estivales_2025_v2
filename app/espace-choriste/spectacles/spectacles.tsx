@@ -42,9 +42,6 @@ export default function SpectaclesChoriste() {
     return (
         <div className="container mx-auto px-4 py-10">
             <div className="mb-10 mt-6 space-y-3">
-                <p className="text-xs uppercase tracking-widest text-neutral-500 text-center">
-                    Espace choriste
-                </p>
                 <h1 className="text-4xl font-bold text-center pt-8 mb-8 text-red-brou">
                     Spectacles
                 </h1>
