@@ -36,7 +36,7 @@ export default function MainLayout({
     console.log("| |_) |  __/ | | || | (_| | | | | | | | | | |");
     console.log("|____/ \\___|_| |_|/ |\\__,_|_| |_| |_|_|_| |_|");
     console.log("                |__/                         ");
-    console.log("https://linktr.ee/devestivaledebrou"); 
+    console.log("https://linktr.ee/devestivaledebrou");
     // Reprise de code
     console.log("    _    _   _    _    ____  ");
     console.log("   / \\  | \\ | |  / \\  / ___| ");
@@ -65,7 +65,7 @@ export default function MainLayout({
     }, 500);
 
     return () => clearTimeout(timer);
-  };, []);
+  }, []);
 
   return (
     <LoadingProvider>
@@ -77,8 +77,7 @@ export default function MainLayout({
             firstName: "Admin",
             lastName: "User",
             userType: "Administrateur",
-          }}
-        >
+          }}>
           {children}
         </AdminLayout>
       ) : (
