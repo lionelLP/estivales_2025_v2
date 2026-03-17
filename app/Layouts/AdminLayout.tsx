@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import {
   ChevronDown,
   FileText,
+  House,
   Images,
   LayoutDashboard,
   LogOut,
@@ -33,6 +34,20 @@ export default function AdminLayout({
   };
 }) {
   const links = [
+    {
+      label: "Revenir à l'accueil",
+      href: "/",
+      icon: (
+        <House className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+    },
+    {
+      label: "Espace choriste",
+      href: "/espace-choriste",
+      icon: (
+        <Music2 className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+    },
     {
       label: "Tableau de bord",
       href: "/admin",
@@ -199,7 +214,11 @@ const AdminProfile = ({
 }) => {
   return (
     <div className="relative">
-      <div className="flex items-center justify-between -ml-[7px] bg-neutral-100 dark:bg-dark-mode-2 rounded-lg cursor-pointer">
+      <button
+        type="button"
+        onClick={() => setShowMenu(!showMenu)}
+        className="flex w-full items-center justify-between -ml-[7px] bg-neutral-100 dark:bg-dark-mode-2 rounded-lg cursor-pointer"
+      >
         <div className="flex items-center gap-2">
           <Image
             src={`https://api.dicebear.com/6.x/miniavs/svg?seed=${encodeURIComponent(
@@ -225,12 +244,11 @@ const AdminProfile = ({
           <motion.div
             animate={{ rotate: showMenu ? 180 : 0 }}
             transition={{ duration: 0.3 }}
-            onClick={() => setShowMenu(!showMenu)}
           >
             <ChevronDown className="h-5 w-5 text-neutral-500 hover:text-neutral-700 transition-colors" />
           </motion.div>
         )}
-      </div>
+      </button>
       <AdminMenu open={open} showMenu={showMenu} />
     </div>
   );
