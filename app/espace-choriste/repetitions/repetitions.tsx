@@ -29,6 +29,7 @@ const emptyForm = {
 export default function ChoristesRepetitionsPage() {
     const {user, isLoading} = useAuth();
     const router = useRouter();
+    const hasChoristeSpaceAccess = user?.userType === 0 || user?.userType === 1;
 
     const [rehearsals, setRehearsals] = useState<Rehearsal[]>([]);
     const [isFetching, setIsFetching] = useState(true);
@@ -46,8 +47,8 @@ export default function ChoristesRepetitionsPage() {
     useEffect(() => {
         if (isLoading) return;
         if (!user) router.replace("/login");
-        if (user?.userType !== 1) router.replace("/unauthorized");
-    }, [isLoading, user, router]);
+        if (!hasChoristeSpaceAccess) router.replace("/unauthorized");
+    }, [isLoading, hasChoristeSpaceAccess, user, router]);
 
     const fetchRehearsals = async () => {
         try {
@@ -63,8 +64,8 @@ export default function ChoristesRepetitionsPage() {
     };
 
     useEffect(() => {
-        if (user?.userType === 1) fetchRehearsals();
-    }, [user]);
+        if (hasChoristeSpaceAccess) fetchRehearsals();
+    }, [hasChoristeSpaceAccess]);
 
     const events = rehearsals.map(rep => ({
         title: `${rep.title} (${rep.type})`,

@@ -197,7 +197,7 @@ export default function MobileNavbar() {
               <strong>Partenaires</strong>
             </HoveredLink>
           </div>
-          {user?.userType === 1 && (
+          {(user?.userType === 0 || user?.userType === 1) && (
             <div className="flex justify-between items-center">
               <HoveredLink
                 href="/espace-choriste"

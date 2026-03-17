@@ -13,6 +13,7 @@ type User = {
 export default function EspaceChoriste() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const hasChoristeSpaceAccess = user?.userType === 0 || user?.userType === 1;
 
   useEffect(() => {
     if (isLoading) return;
@@ -20,10 +21,10 @@ export default function EspaceChoriste() {
       router.replace("/login");
       return;
     }
-    if (user.userType !== 1) {
+    if (!hasChoristeSpaceAccess) {
       router.replace("/unauthorized");
     }
-  }, [isLoading, user, router]);
+  }, [isLoading, hasChoristeSpaceAccess, user, router]);
 
   if (isLoading) {
     return (
@@ -33,7 +34,7 @@ export default function EspaceChoriste() {
     );
   }
 
-  if (!user || user.userType !== 1) {
+  if (!user || !hasChoristeSpaceAccess) {
     return null;
   }
 
