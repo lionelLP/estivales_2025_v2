@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
-import { Calendar, FileText, Mail, Users } from "lucide-react";
+import { Music2, Theater, BookUser, CalendarDays } from "lucide-react";
 
 type User = {
   userType: number;
@@ -42,28 +42,28 @@ export default function EspaceChoriste() {
     {
       label: "Répétitions",
       href: "/espace-choriste/repetitions",
-      icon: <Users className="h-12 w-12" />,
-      description: "Calendrier, lieux, infos pratiques",
+      icon: <CalendarDays className="h-12 w-12" />,
+      description: "Suivre les prochains regroupements",
       color: "bg-red-brou",
     },
     {
       label: "Œuvres & partitions",
       href: "/espace-choriste/oeuvres",
-      icon: <Calendar className="h-12 w-12" />,
+      icon: <Music2 className="h-12 w-12" />,
       description: "Partitions et musiques de travail",
       color: "bg-blue-500",
     },
     {
       label: "Infos choristes",
       href: "/espace-choriste/infos",
-      icon: <FileText className="h-12 w-12" />,
+      icon: <BookUser className="h-12 w-12" />,
       description: "Contact Choriste, trombinoscope, documents",
       color: "bg-emerald-500",
     },
     {
       label: "Spectacles",
       href: "/espace-choriste/spectacles",
-      icon: <Mail className="h-12 w-12" />,
+      icon: <Theater className="h-12 w-12" />,
       description: "Consignes pour les spectacles",
       color: "bg-amber-500",
     },

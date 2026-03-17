@@ -14,6 +14,7 @@ import {
   Scale,
   User,
   Users,
+  Music2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -85,7 +86,7 @@ export default function AdminLayout({
       label: "Oeuvres choristes",
       href: "/admin/oeuvres",
       icon: (
-        <FileText className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <Music2 className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
     {

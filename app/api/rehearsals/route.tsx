@@ -14,7 +14,7 @@ export async function GET() {
 
         const decoded = await verifyToken(token.value);
 
-        if (!decoded || (decoded.userType !== 0 && decoded.userType !== 1)) {
+        if (!decoded) {
             return NextResponse.json({ message: "Accès refusé" }, { status: 403 });
         }
 
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
 
         const decoded = await verifyToken(token.value);
 
-        if (!decoded || (decoded.userType !== 0 && decoded.userType !== 1)) {
+        if (!decoded || decoded.userType !== 0) {
             return NextResponse.json({ message: "Accès refusé" }, { status: 403 });
         }
 
@@ -100,7 +100,7 @@ export async function PUT(req: Request) {
 
         const decoded = await verifyToken(token.value);
 
-        if (!decoded || (decoded.userType !== 0 && decoded.userType !== 1)) {
+        if (!decoded || decoded.userType !== 0) {
             return NextResponse.json({ message: "Accès refusé" }, { status: 403 });
         }
 
@@ -142,7 +142,7 @@ export async function DELETE(req: Request) {
 
         const decoded = await verifyToken(token.value);
 
-        if (!decoded || (decoded.userType !== 0 && decoded.userType !== 1)) {
+        if (!decoded || decoded.userType !== 0) {
             return NextResponse.json({ message: "Accès refusé" }, { status: 403 });
         }
 
