@@ -68,7 +68,7 @@ export default function Navbar({ className }: { className?: string }) {
           item="Partenaires"
           href="/partners"
         />
-        {user?.userType === 1 && (
+        {(user?.userType === 0 || user?.userType === 1) && (
           <MenuItemNoHoverLink
             setActive={setActive}
             item="Espace Choriste"

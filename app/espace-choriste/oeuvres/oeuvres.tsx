@@ -352,6 +352,7 @@ function WorkCard({
 export default function ChoristeOeuvresPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const hasChoristeSpaceAccess = user?.userType === 0 || user?.userType === 1;
   const [oeuvres, setOeuvres] = useState<Oeuvre[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -365,10 +366,10 @@ export default function ChoristeOeuvresPage() {
       router.replace("/login");
       return;
     }
-    if (user.userType !== 1) {
+    if (!hasChoristeSpaceAccess) {
       router.replace("/unauthorized");
     }
-  }, [isLoading, user, router]);
+  }, [isLoading, hasChoristeSpaceAccess, user, router]);
 
   useEffect(() => {
     const fetchOeuvres = async () => {
@@ -391,10 +392,10 @@ export default function ChoristeOeuvresPage() {
       }
     };
 
-    if (user?.userType === 1) {
+    if (hasChoristeSpaceAccess) {
       fetchOeuvres();
     }
-  }, [user]);
+  }, [hasChoristeSpaceAccess]);
 
   const grouped = useMemo<OeuvreWithGroups[]>(() => {
     return oeuvres.map((oeuvre) => ({
@@ -443,7 +444,7 @@ export default function ChoristeOeuvresPage() {
     );
   }
 
-  if (!user || user.userType !== 1) {
+  if (!user || !hasChoristeSpaceAccess) {
     return null;
   }
 
