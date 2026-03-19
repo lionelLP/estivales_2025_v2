@@ -169,6 +169,6 @@ export async function DELETE(req: Request) {
     }
 }
 
-export function formatSQLDate(date: string | Date) {
+function formatSQLDate(date: string | Date) {
     return new Date(date).toISOString().slice(0, 19).replace("T", " ");
 }
