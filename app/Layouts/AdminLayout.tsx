@@ -164,7 +164,7 @@ export default function AdminLayout({
 export const Logo = () => {
   return (
     <a
-      href="/"
+      href="/admin"
       className="font-normal flex items-center space-x-2 text-sm text-black dark:text-white py-1 relative z-20">
       <Image
         src="/logo.png"
@@ -187,7 +187,7 @@ export const Logo = () => {
 export const LogoIcon = () => {
   return (
     <a
-      href="/"
+      href="/admin"
       className="font-normal flex items-center space-x-2 text-sm text-black dark:text-white py-1 relative z-20">
       <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
     </a>
