@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
-import { Calendar, FileText, Mail, Users } from "lucide-react";
+import { Music2, Theater, BookUser, CalendarDays } from "lucide-react";
 
 type User = {
   userType: number;
@@ -13,6 +13,7 @@ type User = {
 export default function EspaceChoriste() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const hasChoristeSpaceAccess = user?.userType === 0 || user?.userType === 1;
 
   useEffect(() => {
     if (isLoading) return;
@@ -20,10 +21,10 @@ export default function EspaceChoriste() {
       router.replace("/login");
       return;
     }
-    if (user.userType !== 1) {
+    if (!hasChoristeSpaceAccess) {
       router.replace("/unauthorized");
     }
-  }, [isLoading, user, router]);
+  }, [isLoading, hasChoristeSpaceAccess, user, router]);
 
   if (isLoading) {
     return (
@@ -33,7 +34,7 @@ export default function EspaceChoriste() {
     );
   }
 
-  if (!user || user.userType !== 1) {
+  if (!user || !hasChoristeSpaceAccess) {
     return null;
   }
 
@@ -41,28 +42,28 @@ export default function EspaceChoriste() {
     {
       label: "Répétitions",
       href: "/espace-choriste/repetitions",
-      icon: <Users className="h-12 w-12" />,
-      description: "Calendrier, lieux, infos pratiques",
+      icon: <CalendarDays className="h-12 w-12" />,
+      description: "Suivre les prochains regroupements",
       color: "bg-red-brou",
     },
     {
       label: "Œuvres & partitions",
       href: "/espace-choriste/oeuvres",
-      icon: <Calendar className="h-12 w-12" />,
+      icon: <Music2 className="h-12 w-12" />,
       description: "Partitions et musiques de travail",
       color: "bg-blue-500",
     },
     {
       label: "Infos choristes",
       href: "/espace-choriste/infos",
-      icon: <FileText className="h-12 w-12" />,
+      icon: <BookUser className="h-12 w-12" />,
       description: "Contact Choriste, trombinoscope, documents",
       color: "bg-emerald-500",
     },
     {
       label: "Spectacles",
       href: "/espace-choriste/spectacles",
-      icon: <Mail className="h-12 w-12" />,
+      icon: <Theater className="h-12 w-12" />,
       description: "Consignes pour les spectacles",
       color: "bg-amber-500",
     },
@@ -71,13 +72,13 @@ export default function EspaceChoriste() {
   return (
     <div className="container mx-auto px-4 py-10">
       <div className="mb-10 mt-6 space-y-3">
-        <p className="text-xs uppercase tracking-widest text-neutral-500">
+        <p className="text-xs uppercase tracking-widest text-neutral-500 text-center">
           Espace privé choristes
         </p>
-        <h1 className="text-3xl font-bold text-neutral-900">
+        <h1 className="text-4xl font-bold text-center pt-8 mb-8 text-red-brou">
           Tableau de bord choristes
         </h1>
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-neutral-60 0 text-center">
           Accès protégé par mot de passe, renouvelé en début de saison.
         </p>
       </div>

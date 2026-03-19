@@ -43,6 +43,7 @@ export default function MobileNavbar() {
               alt="Logo"
               width={60}
               height={60}
+              style={{ width: "auto", height: "auto" }}
               className="rounded-full"
             />
           </a>
@@ -197,7 +198,7 @@ export default function MobileNavbar() {
               <strong>Partenaires</strong>
             </HoveredLink>
           </div>
-          {user?.userType === 1 && (
+          {(user?.userType === 0 || user?.userType === 1) && (
             <div className="flex justify-between items-center">
               <HoveredLink
                 href="/espace-choriste"

@@ -5,11 +5,13 @@ import {
   FileText,
   Images,
   Mail,
+  Music2,
   Newspaper,
   PartyPopper,
   Scale,
-  UserPlus,
   Users,
+  WalletCards,
+  CalendarDays
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -94,6 +96,20 @@ export default function AdminPage() {
       color: "bg-slate-500",
     },
     {
+      label: "Oeuvres choristes",
+      href: "/admin/oeuvres",
+      icon: <Music2 className="h-12 w-12" />,
+      description: "Gerer oeuvres, partitions et musiques de travail",
+      color: "bg-cyan-600",
+    },
+    {
+      label: "Répétitions des choristes",
+      href: "/admin/repetitions",
+      icon: <CalendarDays className="h-12 w-12" />,
+      description: "Gerer les répétitions",
+      color: "bg-green-500",
+    },
+    {
       label: "Gestion des utilisateurs",
       href: "/admin/manage-users",
       icon: <Users className="h-12 w-12" />,
@@ -103,7 +119,7 @@ export default function AdminPage() {
     {
       label: "Billetterie",
       href: "/admin/billetterie",
-      icon: <FileText className="h-12 w-12" />,
+      icon: <WalletCards className="h-12 w-12" />,
       description: "Modifier les prix des billets",
       color: "bg-indigo-500",
     }

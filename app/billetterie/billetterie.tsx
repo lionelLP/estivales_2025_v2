@@ -42,6 +42,7 @@ export default function Billetterie() {
             src="/billetterie/programme_page1.png"
             alt="Programme page 1"
             fill
+            sizes="(max-width: 768px) 100vw, 50vw"
             className="object-contain"
           />
         </a>
@@ -55,6 +56,7 @@ export default function Billetterie() {
             src="/billetterie/programme_page2.png"
             alt="Programme page 2"
             fill
+            sizes="(max-width: 768px) 100vw, 50vw"
             className="object-contain"
           />
         </a>

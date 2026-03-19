@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
       is_public,
       booking_link,
       brochure_path,
+      instructions,
     } = body;
 
     // Validation : au moins une date
@@ -59,8 +60,8 @@ export async function POST(request: NextRequest) {
       const [result] = await connection.execute<ResultSetHeader>(
         `INSERT INTO Event (
           title, subtitle, description, event_date, location, 
-          max_participants, is_public, booking_link, brochure_path, user_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          max_participants, is_public, booking_link, brochure_path, instructions, user_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           title,
           subtitle,
@@ -71,6 +72,7 @@ export async function POST(request: NextRequest) {
           is_public,
           booking_link,
           brochure_path,
+          instructions,
           decoded.userId,
         ]
       );
