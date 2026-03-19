@@ -171,6 +171,7 @@ export const Logo = () => {
         alt="Logo"
         width={24}
         height={24}
+        style={{ width: "auto", height: "auto" }}
         className="flex-shrink-0"
       />
       <motion.span

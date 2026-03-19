@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    allowedDevOrigins: ['127.0.0.1'],
     turbopack: {},
     webpack: (config, { dev, isServer }) => {
         if (dev && !isServer) {

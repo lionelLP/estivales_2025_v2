@@ -5,7 +5,6 @@ import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
-import Strike from "@tiptap/extension-strike";
 import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
@@ -44,6 +43,7 @@ export default function EditLegal() {
   const router = useRouter();
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit,
       Link.configure({
@@ -61,7 +61,6 @@ export default function EditLegal() {
         types: ["heading", "paragraph"],
       }),
       Underline,
-      Strike,
       TextStyle,
       Color,
       Highlight.configure({

@@ -18,6 +18,7 @@ export default function NewsletterPage() {
   const router = useRouter();
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit,
       Link.configure({

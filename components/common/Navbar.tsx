@@ -31,6 +31,7 @@ export default function Navbar({ className }: { className?: string }) {
               alt="Logo"
               width={60}
               height={60}
+              style={{ width: "auto", height: "auto" }}
               className="rounded-full"
             />
           </a>
