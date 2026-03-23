@@ -84,7 +84,7 @@ export default function PressePage() {
             {article.content}
           </div>
           <div className="flex justify-between items-center">
-            {article.content.length > (isLarge ? 150 : 100) && (
+            {article.content.length > (isLarge ? 150 : 100) && article.link && (
               <Link
                 href={article.link}
                 target="_blank"
@@ -97,7 +97,7 @@ export default function PressePage() {
           </div>
         </div>
       ),
-      header: (
+      header: article.link ? (
         <Link
           href={article.link}
           target="_blank"
@@ -119,6 +119,23 @@ export default function PressePage() {
             </div>
           )}
         </Link>
+      ) : (
+        <div className="block w-full">
+          {article.image ? (
+            <div className="relative w-full h-44">
+              <Image
+                src={article.image}
+                alt={article.title}
+                fill
+                className="object-cover rounded-lg"
+              />
+            </div>
+          ) : (
+            <div className="relative w-full h-44 bg-gray-200 flex items-center justify-center">
+              <span className="text-gray-500">Aucune image disponible</span>
+            </div>
+          )}
+        </div>
       ),
       className: `${
         isLarge ? "md:col-span-2" : "md:col-span-1"
