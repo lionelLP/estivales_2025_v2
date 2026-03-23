@@ -206,29 +206,29 @@ export default function ProgrammesPast() {
     });
 
     // Grouper par date et garder une référence à la date réelle pour le tri
-    const eventsByDateMap = new Map<string, { events: Event[]; sortDate: Date }>();
+    const eventsByDateMap = new Map<string, { items: Array<{event: Event, date: Date}>; sortDate: Date }>();
     expandedEvents.forEach((item) => {
       const dateKey = item.date.toLocaleDateString("fr-FR", {
+        timeZone: "UTC",
         day: "numeric",
         month: "long",
         year: "numeric",
       });
       if (!eventsByDateMap.has(dateKey)) {
-        eventsByDateMap.set(dateKey, { events: [], sortDate: item.date });
+        eventsByDateMap.set(dateKey, { items: [], sortDate: item.date });
       }
-      eventsByDateMap.get(dateKey)!.events.push(item.event);
+      eventsByDateMap.get(dateKey)!.items.push(item);
     });
 
     // Transformer en format Timeline
     const timelineData: TimelineEntry[] = Array.from(eventsByDateMap.entries())
-      .map(([date, { events: dateEvents, sortDate }]) => ({
+      .map(([date, { items, sortDate }]) => ({
         title: date,
         sortDate,
         content: (
           <div>
             <div className="mb-8">
-              {dateEvents.map((event: Event) => {
-                const eventTime = new Date(event.event_date);
+              {items.map(({ event, date: eventTime }) => {
                 const hasValidTime = !isNaN(eventTime.getTime());
                 return (
                   <div key={event.id} className="mb-4">
@@ -243,6 +243,7 @@ export default function ProgrammesPast() {
                     {hasValidTime && (
                       <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
                         {eventTime.toLocaleTimeString("fr-FR", {
+                          timeZone: "UTC",
                           hour: "2-digit",
                           minute: "2-digit",
                         })}

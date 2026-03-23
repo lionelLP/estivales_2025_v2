@@ -117,12 +117,14 @@ export function EventDetailModal({
                     {event.event_dates.map((dateObj: any, index: number) => (
                       <div key={dateObj.id || index}>
                         {new Date(dateObj.date_time).toLocaleDateString("fr-FR", {
+                          timeZone: "UTC",
                           day: "numeric",
                           month: "long",
                           year: "numeric",
                         })}{" "}
                         –{" "}
                         {new Date(dateObj.date_time).toLocaleTimeString("fr-FR", {
+                          timeZone: "UTC",
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
@@ -132,11 +134,13 @@ export function EventDetailModal({
                 ) : (
                   <span>
                     {new Date(event.event_date).toLocaleDateString("fr-FR", {
+                      timeZone: "UTC",
                       day: "numeric",
                       month: "long",
                     })}{" "}
                     –{" "}
                     {new Date(event.event_date).toLocaleTimeString("fr-FR", {
+                      timeZone: "UTC",
                       hour: "2-digit",
                       minute: "2-digit",
                     })}

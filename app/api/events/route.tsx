@@ -175,6 +175,19 @@ export async function GET() {
           event.images = transformedMedia.filter(
             (m) => m.event_id === event.id
           );
+          
+          if (event.event_dates && Array.isArray(event.event_dates)) {
+            event.event_dates = event.event_dates.map((ed: any) => {
+              let dt = ed.date_time;
+              if (dt && typeof dt === "string" && !dt.includes("T") && !dt.includes("Z")) {
+                dt = dt.replace(" ", "T");
+                if (!dt.endsWith("Z")) {
+                  dt += "Z";
+                }
+              }
+              return { ...ed, date_time: dt };
+            });
+          }
         });
       }
 
