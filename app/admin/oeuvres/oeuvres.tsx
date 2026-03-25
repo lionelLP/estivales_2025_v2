@@ -1,6 +1,7 @@
 "use client";
 
 import UnauthorizedPage from "@/app/unauthorized/unauthorized";
+import { getMediaUrl } from "@/lib/utils/media-utils";
 import { Plus, Save, Trash2, Upload } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -789,7 +790,7 @@ export default function AdminOeuvresPage() {
                         className="flex items-center justify-between gap-3 rounded-md border border-neutral-200 px-3 py-2 text-sm dark:border-neutral-700"
                       >
                         <a
-                          href={resource.url}
+                          href={getMediaUrl(resource.url)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="truncate text-blue-700 hover:underline"

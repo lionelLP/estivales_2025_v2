@@ -5,12 +5,12 @@ import {
   ChevronDown,
   ChevronUp,
   Download,
-  ExternalLink,
   FileText,
   Headphones,
   Search,
   Music2,
 } from "lucide-react";
+import { getMediaUrl } from "@/lib/utils/media-utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -193,11 +193,11 @@ function PartitionList({ resources }: { resources: OeuvreResource[] }) {
               {resource.source_kind === "file" ? "PDF" : "Lien"}
             </p>
             <div className="flex shrink-0 items-center gap-1">
-              <ResourceActionLink href={resource.url} primary>
+              <ResourceActionLink href={getMediaUrl(resource.url)} primary>
                 Ouvrir
               </ResourceActionLink>
               {resource.source_kind === "file" ? (
-                <ResourceActionLink href={resource.url} download>
+                <ResourceActionLink href={getMediaUrl(resource.url)} download>
                   <span className="inline-flex items-center gap-1">
                     <Download className="h-3 w-3" />
                     Telecharger
@@ -229,10 +229,10 @@ function AudioRow({ resource }: { resource: OeuvreResource }) {
           </p>
         </div>
         <div className="hidden shrink-0 items-center gap-1 md:flex">
-          <ResourceActionLink href={resource.url} primary>
+          <ResourceActionLink href={getMediaUrl(resource.url)} primary>
             Ouvrir
           </ResourceActionLink>
-          <ResourceActionLink href={resource.url}>
+          <ResourceActionLink href={getMediaUrl(resource.url)}>
             <span className="inline-flex items-center gap-1">
               <Download className="h-3 w-3" />
               Telecharger
@@ -244,17 +244,17 @@ function AudioRow({ resource }: { resource: OeuvreResource }) {
       <div className="mt-1.5 pl-8">
         {canPreview ? (
           <audio controls preload="none" className="h-8 w-full max-w-full">
-            <source src={resource.url} type={resource.mime_type || undefined} />
+            <source src={getMediaUrl(resource.url)} type={resource.mime_type || undefined} />
             Votre navigateur ne supporte pas l&apos;audio.
           </audio>
         ) : (
           <p className="text-[11px] text-neutral-500">Apercu indisponible pour ce lien.</p>
         )}
         <div className="mt-1.5 flex items-center gap-1 md:hidden">
-          <ResourceActionLink href={resource.url} primary>
+          <ResourceActionLink href={getMediaUrl(resource.url)} primary>
             Ouvrir
           </ResourceActionLink>
-          <ResourceActionLink href={resource.url}>
+          <ResourceActionLink href={getMediaUrl(resource.url)}>
             <span className="inline-flex items-center gap-1">
               <Download className="h-3 w-3" />
               Telecharger

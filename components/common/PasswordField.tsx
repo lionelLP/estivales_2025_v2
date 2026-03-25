@@ -153,6 +153,7 @@ interface PasswordFieldProps {
   className?: string;
   value?: string;
   showValidation?: boolean;
+  autoComplete?: string;
 }
 
 const PasswordField: React.FC<PasswordFieldProps> = ({
@@ -160,6 +161,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
   className,
   value = "",
   showValidation = true,
+  autoComplete,
 }) => {
   const [show, setShow] = useState(false);
   const [inputValue, setInputValue] = useState(value);
@@ -338,6 +340,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
         <Input
           type="password"
           placeholder="Mot de passe"
+          autoComplete={autoComplete}
           value={inputValue}
           onChange={handleInputChange}
           className={`transform transition-all duration-300 ${
@@ -349,6 +352,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
         <ClearInput
           type="text"
           placeholder="Mot de passe"
+          autoComplete={autoComplete}
           value={inputValue}
           onChange={handleInputChange}
           className={`transform transition-all duration-300 ${

@@ -2,10 +2,11 @@
 
 import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 import { useLoading } from "@/contexts/LoadingContext";
-import { Newspaper } from "lucide-react";
+import { Newspaper, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Article {
   title: string;
@@ -28,6 +29,7 @@ interface FormattedItem {
 
 export default function PressePage() {
   const [items, setItems] = useState<FormattedItem[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const { registerLoadingComponent, componentLoaded } = useLoading();
 
   useEffect(() => {
@@ -162,7 +164,9 @@ export default function PressePage() {
       ),
       link: article.link,
       onClick: () => {
-        if (article.link) {
+        if (article.image) {
+          setSelectedImage(article.image);
+        } else if (article.link) {
           window.open(article.link, "_blank", "noopener,noreferrer");
         }
       },
@@ -183,12 +187,48 @@ export default function PressePage() {
         </div>
       </div>
       <div>
-        <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[23rem]">
-          {items.map((item, i) => (
-            <BentoGridItem key={i} {...item} />
-          ))}
-        </BentoGrid>
-      </div>
+      <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[23rem]">
+        {items.map((item, i) => (
+          <BentoGridItem key={i} {...item} />
+        ))}
+      </BentoGrid>
+
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedImage(null)}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 cursor-zoom-out"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative max-w-5xl max-h-[90vh] w-full h-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
+              >
+                <X className="h-8 w-8" />
+              </button>
+              <div className="relative w-full h-full bg-white rounded-lg overflow-hidden shadow-2xl">
+                <Image
+                  src={selectedImage}
+                  alt="Article press"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
     </div>
   );
 }
