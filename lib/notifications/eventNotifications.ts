@@ -8,6 +8,7 @@ interface Event {
   subtitle?: string;
   description: string;
   event_date: string;
+  address: string;
   location: string;
   booking_link?: string;
   id: number;

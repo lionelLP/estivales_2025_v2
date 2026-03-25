@@ -24,12 +24,14 @@ export default function ProgrammesPast() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCriteria, setFilterCriteria] = useState<{
+    address: string;
     location: string;
     dateRange: {
       from: Date | undefined;
       to: Date | undefined;
     };
   }>({
+    address: "Tous",
     location: "Tous",
     dateRange: { from: undefined, to: undefined },
   });
@@ -78,16 +80,15 @@ export default function ProgrammesPast() {
             return;
           }
 
-          // Extraire les lieux uniques des événements
-          const locations: string[] = pastEvents
-            .map((event: Event) => event.location)
+          const addresses: string[] = pastEvents
+            .map((event: Event) => event.address)
             .filter(
-              (location: string | undefined): location is string => !!location
+              (address: string | undefined): address is string => !!address
             );
 
-          // Dédupliquer les lieux
-          const uniqueLocationsSet = [...new Set(locations)];
-          setUniqueLocations(uniqueLocationsSet);
+          // Dédupliquer les adresses
+          const uniqueAddressesSet = [...new Set(addresses)];
+          setUniqueLocations(uniqueAddressesSet);
 
           // Formatage initial des événements pour la timeline
           formatEventsForTimeline(pastEvents, undefined);
@@ -121,10 +122,10 @@ export default function ProgrammesPast() {
 
     let filtered = [...allEvents];
 
-    // Filtrer par lieu si un lieu spécifique est sélectionné
-    if (filterCriteria.location !== "Tous") {
+    // Filtrer par adresse si une adresse spécifique est sélectionnée
+    if (filterCriteria.address !== "Tous") {
       filtered = filtered.filter(
-        (event) => event.location === filterCriteria.location
+        (event) => event.address === filterCriteria.address
       );
     }
 
@@ -250,7 +251,7 @@ export default function ProgrammesPast() {
                       </p>
                     )}
                     <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
-                      {event.location}
+                      {event.location ? `${event.location}, ` : ""}{event.address}
                     </p>
                     <button
                       onClick={() => {
@@ -280,6 +281,7 @@ export default function ProgrammesPast() {
   };
 
   const handleFilter = (filters: {
+    address: string;
     location: string;
     dateRange: {
       from: Date | undefined;

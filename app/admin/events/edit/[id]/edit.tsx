@@ -17,6 +17,7 @@ export default function EditEvent({
     subtitle: "",
     description: "",
     event_date: "",
+    address: "",
     location: "",
     max_participants: 0,
     is_public: true,
@@ -261,10 +262,10 @@ export default function EditEvent({
           </button>
         </div>
 
-        {/* Lieu */}
+        {/* Lieu précis */}
         <div className="space-y-2">
           <label htmlFor="location" className="block text-sm font-medium">
-            Lieu
+            Lieu précis
           </label>
           <input
             id="location"
@@ -272,6 +273,23 @@ export default function EditEvent({
             value={formData.location || ""}
             onChange={(e) =>
               setFormData({ ...formData, location: e.target.value })
+            }
+            className="w-full rounded-lg border p-2"
+            placeholder="Ex: Monastère royal de Brou"
+          />
+        </div>
+
+        {/* Adresse */}
+        <div className="space-y-2">
+          <label htmlFor="address" className="block text-sm font-medium">
+            Adresse
+          </label>
+          <input
+            id="address"
+            type="text"
+            value={formData.address || ""}
+            onChange={(e) =>
+              setFormData({ ...formData, address: e.target.value })
             }
             className="w-full rounded-lg border p-2"
           />

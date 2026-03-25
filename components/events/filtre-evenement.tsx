@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 export interface FiltreEvenementProps {
   mode: "past" | "toCome";
   onFilter?: (filters: {
+    address: string;
     location: string;
     dateRange: {
       from: Date | undefined;
@@ -37,6 +38,7 @@ export function FiltreEvenement({
   onFilter,
   locations = [],
 }: FiltreEvenementProps) {
+  const [address, setAddress] = useState("Tous");
   const [location, setLocation] = useState("Tous");
   const [dateRange, setDateRange] = useState<{
     from: Date | undefined;
@@ -52,7 +54,7 @@ export function FiltreEvenement({
 
   const handleFilter = () => {
     if (onFilter) {
-      onFilter({ location, dateRange });
+      onFilter({ address, location, dateRange });
     }
   };
 
@@ -70,7 +72,7 @@ export function FiltreEvenement({
           {mode === "past" ? "événements passés" : "événements à venir"}
         </h3>
         <div className="flex flex-col sm:flex-row gap-5 items-center">
-          <Select value={location} onValueChange={setLocation}>
+          <Select value={address} onValueChange={setAddress}>
             <SelectTrigger className="w-full sm:w-[180px] border border-pink-200 dark:border-pink-800 hover:bg-pink-50 dark:hover:bg-pink-900/20 hover:text-pink-600 dark:hover:text-pink-400 transition-colors">
               <SelectValue placeholder="Sélectionner un lieu" />
             </SelectTrigger>

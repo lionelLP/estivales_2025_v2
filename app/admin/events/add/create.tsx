@@ -32,6 +32,7 @@ export default function CreateEvent() {
     title: "",
     subtitle: "",
     description: "",
+    address: "",
     location: "",
     max_participants: "",
     is_public: true,
@@ -138,7 +139,7 @@ export default function CreateEvent() {
   };
 
   const handleAddressSearch = async (query: string) => {
-    setFormData({ ...formData, location: query });
+    setFormData({ ...formData, address: query });
 
     if (query.length > 2) {
       try {
@@ -163,7 +164,7 @@ export default function CreateEvent() {
   const handleAddressSelect = (suggestion: Suggestion) => {
     setFormData({
       ...formData,
-      location: suggestion.properties.label,
+      address: suggestion.properties.label,
     });
     setSuggestions([]);
     setShowSuggestions(false);
@@ -268,19 +269,36 @@ export default function CreateEvent() {
           </button>
         </div>
 
-        {/* Lieu avec autocomplétion */}
+        {/* Lieu précis */}
         <div className="space-y-2">
           <label htmlFor="location" className="block text-sm font-medium">
-            Lieu
+            Lieu précis
+          </label>
+          <input
+            id="location"
+            type="text"
+            value={formData.location}
+            onChange={(e) =>
+              setFormData({ ...formData, location: e.target.value })
+            }
+            className="w-full rounded-lg border p-2"
+            placeholder="Ex: Monastère royal de Brou"
+          />
+        </div>
+
+        {/* Adresse avec autocomplétion */}
+        <div className="space-y-2">
+          <label htmlFor="address" className="block text-sm font-medium">
+            Adresse
           </label>
           <div className="relative">
             <Input
-              id="location"
+              id="address"
               type="text"
-              value={formData.location}
+              value={formData.address}
               onChange={(e) => handleAddressSearch(e.target.value)}
               onFocus={() =>
-                formData.location.length > 2 && setShowSuggestions(true)
+                formData.address.length > 2 && setShowSuggestions(true)
               }
               placeholder="Entrez une adresse"
               className="w-full rounded-lg border p-2 bg-white dark:bg-neutral-950 shadow-sm focus:ring-2 focus:ring-blue-500 transition"

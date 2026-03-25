@@ -30,7 +30,7 @@ export async function GET(
     try {
       const [rows] = await connection.execute(
         `SELECT id, title, subtitle, description, event_date, created_at, 
-          location, max_participants, is_public, user_id, brochure_path, booking_link, instructions 
+          address, location, max_participants, is_public, user_id, brochure_path, booking_link, instructions 
          FROM Event WHERE id = ?`,
         [resolvedParams.id]
       );
@@ -42,6 +42,7 @@ export async function GET(
         description: string | null;
         event_date: Date;
         created_at: Date;
+        address: string | null;
         location: string | null;
         max_participants: number | null;
         is_public: number;
@@ -111,6 +112,7 @@ export async function PUT(
       subtitle,
       description,
       event_dates,
+      address,
       location,
       max_participants,
       is_public,
@@ -129,6 +131,7 @@ export async function PUT(
           subtitle = ?, 
           description = ?, 
           event_date = ?, 
+          address = ?,
           location = ?, 
           max_participants = ?, 
           is_public = ?,
@@ -141,6 +144,7 @@ export async function PUT(
           subtitle,
           description,
           firstDate,
+          address,
           location,
           max_participants,
           is_public,

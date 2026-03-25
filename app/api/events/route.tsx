@@ -37,6 +37,7 @@ export async function POST(request: NextRequest) {
       subtitle,
       description,
       event_dates,
+      address,
       location,
       max_participants,
       is_public,
@@ -56,17 +57,17 @@ export async function POST(request: NextRequest) {
     const connection = await pool.getConnection();
 
     try {
-      // Insérer l'événement d'abord (sans event_date temporairement)
       const [result] = await connection.execute<ResultSetHeader>(
         `INSERT INTO Event (
-          title, subtitle, description, event_date, location, 
+          title, subtitle, description, event_date, address, location, 
           max_participants, is_public, booking_link, brochure_path, instructions, user_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           title,
           subtitle,
           description,
           event_dates[0], // Utiliser la première date pour event_date
+          address,
           location,
           max_participants,
           is_public,
@@ -96,6 +97,7 @@ export async function POST(request: NextRequest) {
             subtitle,
             description,
             event_date: event_dates[0],
+            address,
             location,
             booking_link,
           });

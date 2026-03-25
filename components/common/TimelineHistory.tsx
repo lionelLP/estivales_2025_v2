@@ -229,7 +229,7 @@ export function TimelineHistory({
                       </p>
                     )}
                     <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
-                      {event.location}
+                      {event.location ? `${event.location}, ` : ""}{event.address}
                     </p>
                     <button
                       onClick={() => {
