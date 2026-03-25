@@ -3,6 +3,7 @@
 import { FileUpload } from "@/components/common/file-upload";
 import { ImageViewer } from "@/components/common/ImageViewer";
 import { Button } from "@/components/ui/button";
+import { getMediaUrl } from "@/lib/utils/media-utils";
 import {
   Dialog,
   DialogContent,
@@ -236,7 +237,7 @@ export default function MediasPage() {
             const errorData = JSON.parse(errorText);
             errorMessage = errorData.error || errorMessage;
             console.error("Erreur upload vidéo (JSON):", errorData);
-          } catch (e) {
+          } catch {
             console.error("Erreur upload vidéo (Text):", errorText);
             errorMessage = `Erreur serveur (${uploadResponse.status}): ${errorText.substring(0, 50)}...`;
           }
@@ -269,7 +270,7 @@ export default function MediasPage() {
         for (const audio of audios) {
           if (audio.size > 10 * 1024 * 1024) {
             setError(
-              `Le fichier ${audio.name} est trop volumineux. Maximum 10 Mo.`
+              `Le fichier ${audio.name} est trop volumineuse. Maximum 10 Mo.`
             );
             return;
           }
@@ -299,7 +300,7 @@ export default function MediasPage() {
             const errorData = JSON.parse(errorText);
             errorMessage = errorData.error || errorMessage;
             console.error("Erreur upload audio (JSON):", errorData);
-          } catch (e) {
+          } catch {
             console.error("Erreur upload audio (Text):", errorText);
             errorMessage = `Erreur serveur (${uploadResponse.status}): ${errorText.substring(0, 50)}...`;
           }
@@ -633,7 +634,7 @@ export default function MediasPage() {
                 onClick={(e) => openVideoModal(media.url, e)}
               >
                 <video
-                  src={media.url}
+                  src={getMediaUrl(media.url)}
                   className="w-full h-full object-cover"
                   preload="metadata"
                 />
@@ -660,7 +661,7 @@ export default function MediasPage() {
                 <Music className="w-16 h-16 text-pink-500 mb-2" />
                 <audio
                   controls
-                  src={media.url}
+                  src={getMediaUrl(media.url)}
                   className="w-full mt-2"
                   preload="none"
                 >
@@ -680,10 +681,10 @@ export default function MediasPage() {
               </div>
             ) : (
               // Rendu pour les images (avec le bouton de favoris conservé)
-              <ImageViewer src={media.url} alt={media.title}>
+              <ImageViewer src={getMediaUrl(media.url)} alt={media.title}>
                 <div className="aspect-square relative rounded-lg overflow-hidden cursor-pointer">
                   <Image
-                    src={media.url}
+                    src={getMediaUrl(media.url)}
                     alt={media.title}
                     fill
                     className="object-cover transition-transform group-hover:scale-110"
@@ -748,7 +749,7 @@ export default function MediasPage() {
                   controls
                   autoPlay
                   className="w-full h-full"
-                  src={selectedVideo}
+                  src={getMediaUrl(selectedVideo)}
                 >
                   Votre navigateur ne supporte pas la lecture de vidéos.
                 </video>

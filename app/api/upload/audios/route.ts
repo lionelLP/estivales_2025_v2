@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
         const formData = await request.formData();
         const files = formData.getAll("files") as File[];
         const eventId = formData.get("eventId");
+        const isOeuvre = formData.get("isOeuvre") === "true";
 
         if (!files || files.length === 0) {
             return NextResponse.json(
@@ -24,7 +25,12 @@ export async function POST(request: NextRequest) {
         }
 
         // Vérifier si le répertoire d'upload existe, sinon le créer
-        const uploadDir = path.join(process.cwd(), "public", "uploads", "audios");
+        let uploadDir;
+        if (isOeuvre) {
+            uploadDir = path.join(process.cwd(), "public", "uploads", "oeuvres", "audio");
+        } else {
+            uploadDir = path.join(process.cwd(), "public", "uploads", "audios");
+        }
 
         try {
             await access(uploadDir);
@@ -77,7 +83,9 @@ export async function POST(request: NextRequest) {
                 // Conserver l'extension originale pour l'audio
                 const filename = `${timestamp}_${sanitizedOriginalName}${extension}`;
                 const filepath = path.join(uploadDir, filename);
-                const relativePath = `/uploads/audios/${filename}`;
+                const relativePath = isOeuvre 
+                    ? `/uploads/oeuvres/audio/${filename}`
+                    : `/uploads/audios/${filename}`;
 
                 // Écrire le fichier sur le disque
                 try {
@@ -96,6 +104,16 @@ export async function POST(request: NextRequest) {
                 }
 
                 try {
+                    if (isOeuvre) {
+                        // Pour les oeuvres, on ne sauvegarde pas dans Media
+                        uploadedFiles.push({
+                            id: null,
+                            url: relativePath,
+                            name: file.name,
+                        });
+                        continue;
+                    }
+
                     // Préparer la requête SQL en fonction des colonnes disponibles
                     let query, params;
 

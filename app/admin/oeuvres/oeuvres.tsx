@@ -354,6 +354,7 @@ export default function AdminOeuvresPage() {
       setIsUploading(true);
       const body = new FormData();
       body.append("file", partitionFile);
+      body.append("category", "partition");
 
       const uploadResponse = await fetch("/api/upload", { method: "POST", body });
       const uploadData = await uploadResponse.json().catch(() => ({}));
@@ -407,6 +408,7 @@ export default function AdminOeuvresPage() {
       setIsUploading(true);
       const body = new FormData();
       body.append("files", audioFile);
+      body.append("isOeuvre", "true");
 
       const uploadResponse = await fetch("/api/upload/audios", { method: "POST", body });
       const uploadData = await uploadResponse.json().catch(() => ({}));
@@ -902,7 +904,7 @@ export default function AdminOeuvresPage() {
                         className="flex items-center justify-between gap-3 rounded-md border border-neutral-200 px-3 py-2 text-sm dark:border-neutral-700"
                       >
                         <a
-                          href={resource.url}
+                          href={getMediaUrl(resource.url)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="truncate text-blue-700 hover:underline"

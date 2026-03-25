@@ -164,10 +164,10 @@ export default function PressePage() {
       ),
       link: article.link,
       onClick: () => {
-        if (article.image) {
-          setSelectedImage(article.image);
-        } else if (article.link) {
+        if (article.link) {
           window.open(article.link, "_blank", "noopener,noreferrer");
+        } else if (article.image) {
+          setSelectedImage(article.image);
         }
       },
     };
