@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { getMediaUrl } from "@/lib/utils/media-utils";
 import { useEffect, useState } from "react";
 
 export default function Partenaires() {
@@ -193,7 +194,7 @@ export default function Partenaires() {
                     "cursor-pointer overflow-hidden relative card h-96 rounded-md shadow-xl max-w-sm backgroundImage flex flex-col justify-between p-4",
                     "bg-cover hover:shadow-2xl transition-shadow duration-300"
                   )}
-                  style={{ backgroundImage: `url(${partenaire.banner_url})` }}
+                  style={{ backgroundImage: `url(${getMediaUrl(partenaire.banner_url)})` }}
                 >
                   <div className="absolute w-full h-full top-0 left-0 transition duration-300 group-hover/card:bg-black opacity-60"></div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
@@ -203,7 +204,7 @@ export default function Partenaires() {
                       <div className="absolute inset-0 bg-white rounded-full shadow-lg">
                         <div className="relative w-full h-full">
                           <Image
-                            src={partenaire.logo_url}
+                            src={getMediaUrl(partenaire.logo_url)}
                             alt={`Logo ${partenaire.name}`}
                             fill
                             sizes="64px"
@@ -260,7 +261,7 @@ export default function Partenaires() {
                   "overflow-hidden relative card h-96 rounded-md shadow-xl max-w-sm backgroundImage flex flex-col justify-between p-4",
                   "bg-cover"
                 )}
-                style={{ backgroundImage: `url(${partenaire.banner_url})` }}
+                style={{ backgroundImage: `url(${getMediaUrl(partenaire.banner_url)})` }}
               >
                 <div className="absolute w-full h-full top-0 left-0 transition duration-300 group-hover/card:bg-black opacity-60"></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
@@ -270,7 +271,7 @@ export default function Partenaires() {
                     <div className="absolute inset-0 bg-white rounded-full shadow-lg">
                       <div className="relative w-full h-full">
                         <Image
-                          src={partenaire.logo_url}
+                          src={getMediaUrl(partenaire.logo_url)}
                           alt={`Logo ${partenaire.name}`}
                           fill
                           sizes="64px"

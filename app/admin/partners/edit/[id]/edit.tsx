@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Partner } from "@/lib/types/partner";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { getMediaUrl } from "@/lib/utils/media-utils";
 import { useEffect, useState } from "react";
 
 interface EditPartnerProps {
@@ -225,7 +226,7 @@ export default function EditPartner({ params }: EditPartnerProps) {
               <p className="text-sm text-gray-500 mb-2">Logo actuel :</p>
               <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200">
                 <Image
-                  src={currentLogoUrl}
+                  src={getMediaUrl(currentLogoUrl)}
                   alt="Logo actuel"
                   width={100}
                   height={100}
@@ -252,8 +253,8 @@ export default function EditPartner({ params }: EditPartnerProps) {
             <div className="mb-4">
               <p className="text-sm text-gray-500 mb-2">Bannière actuelle :</p>
               <div className="relative w-full h-40 rounded-lg overflow-hidden border-2 border-gray-200">
-                <Image
-                  src={currentBannerUrl}
+                 <Image
+                  src={getMediaUrl(currentBannerUrl)}
                   alt="Bannière actuelle"
                   width={100}
                   height={100}
