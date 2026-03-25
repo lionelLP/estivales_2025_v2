@@ -1,5 +1,6 @@
 "use client";
 
+import { getMediaUrl } from "@/lib/utils/media-utils";
 import { ParallaxScroll } from "@/components/ui/parallax-scroll";
 import { useEffect, useState } from "react";
 
@@ -67,7 +68,11 @@ export default function MediaPage() {
           if (validMedia.length === 0) {
             setError("Aucun média disponible");
           } else {
-            setMedia(validMedia);
+            const updatedMedia = validMedia.map((item: Media) => ({
+              ...item,
+              url: getMediaUrl(item.url),
+            }));
+            setMedia(updatedMedia);
             setError("");
           }
         } else {

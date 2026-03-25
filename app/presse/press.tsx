@@ -82,19 +82,14 @@ export default function PressePage() {
       ),
       description: (
         <div className="flex flex-col h-full justify-between">
-          <div className="line-clamp-2 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300 mb-4">
+          <div className="line-clamp-2 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300 mb-2">
             {article.content}
           </div>
-          <div className="flex justify-between items-center">
+          <div className="mt-auto pt-2">
             {article.content.length > (isLarge ? 150 : 100) && article.link && (
-              <Link
-                href={article.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline"
-              >
+              <span className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline font-medium">
                 Voir plus
-              </Link>
+              </span>
             )}
           </div>
         </div>
