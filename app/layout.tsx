@@ -29,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${poppins.variable}`} suppressHydrationWarning>
       <head>
+        <meta charSet="utf-8" />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"

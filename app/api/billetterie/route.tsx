@@ -162,7 +162,7 @@ export async function GET() {
                 \`content\` json NOT NULL,
                 \`updated_at\` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
                 PRIMARY KEY (\`id\`)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
             `);
             await db.query("INSERT INTO Billetterie (id, content) VALUES (1, ?)", [JSON.stringify(initialData)]);
             return NextResponse.json(initialData);
