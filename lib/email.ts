@@ -20,10 +20,10 @@ function generateUnsubscribeToken(email: string): string {
 
 const isMailhog = process.env.SMTP_HOST === "mailhog";
 
-const transportOptions: SMTPTransport.Options = {
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: false,
+const transportOptions = {
+  host: process.env.SMTP_HOST || "ssl0.ovh.net",
+  port: Number(process.env.SMTP_PORT) || 465, // On force un vrai chiffre
+  secure: true, // On force le VRAI booléen, on ne fait pas confiance au .env
   auth: isMailhog
       ? undefined
       : {
