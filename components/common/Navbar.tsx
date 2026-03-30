@@ -31,6 +31,7 @@ export default function Navbar({ className }: { className?: string }) {
               alt="Logo"
               width={60}
               height={60}
+              style={{ width: "auto", height: "auto" }}
               className="rounded-full"
             />
           </a>
@@ -68,7 +69,7 @@ export default function Navbar({ className }: { className?: string }) {
           item="Partenaires"
           href="/partners"
         />
-        {user?.userType === 1 && (
+        {(user?.userType === 0 || user?.userType === 1) && (
           <MenuItemNoHoverLink
             setActive={setActive}
             item="Espace Choriste"

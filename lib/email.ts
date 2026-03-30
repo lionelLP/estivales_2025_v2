@@ -6,12 +6,6 @@ interface EmailHeaders {
   [key: string]: string | string[] | { prepared: boolean; value: string };
 }
 
-interface NodemailerError extends Error {
-  code?: string;
-  command?: string;
-  response?: string;
-}
-
 function generateUnsubscribeToken(email: string): string {
   if (!process.env.JWT_SECRET) {
     console.error("JWT_SECRET is not set in environment variables");
@@ -36,6 +30,7 @@ const transportOptions: SMTPTransport.Options = {
         user: process.env.SMTP_USER || "",
         pass: process.env.SMTP_PASS || "",
       },
+} as any);
 };
 
 const transporter = nodemailer.createTransport(transportOptions);

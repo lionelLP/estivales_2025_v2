@@ -37,6 +37,27 @@ export default function MainLayout({
     console.log("|____/ \\___|_| |_|/ |\\__,_|_| |_| |_|_|_| |_|");
     console.log("                |__/                         ");
     console.log("https://linktr.ee/devestivaledebrou");
+    // Reprise de code
+    console.log("    _    _   _    _    ____  ");
+    console.log("   / \\  | \\ | |  / \\  / ___| ");
+    console.log("  / _ \\ |  \\| | / _ \\ \\___ \\ ");
+    console.log(" / ___ \\| |\\  |/ ___ \\ ___) |");
+    console.log("/_/   \\_\\_| \\_/_/   \\_\\____/ ");
+    console.log(" _     _____    _    ");
+    console.log("| |   | ____|  / \\   ");
+    console.log("| |   |  _|   / _ \\  ");
+    console.log("| |___| |___ / ___ \\ ");
+    console.log("|_____|_____/_/   \\_\\");
+    console.log(" _     _   _  ____ ___ _____ ");
+    console.log("| |   | | | |/ ___|_ _| ____|");
+    console.log("| |   | | | | |    | ||  _|  ");
+    console.log("| |___| |_| | |___ | || |___ ");
+    console.log("|_____|\\___/ \\____|___|_____|");
+    console.log(" _____ _   _  ___  __  __    _    ____ ");
+    console.log("|_   _| | | |/ _ \\|  \\/  |  / \\  / ___|");
+    console.log("  | | | |_| | | | | |\\/| | / _ \\ \\___ \\ ");
+    console.log("  | | |  _  | |_| | |  | |/ ___ \\ ___) |");
+    console.log("  |_| |_| |_|\\___/|_|  |_/_/   \\_\\____/ ");
     // Fin easter egg
 
     const timer = setTimeout(() => {
@@ -56,8 +77,7 @@ export default function MainLayout({
             firstName: "Admin",
             lastName: "User",
             userType: "Administrateur",
-          }}
-        >
+          }}>
           {children}
         </AdminLayout>
       ) : (

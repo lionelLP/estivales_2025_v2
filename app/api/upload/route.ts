@@ -3,8 +3,14 @@ import { getMediaUrl } from "@/lib/utils/media-utils";
 import { access, mkdir, writeFile } from "fs/promises";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
+import { apiMiddleware } from "../middleware";
 
 export async function POST(request: NextRequest) {
+  const middlewareResponse = await apiMiddleware(request);
+  if (middlewareResponse.status !== 200) {
+    return middlewareResponse;
+  }
+
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File;
@@ -17,28 +23,38 @@ export async function POST(request: NextRequest) {
       : null;
     // Récupérer le titre si fourni
     const title = formData.get("title") ? String(formData.get("title")) : null;
+    const category = formData.get("category") ? String(formData.get("category")) : null;
+ 
+     if (!file && !image && !video) {
+       return NextResponse.json(
+         { error: "Aucun fichier fourni" },
+         { status: 400 }
+       );
+     }
+ 
+     if (file) {
+       const buffer = Buffer.from(await file.arrayBuffer());
+       const filename = Date.now() + "-" + file.name.replaceAll(" ", "_");
+       
+       let uploadDir;
+       if (category === "partition") {
+         uploadDir = path.join(process.cwd(), "public/uploads/oeuvres/partition");
+       } else {
+         uploadDir = path.join(process.cwd(), "public/uploads/brochures");
+       }
 
-    if (!file && !image && !video) {
-      return NextResponse.json(
-        { error: "Aucun fichier fourni" },
-        { status: 400 }
-      );
-    }
-
-    if (file) {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      const filename = Date.now() + "-" + file.name.replaceAll(" ", "_");
-      const uploadDir = path.join(process.cwd(), "public/uploads/brochures");
-      // Ensure the directory exists
-      try {
-        await access(uploadDir);
-      } catch {
-        await mkdir(uploadDir, { recursive: true });
-      }
-      await writeFile(path.join(uploadDir, filename), buffer);
-
-      const staticPath = `/uploads/brochures/${filename}`;
-      const dynamicPath = useDynamicUrl ? getMediaUrl(staticPath) : staticPath;
+       // Ensure the directory exists
+       try {
+         await access(uploadDir);
+       } catch {
+         await mkdir(uploadDir, { recursive: true });
+       }
+       await writeFile(path.join(uploadDir, filename), buffer);
+ 
+       const staticPath = category === "partition" 
+         ? `/uploads/oeuvres/partition/${filename}`
+         : `/uploads/brochures/${filename}`;
+       const dynamicPath = useDynamicUrl ? getMediaUrl(staticPath) : staticPath;
 
       // Pour les brochures, nous n'enregistrons pas dans Media car elles sont directement liées à l'événement
       // dans le champ brochure_path. Nous retournons simplement le chemin.

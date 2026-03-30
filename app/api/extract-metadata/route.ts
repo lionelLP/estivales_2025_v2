@@ -18,7 +18,10 @@ async function downloadImage(url: string): Promise<string> {
 
 export async function POST(request: Request) {
   try {
-    const { url } = await request.json();
+    let { url } = await request.json();
+    if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
+      url = "https://" + url;
+    }
     const siteUrl = new URL(url);
 
     const response = await fetch(url, {
@@ -53,6 +56,9 @@ export async function POST(request: Request) {
 
     let image = ogTags["og:image"] || "";
     if (image) {
+      if (!image.startsWith("http")) {
+        image = new URL(image, siteUrl.origin).href;
+      }
       image = await downloadImage(image);
     } else {
       image = "/homepage/description.jpg";
@@ -87,9 +93,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json(metadata);
   } catch (error) {
-    console.error("Erreur lors de l'extraction:", error);
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur lors de l'extraction:", errorMessage, error);
     return NextResponse.json(
-      { error: "Erreur lors de l'extraction des métadonnées" },
+      { error: `Erreur d'extraction: ${errorMessage}` },
       { status: 500 }
     );
   }

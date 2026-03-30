@@ -3,6 +3,7 @@
 import { EventCarousel } from "@/components/common/EventCarousel";
 import { Event } from "@/lib/types/event";
 import { getMediaUrl } from "@/lib/utils/media-utils";
+import { getGoogleMapsUrl } from "@/lib/utils/location-utils";
 import { Armchair, Download, MapPin } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -50,11 +51,6 @@ export function EventDetailModal({
     fetchImages();
   }, [event.id]);
 
-  // Fonction pour créer le lien Google Maps
-  const getGoogleMapsUrl = (address: string) => {
-    const encodedAddress = encodeURIComponent(address);
-    return `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
-  };
 
   if (!isOpen) return null;
 
@@ -117,12 +113,14 @@ export function EventDetailModal({
                     {event.event_dates.map((dateObj: any, index: number) => (
                       <div key={dateObj.id || index}>
                         {new Date(dateObj.date_time).toLocaleDateString("fr-FR", {
+                          timeZone: "UTC",
                           day: "numeric",
                           month: "long",
                           year: "numeric",
                         })}{" "}
                         –{" "}
                         {new Date(dateObj.date_time).toLocaleTimeString("fr-FR", {
+                          timeZone: "UTC",
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
@@ -132,11 +130,13 @@ export function EventDetailModal({
                 ) : (
                   <span>
                     {new Date(event.event_date).toLocaleDateString("fr-FR", {
+                      timeZone: "UTC",
                       day: "numeric",
                       month: "long",
                     })}{" "}
                     –{" "}
                     {new Date(event.event_date).toLocaleTimeString("fr-FR", {
+                      timeZone: "UTC",
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
@@ -145,17 +145,24 @@ export function EventDetailModal({
               </div>
             </div>
 
-            {event.location && (
-              <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5" />
-                <a
-                  href={getGoogleMapsUrl(event.location)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-rose-600 transition-colors duration-200"
-                >
-                  {event.location}
-                </a>
+            {(event.location || event.address) && (
+              <div className="flex items-start gap-2">
+                <MapPin className="w-5 h-5 mt-1 flex-shrink-0" />
+                <div className="flex flex-col items-center">
+                  {event.location && (
+                    <span className="font-medium text-center">{event.location}</span>
+                  )}
+                  {event.address && (
+                    <a
+                      href={getGoogleMapsUrl(event.address)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-rose-600 transition-colors duration-200 text-center"
+                    >
+                      {event.address}
+                    </a>
+                  )}
+                </div>
               </div>
             )}
           </div>

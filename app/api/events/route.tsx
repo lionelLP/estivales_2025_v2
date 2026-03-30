@@ -37,11 +37,13 @@ export async function POST(request: NextRequest) {
       subtitle,
       description,
       event_dates,
+      address,
       location,
       max_participants,
       is_public,
       booking_link,
       brochure_path,
+      instructions,
     } = body;
 
     // Validation : au moins une date
@@ -55,22 +57,23 @@ export async function POST(request: NextRequest) {
     const connection = await pool.getConnection();
 
     try {
-      // Insérer l'événement d'abord (sans event_date temporairement)
       const [result] = await connection.execute<ResultSetHeader>(
         `INSERT INTO Event (
-          title, subtitle, description, event_date, location, 
-          max_participants, is_public, booking_link, brochure_path, user_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          title, subtitle, description, event_date, address, location, 
+          max_participants, is_public, booking_link, brochure_path, instructions, user_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           title,
           subtitle,
           description,
           event_dates[0], // Utiliser la première date pour event_date
+          address,
           location,
           max_participants,
           is_public,
           booking_link,
           brochure_path,
+          instructions,
           decoded.userId,
         ]
       );
@@ -94,6 +97,7 @@ export async function POST(request: NextRequest) {
             subtitle,
             description,
             event_date: event_dates[0],
+            address,
             location,
             booking_link,
           });
@@ -173,6 +177,19 @@ export async function GET() {
           event.images = transformedMedia.filter(
             (m) => m.event_id === event.id
           );
+          
+          if (event.event_dates && Array.isArray(event.event_dates)) {
+            event.event_dates = event.event_dates.map((ed: any) => {
+              let dt = ed.date_time;
+              if (dt && typeof dt === "string" && !dt.includes("T") && !dt.includes("Z")) {
+                dt = dt.replace(" ", "T");
+                if (!dt.endsWith("Z")) {
+                  dt += "Z";
+                }
+              }
+              return { ...ed, date_time: dt };
+            });
+          }
         });
       }
 

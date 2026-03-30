@@ -17,6 +17,7 @@ export default function EditEvent({
     subtitle: "",
     description: "",
     event_date: "",
+    address: "",
     location: "",
     max_participants: 0,
     is_public: true,
@@ -58,13 +59,13 @@ export default function EditEvent({
             .slice(0, 16);
           setFormData({ ...data, event_date: eventDate });
           setCurrentBrochurePath(data.brochure_path || "");
-          
+
           // Récupérer les dates depuis Event_Date
           const datesResponse = await fetch(`/api/events/${eventId}/dates`);
           if (datesResponse.ok) {
             const datesData = await datesResponse.json();
             if (datesData.dates && datesData.dates.length > 0) {
-              const formattedDates = datesData.dates.map((d: any) => 
+              const formattedDates = datesData.dates.map((d: any) =>
                 new Date(d.date_time).toISOString().slice(0, 16)
               );
               setEventDates(formattedDates);
@@ -89,13 +90,13 @@ export default function EditEvent({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const validDates = eventDates.filter(date => date.trim() !== "");
     if (validDates.length === 0) {
       setError("Vous devez ajouter au moins une date");
       return;
     }
-    
+
     try {
       let brochurePath = currentBrochurePath;
       if (brochure.length > 0) {
@@ -261,10 +262,10 @@ export default function EditEvent({
           </button>
         </div>
 
-        {/* Lieu */}
+        {/* Lieu précis */}
         <div className="space-y-2">
           <label htmlFor="location" className="block text-sm font-medium">
-            Lieu
+            Lieu précis
           </label>
           <input
             id="location"
@@ -272,6 +273,23 @@ export default function EditEvent({
             value={formData.location || ""}
             onChange={(e) =>
               setFormData({ ...formData, location: e.target.value })
+            }
+            className="w-full rounded-lg border p-2"
+            placeholder="Ex: Monastère royal de Brou"
+          />
+        </div>
+
+        {/* Adresse */}
+        <div className="space-y-2">
+          <label htmlFor="address" className="block text-sm font-medium">
+            Adresse
+          </label>
+          <input
+            id="address"
+            type="text"
+            value={formData.address || ""}
+            onChange={(e) =>
+              setFormData({ ...formData, address: e.target.value })
             }
             className="w-full rounded-lg border p-2"
           />
@@ -330,6 +348,26 @@ export default function EditEvent({
               Brochure actuelle : {currentBrochurePath}
             </p>
           )}
+        </div>
+
+        {/* Consignes choristes */}
+        <div className="space-y-2">
+          <label htmlFor="instructions" className="block text-sm font-medium">
+            Consignes choristes
+          </label>
+          <textarea
+            id="instructions"
+            value={formData.instructions || ""}
+            onChange={(e) =>
+              setFormData({ ...formData, instructions: e.target.value })
+            }
+            rows={4}
+            className="w-full rounded-lg border p-2"
+            placeholder="Consignes spécifiques pour les choristes pour ce spectacle..."
+          />
+          <p className="text-sm text-gray-500">
+            Ces consignes seront visibles uniquement par les choristes connectés.
+          </p>
         </div>
 
         {/* Upload Images */}

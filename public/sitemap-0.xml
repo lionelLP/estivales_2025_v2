@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>http://localhost:3000/about/edit</loc><lastmod>2026-01-15T10:42:08.173Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/about</loc><lastmod>2026-01-15T10:42:08.173Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/admin</loc><lastmod>2026-01-15T10:42:08.173Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/billetterie</loc><lastmod>2026-01-15T10:42:08.173Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/contact</loc><lastmod>2026-01-15T10:42:08.173Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/forgot-password</loc><lastmod>2026-01-15T10:42:08.173Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/media</loc><lastmod>2026-01-15T10:42:08.173Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/mentions-legales</loc><lastmod>2026-01-15T10:42:08.173Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000</loc><lastmod>2026-01-15T10:42:08.173Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/partners</loc><lastmod>2026-01-15T10:42:08.173Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/presse</loc><lastmod>2026-01-15T10:42:08.173Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/programmes/past</loc><lastmod>2026-01-15T10:42:08.173Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/programmes/to-come</loc><lastmod>2026-01-15T10:42:08.173Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-<url><loc>http://localhost:3000/unauthorized</loc><lastmod>2026-01-15T10:42:08.173Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000</loc><lastmod>2026-03-25T12:37:06.223Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/about</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/about/edit</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/admin</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/billetterie</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/contact</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/espace-choriste</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/espace-choriste/infos</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/espace-choriste/oeuvres</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/espace-choriste/repetitions</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/espace-choriste/spectacles</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/forgot-password</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/media</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/mentions-legales</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/partners</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/presse</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/profile</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/programmes/past</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/programmes/to-come</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>http://localhost:3000/unauthorized</loc><lastmod>2026-03-25T12:37:06.224Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
 </urlset>

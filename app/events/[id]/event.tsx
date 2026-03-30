@@ -1,6 +1,7 @@
 "use client";
 
 import { Event } from "@/lib/types/event";
+import { getGoogleMapsUrl } from "@/lib/utils/location-utils";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -84,10 +85,17 @@ export default function EventPage({
                 <h3 className="font-semibold mb-2">Date et heure</h3>
                 <p>{new Date(event.event_date).toLocaleString("fr-FR")}</p>
               </div>
-              {event.location && (
+              {(event.location || event.address) && (
                 <div>
                   <h3 className="font-semibold mb-2">Lieu</h3>
-                  <p>{event.location}</p>
+                  <a
+                    href={getGoogleMapsUrl(event.address || event.location || "")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline decoration-blue-500/30 underline-offset-4 transition-all"
+                  >
+                    <p>{event.location ? `${event.location}, ` : ""}{event.address}</p>
+                  </a>
                 </div>
               )}
             </div>

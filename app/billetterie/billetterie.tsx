@@ -3,27 +3,30 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-type Price = {
-  category: string;
-  barbier: { serie1: string; serie2: string };
-  piano: string;
-  requiem: string;
-  tenors: string;
-  pass: { serie1: string; serie2: string };
+type Column = { id: string; name: string; seriesCount: number };
+type Row = { id: string; category: string; prices: Record<string, string[]> };
+
+type BilletterieData = {
+    columns: Column[];
+    rows: Row[];
+    info: string[];
+    reservation: any;
+    notes: string[];
+    images: { page1: string; page2: string; pdf1: string; pdf2: string };
 };
 
 export default function Billetterie() {
-  const [tableData, setTableData] = useState<Price[]>([]);
+  const [data, setData] = useState<BilletterieData | null>(null);
 
   useEffect(() => {
     fetch("/api/billetterie")
         .then(res => res.json())
-        .then((data: Price[]) => setTableData(data))
+        .then((resData: BilletterieData) => setData(resData))
         .catch(err => console.error(err));
   }, []);
 
+  if (!data) return <p>Chargement de la billetterie...</p>;
 
-  if (!tableData.length) return <p>Chargement des tarifs...</p>;
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold text-center pt-8 mb-8 text-red-brou">
@@ -32,115 +35,97 @@ export default function Billetterie() {
 
       {/* Images des fichiers PDF */}
       <div className="flex flex-col items-center gap-8 mb-8 max-w-2xl mx-auto">
-        <a
-          href="/billetterie/programme_page1.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="relative aspect-[3/4] w-full cursor-pointer transition-transform hover:scale-105"
-        >
-          <Image
-            src="/billetterie/programme_page1.png"
-            alt="Programme page 1"
-            fill
-            className="object-contain"
-          />
-        </a>
-        <a
-          href="/billetterie/programme_page2.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="relative aspect-[3/4] w-full cursor-pointer transition-transform hover:scale-105"
-        >
-          <Image
-            src="/billetterie/programme_page2.png"
-            alt="Programme page 2"
-            fill
-            className="object-contain"
-          />
-        </a>
+        {data.images?.page1 && (
+            <a
+            href={data.images.pdf1 || data.images.page1}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative aspect-[3/4] w-full cursor-pointer transition-transform hover:scale-105 shadow-md"
+            >
+            <Image
+                src={data.images.page1}
+                alt="Programme page 1"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-contain"
+            />
+            </a>
+        )}
+        {data.images?.page2 && (
+            <a
+            href={data.images.pdf2 || data.images.page2}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative aspect-[3/4] w-full cursor-pointer transition-transform hover:scale-105 shadow-md"
+            >
+            <Image
+                src={data.images.page2}
+                alt="Programme page 2"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-contain"
+            />
+            </a>
+        )}
       </div>
 
-      {/* Tableau des tarifs */}
+      {/* Tableau des tarifs (Dynamique parfait) */}
       <div className="overflow-x-auto mb-8">
         <table className="min-w-full bg-white dark:bg-dark-mode border border-gray-300 dark:border-gray-700 shadow-lg">
           <thead>
+            {/* Ligne des Spectacles */}
             <tr className="bg-red-brou text-white">
-              <th className="py-3 px-4 border dark:border-gray-700"></th>
-              <th
-                colSpan={2}
-                className="py-3 px-4 border dark:border-gray-700 text-center"
-              >
-                Le Barbier de Séville
-              </th>
-              <th className="py-3 px-4 border dark:border-gray-700 text-center">
-                Cherche piano aqueux
-              </th>
-              <th className="py-3 px-4 border dark:border-gray-700 text-center">
-                Requiem Fauré
-              </th>
-              <th className="py-3 px-4 border dark:border-gray-700 text-center">
-                Trois ténors
-              </th>
-              <th
-                colSpan={2}
-                className="py-3 px-4 border dark:border-gray-700 text-center"
-              >
-                Pass&apos;Festival
-              </th>
+              <th className="py-3 px-4 border dark:border-gray-700 font-bold border-b-0"></th>
+              {data.columns.map(col => (
+                  <th
+                    key={col.id}
+                    colSpan={col.seriesCount}
+                    className="py-3 px-4 border border-x-gray-300 dark:border-gray-700 text-center font-bold"
+                  >
+                    {col.name}
+                  </th>
+              ))}
             </tr>
-            <tr className="bg-red-100 dark:bg-red-900/30">
-              <th className="py-2 px-4 border dark:border-gray-700">Entrée</th>
-              <th className="py-2 px-4 border dark:border-gray-700 text-center">
-                1° Série
-              </th>
-              <th className="py-2 px-4 border dark:border-gray-700 text-center">
-                2° Série
-              </th>
-              <th className="py-2 px-4 border dark:border-gray-700 text-center"></th>
-              <th className="py-2 px-4 border dark:border-gray-700 text-center"></th>
-              <th className="py-2 px-4 border dark:border-gray-700 text-center"></th>
-              <th className="py-2 px-4 border dark:border-gray-700 text-center">
-                1° Série
-              </th>
-              <th className="py-2 px-4 border dark:border-gray-700 text-center">
-                2° Série
-              </th>
+            {/* Ligne des Séries (affichée uniquement là où c'est nécessaire) */}
+            <tr className="bg-red-brou text-white/90">
+              <th className="py-2 px-4 border dark:border-gray-700 bg-red-800 text-left w-48">Entrée</th>
+              {data.columns.map(col => {
+                  return Array.from({length: col.seriesCount}).map((_, i) => (
+                      <th key={col.id + '_' + i} className="py-2 px-3 border dark:border-gray-700 text-center text-sm font-medium bg-red-800">
+                          {col.seriesCount > 1 ? `${i+1}° Série` : ""}
+                      </th>
+                  ));
+              })}
             </tr>
           </thead>
           <tbody className="dark:text-white">
-            {tableData.map((row, index) => (
+            {data.rows.map((row, index) => (
               <tr
-                key={index}
+                key={row.id}
                 className={
                   index % 2 === 0
                     ? "bg-gray-50 dark:bg-dark-mode-2"
                     : "bg-white dark:bg-dark-mode"
                 }
               >
-                <td className="py-2 px-4 border dark:border-gray-700 font-semibold">
+                <td className="py-3 px-4 border dark:border-gray-700 font-bold">
                   {row.category || "Entrée"}
                 </td>
-                <td className="py-2 px-4 border dark:border-gray-700 text-center">
-                  {row.barbier.serie1}
-                </td>
-                <td className="py-2 px-4 border dark:border-gray-700 text-center">
-                  {row.barbier.serie2}
-                </td>
-                <td className="py-2 px-4 border dark:border-gray-700 text-center">
-                  {row.piano}
-                </td>
-                <td className="py-2 px-4 border dark:border-gray-700 text-center">
-                  {row.requiem}
-                </td>
-                <td className="py-2 px-4 border dark:border-gray-700 text-center">
-                  {row.tenors}
-                </td>
-                <td className="py-2 px-4 border dark:border-gray-700 text-center">
-                  {row.pass.serie1}
-                </td>
-                <td className="py-2 px-4 border dark:border-gray-700 text-center">
-                  {row.pass.serie2}
-                </td>
+                {data.columns.map(col => {
+                    const prices = row.prices[col.id] || [];
+                    return Array.from({length: col.seriesCount}).map((_, i) => {
+                        const val = prices[i] || "";
+                        // Formatage automatique: on affiche l'euro si c'est un nombre valide, sinon on le laisse tel quel (ex: Gratuit)
+                        const showEuro = val && !isNaN(Number(val));
+                        
+                        return (
+                            <td key={col.id + '_' + i} className="py-3 px-3 border dark:border-gray-700 text-center text-lg">
+                                {val}
+                                {showEuro && <span className="text-gray-500 font-normal ml-1 text-sm">€</span>}
+                            </td>
+                        );
+                    });
+                })}
               </tr>
             ))}
           </tbody>
@@ -154,88 +139,77 @@ export default function Billetterie() {
             Informations importantes
           </h2>
           <ul className="list-disc list-inside space-y-2 dark:text-white">
-            <li>
-              « Chéquier Jeune 01 » et « Carte Pass région » acceptés pour la
-              billetterie et le Pass&apos;Festival
-            </li>
-            <li>
-              Tarif préférentiel : adhérents Estivales de Brou et JM France
-            </li>
-            <li>Groupes (dès 15 personnes)</li>
-            <li>Tarif jeunes : moins de 20 ans</li>
-            <li>Enfants gratuits jusqu&apos;à 12 ans</li>
-            <li>Places non numérotées, sauf au théâtre</li>
-            <li>
-              Ouverture des portes ½ heure avant le début de chaque
-              représentation
-            </li>
+            {data.info.map((ligne, idx) => ligne.trim() ? <li key={idx}>{ligne}</li> : null)}
           </ul>
         </div>
 
         {/* Section Réservations */}
-        <div className="bg-white dark:bg-dark-mode p-6 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4 text-red-brou dark:text-red-400">
-            Réservations
-          </h2>
+        {data.reservation && (
+          <div className="bg-white dark:bg-dark-mode p-6 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold mb-4 text-red-brou dark:text-red-400">
+              Réservations
+            </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="space-y-2">
-              <h3 className="font-bold text-lg dark:text-white">
-                Par téléphone
-              </h3>
-              <p className="dark:text-gray-300">04 74 23 63 25</p>
-              <p className="text-sm dark:text-gray-400">
-                10h à 12h et 15h à 18h du mardi au vendredi
-              </p>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {data.reservation.telephone && (
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-lg dark:text-white">
+                      {data.reservation.telephone.titre}
+                    </h3>
+                    <p className="dark:text-gray-300">{data.reservation.telephone.numero}</p>
+                    <p className="text-sm dark:text-gray-400">
+                      {data.reservation.telephone.horaires}
+                    </p>
+                  </div>
+              )}
 
-            <div className="space-y-2">
-              <h3 className="font-bold text-lg dark:text-white">
-                Par courrier
-              </h3>
-              <p className="dark:text-gray-300">Estivales de Brou</p>
-              <p className="dark:text-gray-300">13 avenue Alsace Lorraine</p>
-              <p className="dark:text-gray-300">01000 Bourg en Bresse</p>
-            </div>
+              {data.reservation.courrier && (
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-lg dark:text-white">
+                      {data.reservation.courrier.titre}
+                    </h3>
+                    {data.reservation.courrier.lignes?.map((ligne: string, i: number) => (
+                        <p key={i} className="dark:text-gray-300">{ligne}</p>
+                    ))}
+                  </div>
+              )}
 
-            <div className="space-y-2">
-              <h3 className="font-bold text-lg dark:text-white">
-                Par Internet
-              </h3>
-              <div className="space-y-1">
-                <a
-                  href="https://www.fnacspectacles.com/artist/les-estivales-de-brou/"
-                  className="text-red-brou dark:text-red-400 hover:underline block"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  FNAC Spectacles
-                </a>
-                <a
-                  href="https://www.francebillet.com/artist/les-estivales-de-brou/"
-                  className="text-red-brou dark:text-red-400 hover:underline block"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  France Billet
-                </a>
-              </div>
-            </div>
+              {data.reservation.internet && (
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-lg dark:text-white">
+                      {data.reservation.internet.titre}
+                    </h3>
+                    <div className="space-y-1">
+                      {data.reservation.internet.liens?.map((lien: any, i: number) => (
+                          <a
+                            key={i}
+                            href={lien.url}
+                            className="text-red-brou dark:text-red-400 hover:underline block"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {lien.nom}
+                          </a>
+                      ))}
+                    </div>
+                  </div>
+              )}
 
-            <div className="space-y-2">
-              <h3 className="font-bold text-lg dark:text-white">
-                Au bureau de location
-              </h3>
-              <p className="dark:text-gray-300">Cinéma Amphi de Bourg</p>
-              <p className="dark:text-gray-300">
-                Les mercredis et samedis de 15h à 18h
-              </p>
-              <p className="text-sm dark:text-gray-400">
-                à partir du samedi 10 mai 2024
-              </p>
+              {data.reservation.bureau && (
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-lg dark:text-white">
+                      {data.reservation.bureau.titre}
+                    </h3>
+                    {data.reservation.bureau.lignes?.map((ligne: string, i: number) => (
+                        <p key={i} className={i === data.reservation.bureau.lignes.length - 1 ? "text-sm dark:text-gray-400" : "dark:text-gray-300"}>
+                            {ligne}
+                        </p>
+                    ))}
+                  </div>
+              )}
             </div>
           </div>
-        </div>
+        )}
 
         {/* Notes importantes */}
         <div className="bg-red-50 dark:bg-red-950/20 p-6 rounded-lg border border-red-200 dark:border-red-900">
@@ -243,16 +217,7 @@ export default function Billetterie() {
             Notes importantes
           </h2>
           <ul className="space-y-2 dark:text-gray-300">
-            <li>
-              Les places retenues par téléphone et non réglées dans la quinzaine
-              seront remises en vente.
-            </li>
-            <li>Les billets ne seront plus expédiés à partir du 22 juin.</li>
-            <li>
-              Ils devront alors être retirés au guichet 20 minutes au plus tard
-              avant le début du spectacle.
-            </li>
-            <li>En aucun cas les billets ne seront repris.</li>
+            {data.notes.map((ligne, idx) => ligne.trim() ? <li key={idx} className="flex gap-2"><span className="text-red-400">•</span> {ligne}</li> : null)}
           </ul>
         </div>
       </div>

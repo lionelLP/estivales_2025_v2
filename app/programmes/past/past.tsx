@@ -24,12 +24,14 @@ export default function ProgrammesPast() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCriteria, setFilterCriteria] = useState<{
+    address: string;
     location: string;
     dateRange: {
       from: Date | undefined;
       to: Date | undefined;
     };
   }>({
+    address: "Tous",
     location: "Tous",
     dateRange: { from: undefined, to: undefined },
   });
@@ -78,16 +80,15 @@ export default function ProgrammesPast() {
             return;
           }
 
-          // Extraire les lieux uniques des événements
-          const locations: string[] = pastEvents
-            .map((event: Event) => event.location)
+          const addresses: string[] = pastEvents
+            .map((event: Event) => event.address)
             .filter(
-              (location: string | undefined): location is string => !!location
+              (address: string | undefined): address is string => !!address
             );
 
-          // Dédupliquer les lieux
-          const uniqueLocationsSet = [...new Set(locations)];
-          setUniqueLocations(uniqueLocationsSet);
+          // Dédupliquer les adresses
+          const uniqueAddressesSet = [...new Set(addresses)];
+          setUniqueLocations(uniqueAddressesSet);
 
           // Formatage initial des événements pour la timeline
           formatEventsForTimeline(pastEvents, undefined);
@@ -121,10 +122,10 @@ export default function ProgrammesPast() {
 
     let filtered = [...allEvents];
 
-    // Filtrer par lieu si un lieu spécifique est sélectionné
-    if (filterCriteria.location !== "Tous") {
+    // Filtrer par adresse si une adresse spécifique est sélectionnée
+    if (filterCriteria.address !== "Tous") {
       filtered = filtered.filter(
-        (event) => event.location === filterCriteria.location
+        (event) => event.address === filterCriteria.address
       );
     }
 
@@ -206,29 +207,29 @@ export default function ProgrammesPast() {
     });
 
     // Grouper par date et garder une référence à la date réelle pour le tri
-    const eventsByDateMap = new Map<string, { events: Event[]; sortDate: Date }>();
+    const eventsByDateMap = new Map<string, { items: Array<{event: Event, date: Date}>; sortDate: Date }>();
     expandedEvents.forEach((item) => {
       const dateKey = item.date.toLocaleDateString("fr-FR", {
+        timeZone: "UTC",
         day: "numeric",
         month: "long",
         year: "numeric",
       });
       if (!eventsByDateMap.has(dateKey)) {
-        eventsByDateMap.set(dateKey, { events: [], sortDate: item.date });
+        eventsByDateMap.set(dateKey, { items: [], sortDate: item.date });
       }
-      eventsByDateMap.get(dateKey)!.events.push(item.event);
+      eventsByDateMap.get(dateKey)!.items.push(item);
     });
 
     // Transformer en format Timeline
     const timelineData: TimelineEntry[] = Array.from(eventsByDateMap.entries())
-      .map(([date, { events: dateEvents, sortDate }]) => ({
+      .map(([date, { items, sortDate }]) => ({
         title: date,
         sortDate,
         content: (
           <div>
             <div className="mb-8">
-              {dateEvents.map((event: Event) => {
-                const eventTime = new Date(event.event_date);
+              {items.map(({ event, date: eventTime }) => {
                 const hasValidTime = !isNaN(eventTime.getTime());
                 return (
                   <div key={event.id} className="mb-4">
@@ -243,13 +244,14 @@ export default function ProgrammesPast() {
                     {hasValidTime && (
                       <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
                         {eventTime.toLocaleTimeString("fr-FR", {
+                          timeZone: "UTC",
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
                       </p>
                     )}
                     <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
-                      {event.location}
+                      {event.location ? `${event.location}, ` : ""}{event.address}
                     </p>
                     <button
                       onClick={() => {
@@ -279,6 +281,7 @@ export default function ProgrammesPast() {
   };
 
   const handleFilter = (filters: {
+    address: string;
     location: string;
     dateRange: {
       from: Date | undefined;

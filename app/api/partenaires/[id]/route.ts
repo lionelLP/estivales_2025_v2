@@ -1,6 +1,6 @@
 import { verifyToken } from "@/lib/auth/jwt";
 import pool from "@/lib/db/mysql";
-import { unlink, writeFile } from "fs/promises";
+import { mkdir, unlink, writeFile } from "fs/promises";
 import { RowDataPacket } from "mysql2";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -10,6 +10,10 @@ interface PartenaireRow extends RowDataPacket {
   id: number;
   logo_url: string | null;
   banner_url: string | null;
+}
+
+function isFile(value: any): value is File {
+  return value && typeof value === "object" && "arrayBuffer" in value;
 }
 
 export async function GET(
@@ -78,8 +82,8 @@ export async function PUT(
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const website_url = formData.get("website_url") as string;
-    const logo = formData.get("logo") as File | null;
-    const banner = formData.get("banner") as File | null;
+    const logo = formData.get("logo");
+    const banner = formData.get("banner");
 
     if (!name || !description || !website_url) {
       return NextResponse.json(
@@ -90,28 +94,23 @@ export async function PUT(
 
     const connection = await pool.getConnection();
     try {
+      const uploadsDir = path.join(process.cwd(), "public/uploads/partners");
+      await mkdir(uploadsDir, { recursive: true });
+
       let logoUrl = null;
       let bannerUrl = null;
 
-      if (logo) {
+      if (isFile(logo)) {
         const logoFileName = `${Date.now()}-${logo.name}`;
-        const logoPath = path.join(
-          process.cwd(),
-          "public/uploads/partners",
-          logoFileName
-        );
+        const logoPath = path.join(uploadsDir, logoFileName);
         const logoBuffer = Buffer.from(await logo.arrayBuffer());
         await writeFile(logoPath, logoBuffer);
         logoUrl = `/uploads/partners/${logoFileName}`;
       }
 
-      if (banner) {
+      if (isFile(banner)) {
         const bannerFileName = `${Date.now()}-${banner.name}`;
-        const bannerPath = path.join(
-          process.cwd(),
-          "public/uploads/partners",
-          bannerFileName
-        );
+        const bannerPath = path.join(uploadsDir, bannerFileName);
         const bannerBuffer = Buffer.from(await banner.arrayBuffer());
         await writeFile(bannerPath, bannerBuffer);
         bannerUrl = `/uploads/partners/${bannerFileName}`;
@@ -142,7 +141,7 @@ export async function PUT(
   } catch (error) {
     console.error("Error updating partner:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la mise à jour du partenaire" },
+      { error: error instanceof Error ? error.message : "Erreur lors de la mise à jour du partenaire" },
       { status: 500 }
     );
   }

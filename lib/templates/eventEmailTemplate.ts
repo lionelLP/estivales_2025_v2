@@ -6,6 +6,7 @@ export function createEventNotificationEmail(
     subtitle?: string;
     description: string;
     event_date: string;
+    address: string;
     location: string;
     booking_link?: string;
     id: number;
@@ -38,7 +39,9 @@ export function createEventNotificationEmail(
             : ""
         }
         <p style="margin: 10px 0;"><strong>Date :</strong> ${eventDate}</p>
-        <p style="margin: 10px 0;"><strong>Lieu :</strong> ${event.location}</p>
+        <p style="margin: 10px 0;"><strong>Lieu :</strong> ${
+          event.location ? `${event.location}, ` : ""
+        }${event.address}</p>
         <p style="margin: 15px 0;">${event.description}</p>
       </div>
       

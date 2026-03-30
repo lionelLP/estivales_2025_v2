@@ -14,6 +14,7 @@ export const db = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
   connectTimeout: 60000, // Augmenter le timeout à 60 secondes
+  charset: "utf8mb4",
 });
 
 // Fonction pour tester la connexion

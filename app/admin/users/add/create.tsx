@@ -113,6 +113,7 @@ export default function CreateUser() {
                         id="username"
                         name="username"
                         type="text"
+                        autoComplete="nickname"
                         value={formData.username}
                         onChange={handleChange}
                         required
@@ -132,6 +133,7 @@ export default function CreateUser() {
                         id="email"
                         name="email"
                         type="email"
+                        autoComplete="username"
                         value={formData.email}
                         onChange={handleChange}
                         required
@@ -146,6 +148,7 @@ export default function CreateUser() {
                         Mot de passe
                     </Label>
                     <PasswordField
+                        autoComplete="new-password"
                         value={formData.password}
                         onChange={(value) =>
                             setFormData((prev) => ({...prev, password: value}))

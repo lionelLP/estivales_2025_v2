@@ -2,10 +2,11 @@
 
 import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 import { useLoading } from "@/contexts/LoadingContext";
-import { Newspaper } from "lucide-react";
+import { Newspaper, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Article {
   title: string;
@@ -28,6 +29,7 @@ interface FormattedItem {
 
 export default function PressePage() {
   const [items, setItems] = useState<FormattedItem[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const { registerLoadingComponent, componentLoaded } = useLoading();
 
   useEffect(() => {
@@ -80,24 +82,19 @@ export default function PressePage() {
       ),
       description: (
         <div className="flex flex-col h-full justify-between">
-          <div className="line-clamp-2 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300 mb-4">
+          <div className="line-clamp-2 font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300 mb-2">
             {article.content}
           </div>
-          <div className="flex justify-between items-center">
-            {article.content.length > (isLarge ? 150 : 100) && (
-              <Link
-                href={article.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline"
-              >
+          <div className="mt-auto pt-2">
+            {article.content.length > (isLarge ? 150 : 100) && article.link && (
+              <span className="text-xs text-bleu-fonce dark:text-bleu-clair hover:underline font-medium">
                 Voir plus
-              </Link>
+              </span>
             )}
           </div>
         </div>
       ),
-      header: (
+      header: article.link ? (
         <Link
           href={article.link}
           target="_blank"
@@ -119,6 +116,23 @@ export default function PressePage() {
             </div>
           )}
         </Link>
+      ) : (
+        <div className="block w-full">
+          {article.image ? (
+            <div className="relative w-full h-44">
+              <Image
+                src={article.image}
+                alt={article.title}
+                fill
+                className="object-cover rounded-lg"
+              />
+            </div>
+          ) : (
+            <div className="relative w-full h-44 bg-gray-200 flex items-center justify-center">
+              <span className="text-gray-500">Aucune image disponible</span>
+            </div>
+          )}
+        </div>
       ),
       className: `${
         isLarge ? "md:col-span-2" : "md:col-span-1"
@@ -147,6 +161,8 @@ export default function PressePage() {
       onClick: () => {
         if (article.link) {
           window.open(article.link, "_blank", "noopener,noreferrer");
+        } else if (article.image) {
+          setSelectedImage(article.image);
         }
       },
     };
@@ -166,12 +182,48 @@ export default function PressePage() {
         </div>
       </div>
       <div>
-        <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[23rem]">
-          {items.map((item, i) => (
-            <BentoGridItem key={i} {...item} />
-          ))}
-        </BentoGrid>
-      </div>
+      <BentoGrid className="max-w-7xl mx-auto md:auto-rows-[23rem]">
+        {items.map((item, i) => (
+          <BentoGridItem key={i} {...item} />
+        ))}
+      </BentoGrid>
+
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedImage(null)}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 cursor-zoom-out"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative max-w-5xl max-h-[90vh] w-full h-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
+              >
+                <X className="h-8 w-8" />
+              </button>
+              <div className="relative w-full h-full bg-white rounded-lg overflow-hidden shadow-2xl">
+                <Image
+                  src={selectedImage}
+                  alt="Article press"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { apiMiddleware } from "@/app/api/middleware";
 import { verifyToken } from "@/lib/auth/jwt";
 import pool from "@/lib/db/mysql";
-import { writeFile } from "fs/promises";
+import { mkdir, writeFile } from "fs/promises";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 
@@ -13,6 +13,10 @@ interface SQLError extends Error {
 interface ConnectionError extends Error {
   code?: string;
   name: string;
+}
+
+function isFile(value: any): value is File {
+  return value && typeof value === "object" && "arrayBuffer" in value;
 }
 
 export async function GET() {
@@ -87,24 +91,29 @@ export async function POST(request: NextRequest) {
       const name = data.get("name") as string;
       const description = data.get("description") as string;
       const website_url = data.get("website_url") as string;
-      const logo = data.get("logo") as File;
-      const banner = data.get("banner") as File;
-
-      const logoFileName = `${Date.now()}-${logo.name}`;
-      const bannerFileName = `${Date.now()}-${banner.name}`;
+      const logo = data.get("logo");
+      const banner = data.get("banner");
 
       const uploadsDir = path.join(process.cwd(), "public/uploads/partners");
-      const logoPath = path.join(uploadsDir, logoFileName);
-      const bannerPath = path.join(uploadsDir, bannerFileName);
+      await mkdir(uploadsDir, { recursive: true });
 
-      const logoBuffer = Buffer.from(await logo.arrayBuffer());
-      const bannerBuffer = Buffer.from(await banner.arrayBuffer());
+      let logoUrl = null;
+      if (isFile(logo)) {
+        const logoFileName = `${Date.now()}-${logo.name}`;
+        const logoPath = path.join(uploadsDir, logoFileName);
+        const logoBuffer = Buffer.from(await logo.arrayBuffer());
+        await writeFile(logoPath, logoBuffer);
+        logoUrl = `/uploads/partners/${logoFileName}`;
+      }
 
-      await writeFile(logoPath, logoBuffer);
-      await writeFile(bannerPath, bannerBuffer);
-
-      const logoUrl = `/uploads/partners/${logoFileName}`;
-      const bannerUrl = `/uploads/partners/${bannerFileName}`;
+      let bannerUrl = null;
+      if (isFile(banner)) {
+        const bannerFileName = `${Date.now()}-${banner.name}`;
+        const bannerPath = path.join(uploadsDir, bannerFileName);
+        const bannerBuffer = Buffer.from(await banner.arrayBuffer());
+        await writeFile(bannerPath, bannerBuffer);
+        bannerUrl = `/uploads/partners/${bannerFileName}`;
+      }
 
       const [result] = await connection.execute(
         "INSERT INTO Partenaire (name, description, website_url, logo_url, banner_url) VALUES (?, ?, ?, ?, ?)",
@@ -115,7 +124,7 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       console.error("Error in partner creation:", error);
       return NextResponse.json(
-        { error: "Error creating partner" },
+        { error: error instanceof Error ? error.message : "Error creating partner" },
         { status: 500 }
       );
     } finally {
