@@ -30,8 +30,7 @@ const transportOptions: SMTPTransport.Options = {
         user: process.env.SMTP_USER || "",
         pass: process.env.SMTP_PASS || "",
       },
-} as any);
-};
+} as any;
 
 const transporter = nodemailer.createTransport(transportOptions);
 
