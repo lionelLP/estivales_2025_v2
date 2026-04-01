@@ -1,7 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     allowedDevOrigins: ['127.0.0.1'],
-    // === LES PILULES ANTI-CRASH MÉMOIRE ===
+    experimental: {
+        serverActions: {
+        bodySizeLimit: '10mb',
+        },
+    },
     typescript: {
         ignoreBuildErrors: true,
     },
